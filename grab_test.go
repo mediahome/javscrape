@@ -16,6 +16,10 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	grab := NewGrabJAVBUS(LanguageJapanese)
 	doc, err := grab.Find("Q8180")
 	msg := new(Message)
+	if err != nil {
+		t.Fatal(err)
+	}
 	err = doc.Decode(msg)
-	t.Log(err)
+	t.Logf("%+v", msg)
+	t.Error(err)
 }

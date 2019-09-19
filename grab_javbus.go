@@ -40,14 +40,21 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 		ug.isUncensored = true
 	}
 	ug.doc = document
-	ret, e := document.Html()
-	log.Println(ret)
+	//ret, e := document.Html()
+	//log.Println(ret)
 	return &ug, nil
 }
 
 // Decode ...
 func (g *grabJAVBUS) Decode(msg *Message) error {
-	panic("implement me")
+	msg.Title = g.doc.Find("div.container > h3").Text()
+	movie := g.doc.Find("div.container > div.row.movie")
+	movie.Find("div.info > p").Each(func(i int, selection *goquery.Selection) {
+		selection.Find("span").Each(func(i int, selection *goquery.Selection) {
+			log.Println("index", i, "text", selection.Text())
+		})
+	})
+	return nil
 }
 
 // NewGrabJAVBUS ...

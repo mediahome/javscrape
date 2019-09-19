@@ -2,7 +2,6 @@ package scrape
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
@@ -45,8 +44,8 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 		return g, e
 	}
 	g.doc = document
-	ret, e := document.Html()
-	log.Println(ret)
+	//ret, e := document.Html()
+	//log.Println(ret)
 	return g, nil
 }
 
