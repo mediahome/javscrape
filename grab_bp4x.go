@@ -44,6 +44,7 @@ func (g *grabBP4X) Find(name string) error {
 	}
 	ret, e := document.Html()
 	log.Println(ret)
+	return nil
 }
 
 // Decode ...
