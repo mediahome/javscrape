@@ -4,8 +4,9 @@ type IScrape interface {
 }
 
 type scrapeImpl struct {
+	grabs []IGrab
 }
 
-func NewScrape(...Graber) {
-
+func NewScrape(grabs ...IGrab) IScrape {
+	return scrapeImpl{grabs: grabs}
 }
