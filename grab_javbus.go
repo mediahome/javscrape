@@ -7,14 +7,16 @@ import (
 	"github.com/javscrape/go-scrape/query"
 )
 
-const javbusCN_URL = "https://www.javbus.com/%s"
-const javbusJA_URL = "https://www.javbus.com/ja/%s"
-const javbusEN_URL = "https://www.javbus.com/en/%s"
+const javbusCNURL = "https://www.javbus.com/%s"
+const javbusJAURL = "https://www.javbus.com/ja/%s"
+const javbusENURL = "https://www.javbus.com/en/%s"
+
+const uncensored = "uncensored/%s"
 
 var grabJavbusLanguageList = []string{
-	LanguageChinese:  javbusCN_URL,
-	LanguageEnglish:  javbusEN_URL,
-	LanguageJapanese: javbusJA_URL,
+	LanguageChinese:  javbusCNURL,
+	LanguageEnglish:  javbusENURL,
+	LanguageJapanese: javbusJAURL,
 }
 
 type grabJAVBUS struct {
