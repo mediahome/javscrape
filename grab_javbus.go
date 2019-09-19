@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
 )
 
@@ -23,6 +24,7 @@ var grabJavbusLanguageList = []string{
 type grabJAVBUS struct {
 	language     GrabLanguage
 	isUncensored bool
+	doc          *goquery.Document
 }
 
 // Find ...
@@ -37,16 +39,14 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 		}
 		ug.isUncensored = true
 	}
+	ug.doc = document
 	ret, e := document.Html()
-	if e != nil {
-		return nil, e
-	}
 	log.Println(ret)
 	return &ug, nil
 }
 
 // Decode ...
-func (g *grabJAVBUS) Decode(*Message) error {
+func (g *grabJAVBUS) Decode(msg *Message) error {
 	panic("implement me")
 }
 

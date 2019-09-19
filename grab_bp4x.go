@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
 )
 
@@ -31,6 +32,7 @@ var bp4xGrabList = []string{
 }
 
 type grabBP4X struct {
+	doc      *goquery.Document
 	grabType GrabBP4XType
 }
 
@@ -42,6 +44,7 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 	if e != nil {
 		return g, e
 	}
+	g.doc = document
 	ret, e := document.Html()
 	log.Println(ret)
 	return g, nil
