@@ -10,13 +10,14 @@ import (
 const javbusCNURL = "https://www.javbus.com/%s"
 const javbusJAURL = "https://www.javbus.com/ja/%s"
 const javbusENURL = "https://www.javbus.com/en/%s"
-
+const javbusKOURL = "https://www.javbus.com/ko/%s"
 const uncensored = "uncensored/%s"
 
 var grabJavbusLanguageList = []string{
 	LanguageChinese:  javbusCNURL,
 	LanguageEnglish:  javbusENURL,
 	LanguageJapanese: javbusJAURL,
+	LanguageKorea:    javbusKOURL,
 }
 
 type grabJAVBUS struct {

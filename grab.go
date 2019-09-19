@@ -14,4 +14,5 @@ const (
 	LanguageEnglish GrabLanguage = iota
 	LanguageJapanese
 	LanguageChinese
+	LanguageKorea
 )
