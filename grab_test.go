@@ -4,5 +4,7 @@ import "testing"
 
 // TestGrabBP4X_Find ...
 func TestGrabBP4X_Find(t *testing.T) {
-	NewGrabBP4X(BP4XTypeJAV)
+	grab := NewGrabBP4X(BP4XTypeJAV)
+	err := grab.Find("abp-874")
+	t.Log(err)
 }
