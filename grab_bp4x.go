@@ -15,19 +15,19 @@ const bp4xHentaiURL = "https://www.bp4x.com/?c=hentai&q=%s"
 // GrabBP4XType ...
 type GrabBP4XType int
 
-// JAV ...
+// BP4XTypeJAV ...
 const (
-	JAV GrabBP4XType = iota
-	AMATEUR
-	IV
-	HENTAI
+	BP4XTypeJAV GrabBP4XType = iota
+	BP4XTypeAMATEUR
+	BP4XTypeIV
+	BP4XTypeHENTAI
 )
 
 var bp4xGrabList = []string{
-	JAV:     bp4xJavURL,
-	AMATEUR: bp4xAmateurURL,
-	IV:      bp4xIVURL,
-	HENTAI:  bp4xHentaiURL,
+	BP4XTypeJAV:     bp4xJavURL,
+	BP4XTypeAMATEUR: bp4xAmateurURL,
+	BP4XTypeIV:      bp4xIVURL,
+	BP4XTypeHENTAI:  bp4xHentaiURL,
 }
 
 type grabBP4X struct {
