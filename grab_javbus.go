@@ -28,7 +28,10 @@ func (g *grabJAVBUS) Find(name string) error {
 	url := grabJavbusLanguageList[g.language]
 	document, e := query.New(fmt.Sprintf(url, name))
 	if e != nil {
-		return e
+		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, uncensored), name))
+		if e != nil {
+			return e
+		}
 	}
 	ret, e := document.Html()
 	if e != nil {
