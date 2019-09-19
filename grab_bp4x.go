@@ -35,16 +35,16 @@ type grabBP4X struct {
 }
 
 // Find ...
-func (g *grabBP4X) Find(name string) error {
+func (g *grabBP4X) Find(name string) (IGrab, error) {
 	url := bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
 	document, e := query.New(url)
 	if e != nil {
-		return e
+		return g, e
 	}
 	ret, e := document.Html()
 	log.Println(ret)
-	return nil
+	return g, nil
 }
 
 // Decode ...

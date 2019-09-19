@@ -21,25 +21,28 @@ var grabJavbusLanguageList = []string{
 }
 
 type grabJAVBUS struct {
-	language GrabLanguage
+	language     GrabLanguage
+	isUncensored bool
 }
 
 // Find ...
-func (g *grabJAVBUS) Find(name string) error {
+func (g *grabJAVBUS) Find(name string) (IGrab, error) {
+	ug := *g
 	url := grabJavbusLanguageList[g.language]
 	document, e := query.New(fmt.Sprintf(url, name))
 	if e != nil {
 		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, uncensored), name))
 		if e != nil {
-			return e
+			return nil, e
 		}
+		ug.isUncensored = true
 	}
 	ret, e := document.Html()
 	if e != nil {
-		return e
+		return nil, e
 	}
 	log.Println(ret)
-	return nil
+	return &ug, nil
 }
 
 // Decode ...
