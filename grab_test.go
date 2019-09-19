@@ -8,3 +8,10 @@ func TestGrabBP4X_Find(t *testing.T) {
 	err := grab.Find("abp-874")
 	t.Log(err)
 }
+
+// TestGrabJAVBUS_Find ...
+func TestGrabJAVBUS_Find(t *testing.T) {
+	grab := NewGrabJAVBUS(LanguageJapanese)
+	err := grab.Find("abp-874")
+	t.Log(err)
+}
