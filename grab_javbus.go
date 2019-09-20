@@ -32,15 +32,11 @@ type grabJAVBUS struct {
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	ug := *g
 	url := grabJavbusLanguageList[g.language]
-	document, e := query.New(fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
+	results, e := g.getIndex(url, name)
 	if e != nil {
-		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
-		if e != nil {
-			return nil, e
-		}
-		ug.isUncensored = true
+		return nil, e
 	}
-	ug.doc = document
+	log.Println(results)
 	return &ug, nil
 }
 
@@ -68,8 +64,8 @@ func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, e
 
 func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSearchResult, error) {
 	var res []*javbusSearchResult
-	document.Find("#waterfall").Each(func(i int, selection *goquery.Selection) {
-
+	document.Find("#waterfall > a.movie-box").Each(func(i int, selection *goquery.Selection) {
+		log.Println(selection.Html())
 	})
 	if res == nil || len(res) == 0 {
 		return nil, errors.New("no data found")
