@@ -36,12 +36,15 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	if e != nil {
 		return nil, e
 	}
-	log.Println(results)
+	for _, r := range results {
+		log.Printf("%+v", r)
+	}
 	return &ug, nil
 }
 
 type javbusSearchResult struct {
 	Uncensored  bool
+	DetailLink  string
 	Title       string
 	PhotoFrame  string
 	PhotoInfo   string
@@ -66,7 +69,34 @@ func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, e
 
 func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSearchResult, error) {
 	var res []*javbusSearchResult
+
 	document.Find("#waterfall > div > a.movie-box").Each(func(i int, selection *goquery.Selection) {
+		resTmp := new(javbusSearchResult)
+		resTmp.Uncensored = b
+		link, b := selection.Attr("href")
+		if b {
+			log.Println("link:", link)
+			resTmp.DetailLink = link
+		}
+		src, b := selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("src")
+		if b {
+			resTmp.PhotoFrame = src
+		}
+		title, b := selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("title")
+		if b {
+			resTmp.Title = title
+		}
+		selection.Find("#waterfall > div > a.movie-box > div.photo-info > span > date").Each(func(i int, selection *goquery.Selection) {
+			if i == 0 {
+				resTmp.ID = selection.Text()
+			} else if i == 1 {
+				resTmp.ReleaseDate = selection.Text()
+			} else {
+				//todo
+			}
+
+		})
+		res = append(res, resTmp)
 		log.Println(selection.Html())
 	})
 	if res == nil || len(res) == 0 {
@@ -77,13 +107,7 @@ func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSea
 
 // Decode ...
 func (g *grabJAVBUS) Decode(msg *Message) error {
-	msg.Title = g.doc.Find("div.container > h3").Text()
-	movie := g.doc.Find("div.container > div.row.movie")
-	movie.Find("div.info > p").Each(func(i int, selection *goquery.Selection) {
-		selection.Find("span").Each(func(i int, selection *goquery.Selection) {
-			log.Println("index", i, "text", selection.Text())
-		})
-	})
+
 	return nil
 }
 

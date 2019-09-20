@@ -14,7 +14,7 @@ func TestGrabBP4X_Find(t *testing.T) {
 // TestGrabJAVBUS_Find ...
 func TestGrabJAVBUS_Find(t *testing.T) {
 	grab := NewGrabJAVBUS(LanguageJapanese)
-	doc, err := grab.Find("Q8180")
+	doc, err := grab.Find("abp-906")
 	msg := new(Message)
 	if err != nil {
 		t.Fatal(err)
