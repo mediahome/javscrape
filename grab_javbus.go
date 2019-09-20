@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -23,9 +24,8 @@ var grabJavbusLanguageList = []string{
 }
 
 type grabJAVBUS struct {
-	language     GrabLanguage
-	isUncensored bool
-	doc          *goquery.Document
+	language GrabLanguage
+	doc      *goquery.Document
 }
 
 // Find ...
@@ -41,21 +41,40 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 		ug.isUncensored = true
 	}
 	ug.doc = document
-	//ret, e := document.Html()
-	//log.Println(ret)
 	return &ug, nil
 }
 
-func (g *grabJAVBUS) getIndexPage() {
+type javbusSearchResult struct {
+	Uncensored  bool
+	Title       string
+	PhotoFrame  string
+	PhotoInfo   string
+	ID          string
+	ReleaseDate string
+}
+
+func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, error) {
 	document, e := query.New(fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
+	isUncensored := false
 	if e != nil {
 		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
 		if e != nil {
 			return nil, e
 		}
-		ug.isUncensored = true
+		isUncensored = true
 	}
-	ug.doc = document
+	return javbusSearchResultAnalyze(document, isUncensored)
+}
+
+func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSearchResult, error) {
+	var res []*javbusSearchResult
+	document.Find("#waterfall").Each(func(i int, selection *goquery.Selection) {
+
+	})
+	if res == nil || len(res) == 0 {
+		return nil, errors.New("no data found")
+	}
+	return res, nil
 }
 
 // Decode ...
