@@ -9,10 +9,10 @@ import (
 	"github.com/javscrape/go-scrape/query"
 )
 
-const javbusCNURL = "https://www.javbus.com/%s"
-const javbusJAURL = "https://www.javbus.com/ja/%s"
-const javbusENURL = "https://www.javbus.com/en/%s"
-const javbusKOURL = "https://www.javbus.com/ko/%s"
+const javbusCNURL = "https://www.javbus.com/"
+const javbusJAURL = "https://www.javbus.com/ja/"
+const javbusENURL = "https://www.javbus.com/en/"
+const javbusKOURL = "https://www.javbus.com/ko/"
 const javbusUncensored = "uncensored/search/%s&type=1"
 const javbusCensored = "search/%s&type=1"
 
@@ -50,12 +50,12 @@ type javbusSearchResult struct {
 }
 
 func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, error) {
-	log.Println("request url", fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
-	document, e := query.New(fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
+	searchURL := fmt.Sprintf(url+javbusCensored, name)
+	document, e := query.New(searchURL)
 	isUncensored := false
 	if e != nil {
-		log.Println("request url", fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
-		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
+		searchURL = fmt.Sprintf(url+javbusUncensored, name)
+		document, e = query.New(searchURL)
 		if e != nil {
 			return nil, e
 		}
