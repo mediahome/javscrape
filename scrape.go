@@ -1,11 +1,18 @@
 package scrape
 
+var debug = false
+
 // IScrape ...
 type IScrape interface {
 }
 
 type scrapeImpl struct {
 	grabs []IGrab
+}
+
+// DebugOn ...
+func DebugOn() {
+	debug = true
 }
 
 // NewScrape ...

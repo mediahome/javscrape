@@ -36,8 +36,10 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	if e != nil {
 		return nil, e
 	}
-	for _, r := range results {
-		log.Printf("%+v", r)
+	if debug {
+		for _, r := range results {
+			log.Printf("%+v", r)
+		}
 	}
 	return &ug, nil
 }
@@ -94,7 +96,6 @@ func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSea
 			} else {
 				//todo
 			}
-
 		})
 		res = append(res, resTmp)
 	})

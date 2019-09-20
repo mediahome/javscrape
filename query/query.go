@@ -4,9 +4,34 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/net/proxy"
 )
+
+var queryProxy proxy.Dialer
+
+// RegisterProxy ...
+func RegisterProxy(path string) {
+	proxyURL, err := url.Parse(path)
+	if err != nil {
+		return
+	}
+	p, err := proxy.FromURL(proxyURL, proxy.Direct)
+	if err != nil {
+		return
+	}
+
+	host := proxy.NewPerHost(p, proxy.Direct)
+	host.AddFromString("localhost, 127.0.0.1")
+}
+
+func getTransport() {
+	if queryProxy == nil {
+
+	}
+}
 
 // New ...
 func New(url string) (*goquery.Document, error) {
