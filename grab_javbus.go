@@ -97,7 +97,6 @@ func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSea
 
 		})
 		res = append(res, resTmp)
-		log.Println(selection.Html())
 	})
 	if res == nil || len(res) == 0 {
 		return nil, errors.New("no data found")
