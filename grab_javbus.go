@@ -12,7 +12,8 @@ const javbusCNURL = "https://www.javbus.com/%s"
 const javbusJAURL = "https://www.javbus.com/ja/%s"
 const javbusENURL = "https://www.javbus.com/en/%s"
 const javbusKOURL = "https://www.javbus.com/ko/%s"
-const uncensored = "uncensored/%s"
+const javbusUncensored = "javbusUncensored/search/%s&type=1"
+const javbusCensored = "search/%s&type=1&parent=uc"
 
 var grabJavbusLanguageList = []string{
 	LanguageChinese:  javbusCNURL,
@@ -31,9 +32,9 @@ type grabJAVBUS struct {
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	ug := *g
 	url := grabJavbusLanguageList[g.language]
-	document, e := query.New(fmt.Sprintf(url, name))
+	document, e := query.New(fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
 	if e != nil {
-		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, uncensored), name))
+		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
 		if e != nil {
 			return nil, e
 		}
@@ -43,6 +44,18 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	//ret, e := document.Html()
 	//log.Println(ret)
 	return &ug, nil
+}
+
+func (g *grabJAVBUS) getIndexPage() {
+	document, e := query.New(fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
+	if e != nil {
+		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
+		if e != nil {
+			return nil, e
+		}
+		ug.isUncensored = true
+	}
+	ug.doc = document
 }
 
 // Decode ...
