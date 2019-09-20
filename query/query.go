@@ -1,16 +1,21 @@
 package query
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/proxy"
 )
 
 var queryProxy proxy.Dialer
+
+// ProxyURL ...
+var ProxyURL string
 
 // RegisterProxy ...
 func RegisterProxy(path string) {
@@ -27,15 +32,30 @@ func RegisterProxy(path string) {
 	host.AddFromString("localhost, 127.0.0.1")
 }
 
-func getTransport() {
-	if queryProxy == nil {
-
+func getTransport() *http.Transport {
+	if ProxyURL != "" {
+		proxy, _ := url.Parse(ProxyURL)
+		return &http.Transport{
+			Proxy:           http.ProxyURL(proxy),
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+	return &http.Transport{
+		Proxy:           nil,
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 }
 
 // New ...
 func New(url string) (*goquery.Document, error) {
-	res, err := http.Get(url)
+	cli := &http.Client{
+		Transport:     getTransport(),
+		CheckRedirect: nil,
+		Jar:           nil,
+		Timeout:       15 * time.Second,
+	}
+
+	res, err := cli.Get(url)
 	if err != nil {
 		log.Fatal(err)
 	}
