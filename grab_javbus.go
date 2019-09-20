@@ -13,8 +13,8 @@ const javbusCNURL = "https://www.javbus.com/%s"
 const javbusJAURL = "https://www.javbus.com/ja/%s"
 const javbusENURL = "https://www.javbus.com/en/%s"
 const javbusKOURL = "https://www.javbus.com/ko/%s"
-const javbusUncensored = "javbusUncensored/search/%s&type=1"
-const javbusCensored = "search/%s&type=1&parent=uc"
+const javbusUncensored = "uncensored/search/%s&type=1"
+const javbusCensored = "search/%s&type=1"
 
 var grabJavbusLanguageList = []string{
 	LanguageChinese:  javbusCNURL,
@@ -50,9 +50,11 @@ type javbusSearchResult struct {
 }
 
 func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, error) {
+	log.Println("request url", fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
 	document, e := query.New(fmt.Sprintf(fmt.Sprintf(url, javbusCensored), name))
 	isUncensored := false
 	if e != nil {
+		log.Println("request url", fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
 		document, e = query.New(fmt.Sprintf(fmt.Sprintf(url, javbusUncensored), name))
 		if e != nil {
 			return nil, e
@@ -64,7 +66,7 @@ func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, e
 
 func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSearchResult, error) {
 	var res []*javbusSearchResult
-	document.Find("#waterfall > a.movie-box").Each(func(i int, selection *goquery.Selection) {
+	document.Find("#waterfall > div > a.movie-box").Each(func(i int, selection *goquery.Selection) {
 		log.Println(selection.Html())
 	})
 	if res == nil || len(res) == 0 {
