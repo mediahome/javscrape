@@ -21,11 +21,18 @@ func NewScrape(grabs ...IGrab) IScrape {
 }
 
 // Find ...
-func (impl *scrapeImpl) Find(name string) {
+func (impl *scrapeImpl) Find(name string) (msg []*Message, e error) {
+	msg = *new([]*Message)
 	for _, grab := range impl.grabs {
 		iGrab, e := grab.Find(name)
 		if e != nil {
-
+			log.With("name", grab.Name()).Error(e)
+			continue
+		}
+		e = iGrab.Decode(msg)
+		if e != nil {
+			log.With("name", grab.Name()).Error(e)
 		}
 	}
+	return
 }
