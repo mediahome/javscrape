@@ -17,12 +17,13 @@ func TestGrabBP4X_Find(t *testing.T) {
 
 // TestGrabJAVBUS_Find ...
 func TestGrabJAVBUS_Find(t *testing.T) {
+	DebugOn()
 	e := query.RegisterProxy("socks5://localhost:11080")
 	if e != nil {
 		return
 	}
 	grab := NewGrabJAVBUS(LanguageJapanese)
-	doc, err := grab.Find("abp-777")
+	doc, err := grab.Find("abp-77")
 	msg := new(Message)
 	if err != nil {
 		t.Fatal(err)

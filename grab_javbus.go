@@ -3,7 +3,6 @@ package scrape
 import (
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
@@ -38,7 +37,7 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	}
 	if debug {
 		for _, r := range results {
-			log.Printf("%+v", r)
+			log.Infof("%+v", r)
 		}
 	}
 	return &ug, nil
@@ -77,7 +76,6 @@ func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSea
 		resTmp.Uncensored = b
 		link, b := selection.Attr("href")
 		if b {
-			log.Println("link:", link)
 			resTmp.DetailLink = link
 		}
 		src, b := selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("src")
