@@ -35,6 +35,11 @@ type grabBP4X struct {
 	grabType GrabBP4XType
 }
 
+// Decode ...
+func (g *grabBP4X) Decode([]*Message) error {
+	panic("implement me")
+}
+
 // Find ...
 func (g *grabBP4X) Find(name string) (IGrab, error) {
 	url := bp4xGrabList[g.grabType]
@@ -47,11 +52,6 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 	//ret, e := document.Html()
 	//log.Println(ret)
 	return g, nil
-}
-
-// Decode ...
-func (g *grabBP4X) Decode(*Message) error {
-	panic("implement me")
 }
 
 // NewGrabBP4X ...

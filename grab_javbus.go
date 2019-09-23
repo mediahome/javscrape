@@ -24,15 +24,19 @@ var grabJavbusLanguageList = []string{
 
 type grabJAVBUS struct {
 	language GrabLanguage
-	//doc        *goquery.Document
-	//uncensored bool
+	res      []*javbusSearchResult
+}
+
+// Decode ...
+func (g *grabJAVBUS) Decode([]*Message) error {
+	panic("implement me")
 }
 
 // Find ...
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	ug := *g
 	url := grabJavbusLanguageList[g.language]
-	results, e := g.getIndexDocument(url, name)
+	results, e := javbusSearchResultAnalyze(url, name)
 	if e != nil {
 		return nil, e
 	}
@@ -41,6 +45,7 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 			log.Infof("%+v", r)
 		}
 	}
+	ug.res = results
 	return &ug, nil
 }
 
@@ -54,7 +59,7 @@ type javbusSearchResult struct {
 	ReleaseDate string
 }
 
-func (g *grabJAVBUS) getIndexDocument(url, name string) ([]*javbusSearchResult, error) {
+func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) {
 	searchURL := fmt.Sprintf(url+javbusCensored, name)
 	document, e := query.New(searchURL)
 	isUncensored := false
@@ -66,15 +71,11 @@ func (g *grabJAVBUS) getIndexDocument(url, name string) ([]*javbusSearchResult, 
 		}
 		isUncensored = true
 	}
-	return javbusSearchResultAnalyze(document, isUncensored)
-}
 
-func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSearchResult, error) {
 	var res []*javbusSearchResult
-
 	document.Find("#waterfall > div > a.movie-box").Each(func(i int, selection *goquery.Selection) {
 		resTmp := new(javbusSearchResult)
-		resTmp.Uncensored = b
+		resTmp.Uncensored = isUncensored
 		link, b := selection.Attr("href")
 		if b {
 			resTmp.DetailLink = link
@@ -104,10 +105,18 @@ func javbusSearchResultAnalyze(document *goquery.Document, b bool) ([]*javbusSea
 	return res, nil
 }
 
-// Decode ...
-func (g *grabJAVBUS) Decode(msg *Message) error {
+type javbusSearchDetail struct {
+}
 
-	return nil
+func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail, error) {
+	if result == nil || result.DetailLink == "" {
+		return nil, errors.New("javbus search result is null")
+	}
+	document, e := query.New(result.DetailLink)
+	if e != nil {
+		return nil, e
+	}
+	document.Find("div.row.movie")
 }
 
 // NewGrabJAVBUS ...

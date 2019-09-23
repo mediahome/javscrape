@@ -3,7 +3,7 @@ package scrape
 // IGrab ...
 type IGrab interface {
 	Find(string) (IGrab, error)
-	Decode(*Message) error
+	Decode([]*Message) error
 }
 
 // GrabLanguage ...
