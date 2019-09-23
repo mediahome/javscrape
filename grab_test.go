@@ -1,6 +1,10 @@
 package scrape
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/javscrape/go-scrape/query"
+)
 
 // TestGrabBP4X_Find ...
 func TestGrabBP4X_Find(t *testing.T) {
@@ -13,8 +17,12 @@ func TestGrabBP4X_Find(t *testing.T) {
 
 // TestGrabJAVBUS_Find ...
 func TestGrabJAVBUS_Find(t *testing.T) {
+	e := query.RegisterProxy("socks5://localhost:11080")
+	if e != nil {
+		return
+	}
 	grab := NewGrabJAVBUS(LanguageJapanese)
-	doc, err := grab.Find("abp-906")
+	doc, err := grab.Find("abp-777")
 	msg := new(Message)
 	if err != nil {
 		t.Fatal(err)

@@ -1,9 +1,11 @@
 package query
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -14,34 +16,37 @@ import (
 
 var queryProxy proxy.Dialer
 
-// ProxyURL ...
-var ProxyURL string
-
 // RegisterProxy ...
-func RegisterProxy(path string) {
-	proxyURL, err := url.Parse(path)
-	if err != nil {
-		return
+func RegisterProxy(addr string) (e error) {
+	u, e := url.Parse(addr)
+	if e != nil {
+		return e
 	}
-	p, err := proxy.FromURL(proxyURL, proxy.Direct)
-	if err != nil {
-		return
+	switch u.Scheme {
+	case "socks5":
+		queryProxy, e = proxySOCKS5(u.Host)
 	}
+	return nil
+}
 
-	host := proxy.NewPerHost(p, proxy.Direct)
-	host.AddFromString("localhost, 127.0.0.1")
+func proxySOCKS5(addr string) (proxy.Dialer, error) {
+	return proxy.SOCKS5("tcp", addr,
+		nil, //&proxy.Auth{User: "", Password: ""},
+		&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		},
+	)
 }
 
 func getTransport() *http.Transport {
-	if ProxyURL != "" {
-		proxy, _ := url.Parse(ProxyURL)
-		return &http.Transport{
-			Proxy:           http.ProxyURL(proxy),
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	}
 	return &http.Transport{
-		Proxy:           nil,
+		DialContext: func(ctx context.Context, network, addr string) (conn net.Conn, e error) {
+			if queryProxy != nil {
+				return queryProxy.Dial(network, addr)
+			}
+			return net.Dial(network, addr)
+		},
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 }
