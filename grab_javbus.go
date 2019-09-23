@@ -122,6 +122,7 @@ func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail,
 		return nil, e
 	}
 	document.Find("div.row.movie")
+	return &javbusSearchDetail{}, nil
 }
 
 // NewGrabJAVBUS ...
