@@ -24,14 +24,15 @@ var grabJavbusLanguageList = []string{
 
 type grabJAVBUS struct {
 	language GrabLanguage
-	doc      *goquery.Document
+	//doc        *goquery.Document
+	//uncensored bool
 }
 
 // Find ...
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	ug := *g
 	url := grabJavbusLanguageList[g.language]
-	results, e := g.getIndex(url, name)
+	results, e := g.getIndexDocument(url, name)
 	if e != nil {
 		return nil, e
 	}
@@ -44,16 +45,16 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 }
 
 type javbusSearchResult struct {
-	Uncensored  bool
-	DetailLink  string
-	Title       string
-	PhotoFrame  string
-	PhotoInfo   string
+	Uncensored bool
+	DetailLink string
+	Title      string
+	PhotoFrame string
+	//PhotoInfo   string
 	ID          string
 	ReleaseDate string
 }
 
-func (g *grabJAVBUS) getIndex(url string, name string) ([]*javbusSearchResult, error) {
+func (g *grabJAVBUS) getIndexDocument(url, name string) ([]*javbusSearchResult, error) {
 	searchURL := fmt.Sprintf(url+javbusCensored, name)
 	document, e := query.New(searchURL)
 	isUncensored := false
