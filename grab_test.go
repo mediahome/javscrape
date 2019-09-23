@@ -18,7 +18,7 @@ func TestGrabBP4X_Find(t *testing.T) {
 // TestGrabJAVBUS_Find ...
 func TestGrabJAVBUS_Find(t *testing.T) {
 	DebugOn()
-	e := query.RegisterProxy("socks5://localhost:11080")
+	e := query.RegisterProxy("socks5://localhost:10808")
 	if e != nil {
 		return
 	}

@@ -53,17 +53,6 @@ func proxySOCKS5(addr string) (proxy.Dialer, error) {
 	return proxy.SOCKS5("tcp", addr,
 		nil, //&proxy.Auth{User: "", Password: ""},
 		&net.Dialer{
-			Timeout:   15 * time.Second,
-			KeepAlive: 15 * time.Second,
-		},
-	)
-}
-
-func proxyHTTP(addr string) (proxy.Dialer, error) {
-
-	return proxy.SOCKS5("tcp", addr,
-		nil, //&proxy.Auth{User: "", Password: ""},
-		&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 		},
