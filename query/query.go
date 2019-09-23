@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/proxy"
 )
 
-var queryProxy proxy.Dialer
+var cli *http.Client
 
 // RegisterProxy ...
 func RegisterProxy(addr string) (e error) {
@@ -22,14 +22,45 @@ func RegisterProxy(addr string) (e error) {
 	if e != nil {
 		return e
 	}
+	var transport *http.Transport
 	switch u.Scheme {
+	case "http", "https":
+		transport = getHTTPTransport(u)
 	case "socks5":
-		queryProxy, e = proxySOCKS5(u.Host)
+		transport = getSOCKS5Transport(u.Host)
+	default:
+		transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
+	cli = &http.Client{
+		Transport:     transport,
+		CheckRedirect: nil,
+		Jar:           nil,
+		Timeout:       15 * time.Second,
 	}
 	return nil
 }
 
+func getHTTPTransport(u *url.URL) *http.Transport {
+	return &http.Transport{
+		Proxy:           http.ProxyURL(u),
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+}
+
 func proxySOCKS5(addr string) (proxy.Dialer, error) {
+	return proxy.SOCKS5("tcp", addr,
+		nil, //&proxy.Auth{User: "", Password: ""},
+		&net.Dialer{
+			Timeout:   15 * time.Second,
+			KeepAlive: 15 * time.Second,
+		},
+	)
+}
+
+func proxyHTTP(addr string) (proxy.Dialer, error) {
+
 	return proxy.SOCKS5("tcp", addr,
 		nil, //&proxy.Auth{User: "", Password: ""},
 		&net.Dialer{
@@ -38,26 +69,24 @@ func proxySOCKS5(addr string) (proxy.Dialer, error) {
 		},
 	)
 }
-
-func getTransport() *http.Transport {
+func getSOCKS5Transport(addr string) *http.Transport {
+	queryProxy, err := proxySOCKS5(addr)
+	if err != nil {
+		return &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	}
 	return &http.Transport{
 		DialContext: func(ctx context.Context, network, addr string) (conn net.Conn, e error) {
-			if queryProxy != nil {
-				return queryProxy.Dial(network, addr)
-			}
-			return net.Dial(network, addr)
+			return queryProxy.Dial(network, addr)
 		},
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 }
 
 // New ...
 func New(url string) (*goquery.Document, error) {
-	cli := &http.Client{
-		Transport:     getTransport(),
-		CheckRedirect: nil,
-		Jar:           nil,
-		Timeout:       15 * time.Second,
+	if cli == nil {
+		cli = http.DefaultClient
 	}
 
 	res, err := cli.Get(url)
