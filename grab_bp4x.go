@@ -35,6 +35,11 @@ type grabBP4X struct {
 	grabType GrabBP4XType
 }
 
+// Name ...
+func (g *grabBP4X) Name() string {
+	return "bp4x"
+}
+
 // Decode ...
 func (g *grabBP4X) Decode([]*Message) error {
 	panic("implement me")

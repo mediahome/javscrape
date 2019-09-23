@@ -2,6 +2,7 @@ package scrape
 
 // IGrab ...
 type IGrab interface {
+	Name() string
 	Find(string) (IGrab, error)
 	Decode([]*Message) error
 }

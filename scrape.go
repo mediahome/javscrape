@@ -21,6 +21,11 @@ func NewScrape(grabs ...IGrab) IScrape {
 }
 
 // Find ...
-func (scrapeImpl) Find(name string) {
+func (impl *scrapeImpl) Find(name string) {
+	for _, grab := range impl.grabs {
+		iGrab, e := grab.Find(name)
+		if e != nil {
 
+		}
+	}
 }

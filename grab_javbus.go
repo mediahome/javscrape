@@ -27,6 +27,11 @@ type grabJAVBUS struct {
 	res      []*javbusSearchResult
 }
 
+// Name ...
+func (g *grabJAVBUS) Name() string {
+	return "javbus"
+}
+
 // Decode ...
 func (g *grabJAVBUS) Decode([]*Message) error {
 	panic("implement me")
