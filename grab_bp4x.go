@@ -2,6 +2,7 @@ package scrape
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
@@ -47,6 +48,7 @@ func (g *grabBP4X) Decode([]*Message) error {
 
 // Find ...
 func (g *grabBP4X) Find(name string) (IGrab, error) {
+	name = strings.ToUpper(name)
 	url := bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
 	document, e := query.New(url)

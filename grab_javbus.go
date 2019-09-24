@@ -3,6 +3,7 @@ package scrape
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
@@ -46,6 +47,7 @@ func (g *grabJAVBUS) Decode([]*Message) error {
 
 // Find ...
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
+	name = strings.ToUpper(name)
 	ug := *g
 	url := grabJavbusLanguageList[g.language]
 	results, e := javbusSearchResultAnalyze(url, name)
@@ -128,7 +130,17 @@ func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail,
 	if e != nil {
 		return nil, e
 	}
-	document.Find("div.row.movie")
+
+	container := document.Find("body > div.container")
+
+	title := container.Find("body > div.container > h3").Text()
+	log.With("title", title).Info(result.ID)
+	bigImage, exists := container.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
+	log.With("bigImage", bigImage).Info(exists)
+	image, exists := container.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
+	log.With("image", image).Info(exists)
+	bigTitle, exists := container.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
+	log.With("bigTitle", bigTitle).Info(exists)
 	return &javbusSearchDetail{}, nil
 }
 
