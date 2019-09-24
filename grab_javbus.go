@@ -34,7 +34,14 @@ func (g *grabJAVBUS) Name() string {
 
 // Decode ...
 func (g *grabJAVBUS) Decode([]*Message) error {
-	panic("implement me")
+	for _, r := range g.res {
+		detail, e := javbusSearchDetailAnalyze(r)
+		if e != nil {
+			return e
+		}
+		log.Infof("javbus detail:%+v", detail)
+	}
+	return nil
 }
 
 // Find ...
