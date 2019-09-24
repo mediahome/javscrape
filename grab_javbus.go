@@ -131,16 +131,18 @@ func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail,
 		return nil, e
 	}
 
-	container := document.Find("body > div.container")
-
-	title := container.Find("body > div.container > h3").Text()
+	title := document.Find("body > div.container > h3").Text()
 	log.With("title", title).Info(result.ID)
-	bigImage, exists := container.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
+	bigImage, exists := document.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
 	log.With("bigImage", bigImage).Info(exists)
-	image, exists := container.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
+	image, exists := document.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
 	log.With("image", image).Info(exists)
-	bigTitle, exists := container.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
+	bigTitle, exists := document.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
 	log.With("bigTitle", bigTitle).Info(exists)
+	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
+		log.With("index", i).Info(selection.Text())
+	})
+
 	return &javbusSearchDetail{}, nil
 }
 
