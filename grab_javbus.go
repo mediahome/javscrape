@@ -163,8 +163,19 @@ func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail,
 			series := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
 			log.With("series", series).Info("movie")
 		case 7:
-			genre := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
-			log.With("genre", genre).Info("movie")
+			//genre := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			//log.With("genre", genre).Info("movie")
+		case 8:
+			selection.Find("span.genre > a").Each(func(i int, selection *goquery.Selection) {
+				log.With("genre", selection.Text()).Info("movie")
+			})
+		case 9:
+		case 10:
+			selection.Find("span.genre > a").Each(func(i int, selection *goquery.Selection) {
+				val, _ := selection.Attr("href")
+				log.With("idols", selection.Text(), "image", val).Info("movie")
+			})
+			//.col-md-3 > p:nth-child(9) > span:nth-child(1) > a:nth-child(1)
 		}
 		log.With("index", i, "text", selection.Text()).Info("movie info")
 		selection.Contents().Each(func(i int, selection *goquery.Selection) {
