@@ -20,8 +20,8 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	//if e != nil {
 	//	return
 	//}
-	grab := NewGrabJAVBUS(LanguageEnglish)
-	doc, err := grab.Find("abp-773")
+	grab := NewGrabJAVBUS(LanguageJapanese)
+	doc, err := grab.Find("abp-894")
 	msg := *new([]*Message)
 	if err != nil {
 		t.Fatal(err)
