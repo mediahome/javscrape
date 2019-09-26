@@ -151,8 +151,25 @@ func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail,
 			length := goquery.NewDocumentFromNode(selection.Contents().Nodes[1]).Text()
 			log.With("length", length).Info("movie")
 		case 3:
+			director := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			log.With("director", director).Info("movie")
+		case 4:
+			studio := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			log.With("studio", studio).Info("movie")
+		case 5:
+			label := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			log.With("label", label).Info("movie")
+		case 6:
+			series := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			log.With("series", series).Info("movie")
+		case 7:
+			genre := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			log.With("genre", genre).Info("movie")
 		}
-		log.With("index", i, "text", selection.Text()).Info("contents")
+		log.With("index", i, "text", selection.Text()).Info("movie info")
+		selection.Contents().Each(func(i int, selection *goquery.Selection) {
+			log.With("content", selection.Text()).Info("contents")
+		})
 	})
 
 	return &javbusSearchDetail{}, nil
