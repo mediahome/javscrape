@@ -132,6 +132,14 @@ var analyzeLangFuncList = []AnalyzeLanguageFunc{
 	javbusSearchDetailAnalyzeID,
 	javbusSearchDetailAnalyzeDate,
 	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeDummy,
 }
 
 var analyzeLanguageList = map[GrabLanguage][]string{
@@ -142,6 +150,8 @@ var analyzeLanguageList = map[GrabLanguage][]string{
 		"Director:",
 		"Studio:",
 		"Label:",
+		"Genre:",
+		"JAV Idols",
 	},
 	LanguageJapanese: {
 		"品番:",
