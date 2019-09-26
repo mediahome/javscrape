@@ -7,7 +7,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/query"
-	"golang.org/x/net/html"
 )
 
 const javbusCNURL = "https://www.javbus.com/"
@@ -120,6 +119,11 @@ func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) 
 	return res, nil
 }
 
+type Idols struct {
+	Image string
+	Name  string
+}
+
 type javbusSearchDetail struct {
 	id       string
 	date     string
@@ -127,6 +131,9 @@ type javbusSearchDetail struct {
 	director string
 	studio   string
 	label    string
+	series   string
+	genre    []string
+	idols    []*Idols
 }
 
 // AnalyzeLanguageFunc ...
@@ -137,11 +144,11 @@ var analyzeLangFuncList = []AnalyzeLanguageFunc{
 	javbusSearchDetailAnalyzeDate,
 	javbusSearchDetailAnalyzeLength,
 	javbusSearchDetailAnalyzeDirector,
-	javbusSearchDetailAnalyzeDummy,
-	javbusSearchDetailAnalyzeDummy,
-	javbusSearchDetailAnalyzeDummy,
-	javbusSearchDetailAnalyzeDummy,
-	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeStudio,
+	javbusSearchDetailAnalyzeLabel,
+	javbusSearchDetailAnalyzeSeries,
+	javbusSearchDetailAnalyzeGenre,
+	javbusSearchDetailAnalyzeIdols,
 	javbusSearchDetailAnalyzeDummy,
 	javbusSearchDetailAnalyzeDummy,
 }
@@ -170,13 +177,25 @@ var analyzeLanguageList = map[GrabLanguage][]string{
 	},
 }
 
-func getAnalyzeLanguageFunc(language GrabLanguage, nodes []*html.Node) AnalyzeLanguageFunc {
-	text := goquery.NewDocumentFromNode(nodes[0]).Text()
+func getAnalyzeLanguageFunc(language GrabLanguage, selection *goquery.Selection) AnalyzeLanguageFunc {
+	//text := selection.Find("p > span.header").Text()
+	//genre := selection.Text()
+	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
 	for idx, list := range analyzeLanguageList[language] {
 		if strings.Compare(text, list) == 0 {
 			return analyzeLangFuncList[idx]
 		}
+		if debug {
+			//log.With("source", list, "target", text).Info(strings.Compare(text, list))
+		}
 	}
+	//6 is genre
+	//if strings.Compare(analyzeLanguageList[language][6], genre) == 0 {
+	//	return analyzeLangFuncList[6]
+	//}
+	//if debug {
+	//	log.With("source", analyzeLanguageList[language][6], "target", genre).Info(strings.Compare(analyzeLanguageList[language][6], genre))
+	//}
 	return javbusSearchDetailAnalyzeDummy
 }
 func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
@@ -185,33 +204,53 @@ func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbus
 	return nil
 }
 func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	var idols []*Idols
+	selection.Next().Find("span.genre > a").Each(func(i int, selection *goquery.Selection) {
+		val, _ := selection.Attr("href")
+		name := selection.Text()
+		name = strings.TrimSpace(name)
+		log.With("text", selection.Text(), "url", val).Info("idols")
+		idols = append(idols, &Idols{
+			Image: val,
+			Name:  name,
+		})
+	})
+	if debug {
+		log.With("idols", idols).Info("movie")
+	}
+	detail.idols = idols
+	return
+}
+func javbusSearchDetailAnalyzeSeries(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	nodes := selection.Contents().Nodes
 	if len(nodes) <= 2 {
 		return errors.New("wrong director node size")
 	}
-	director := goquery.NewDocumentFromNode(nodes[2]).Text()
+	series := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
-		log.With("director", director).Info("movie")
+		log.With("series", series).Info("movie")
 	}
-	detail.director = director
+	detail.series = series
 	return
 }
 func javbusSearchDetailAnalyzeGenre(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
-	nodes := selection.Contents().Nodes
-	if len(nodes) <= 2 {
-		return errors.New("wrong director node size")
-	}
-	genre := goquery.NewDocumentFromNode(nodes[2]).Text()
+	var genre []string
+	selection.Next().Find("p > span.genre > a").Each(func(i int, selection *goquery.Selection) {
+		log.With("text", selection.Text()).Info("genre")
+		g := selection.Text()
+		g = strings.TrimSpace(g)
+		genre = append(genre, g)
+	})
 	if debug {
-		log.With("director", genre).Info("movie")
+		log.With("genre", genre).Info("movie")
 	}
-	detail.director = strings.TrimSpace(genre)
+	detail.genre = genre
 	return
 }
 func javbusSearchDetailAnalyzeLabel(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	nodes := selection.Contents().Nodes
 	if len(nodes) <= 2 {
-		return errors.New("wrong director node size")
+		return errors.New("wrong label node size")
 	}
 	label := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
@@ -299,7 +338,7 @@ func javbusSearchDetailAnalyze(lan GrabLanguage, result *javbusSearchResult) (*j
 	log.With("bigTitle", bigTitle).Info(exists)
 	deatil := &javbusSearchDetail{}
 	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
-		err := getAnalyzeLanguageFunc(lan, selection.Find("p > span.header").Nodes)(selection, deatil)
+		err := getAnalyzeLanguageFunc(lan, selection)(selection, deatil)
 		if err != nil {
 			log.Error(err)
 		}
