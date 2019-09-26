@@ -140,7 +140,19 @@ func javbusSearchDetailAnalyze(result *javbusSearchResult) (*javbusSearchDetail,
 	bigTitle, exists := document.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
 	log.With("bigTitle", bigTitle).Info(exists)
 	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
-		log.With("index", i).Info(selection.Text())
+		switch i {
+		case 0:
+			id := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
+			log.With("id", id).Info("movie")
+		case 1:
+			date := goquery.NewDocumentFromNode(selection.Contents().Nodes[1]).Text()
+			log.With("release date", date).Info("movie")
+		case 2:
+			length := goquery.NewDocumentFromNode(selection.Contents().Nodes[1]).Text()
+			log.With("length", length).Info("movie")
+		case 3:
+		}
+		log.With("index", i, "text", selection.Text()).Info("contents")
 	})
 
 	return &javbusSearchDetail{}, nil
