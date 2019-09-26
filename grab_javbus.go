@@ -121,8 +121,12 @@ func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) 
 }
 
 type javbusSearchDetail struct {
-	id   string
-	date string
+	id       string
+	date     string
+	length   string
+	director string
+	studio   string
+	label    string
 }
 
 // AnalyzeLanguageFunc ...
@@ -131,8 +135,8 @@ type AnalyzeLanguageFunc func(selection *goquery.Selection, detail *javbusSearch
 var analyzeLangFuncList = []AnalyzeLanguageFunc{
 	javbusSearchDetailAnalyzeID,
 	javbusSearchDetailAnalyzeDate,
-	javbusSearchDetailAnalyzeDummy,
-	javbusSearchDetailAnalyzeDummy,
+	javbusSearchDetailAnalyzeLength,
+	javbusSearchDetailAnalyzeDirector,
 	javbusSearchDetailAnalyzeDummy,
 	javbusSearchDetailAnalyzeDummy,
 	javbusSearchDetailAnalyzeDummy,
@@ -150,6 +154,7 @@ var analyzeLanguageList = map[GrabLanguage][]string{
 		"Director:",
 		"Studio:",
 		"Label:",
+		"Series:",
 		"Genre:",
 		"JAV Idols",
 	},
@@ -179,6 +184,78 @@ func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbus
 	log.With("size", len(selection.Contents().Nodes), "text", text).Warnf("%+v", *detail)
 	return nil
 }
+func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
+	if len(nodes) <= 2 {
+		return errors.New("wrong director node size")
+	}
+	director := goquery.NewDocumentFromNode(nodes[2]).Text()
+	if debug {
+		log.With("director", director).Info("movie")
+	}
+	detail.director = director
+	return
+}
+func javbusSearchDetailAnalyzeGenre(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
+	if len(nodes) <= 2 {
+		return errors.New("wrong director node size")
+	}
+	genre := goquery.NewDocumentFromNode(nodes[2]).Text()
+	if debug {
+		log.With("director", genre).Info("movie")
+	}
+	detail.director = strings.TrimSpace(genre)
+	return
+}
+func javbusSearchDetailAnalyzeLabel(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
+	if len(nodes) <= 2 {
+		return errors.New("wrong director node size")
+	}
+	label := goquery.NewDocumentFromNode(nodes[2]).Text()
+	if debug {
+		log.With("label", label).Info("movie")
+	}
+	detail.label = strings.TrimSpace(label)
+	return
+}
+func javbusSearchDetailAnalyzeStudio(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
+	if len(nodes) <= 2 {
+		return errors.New("wrong studio node size")
+	}
+	studio := goquery.NewDocumentFromNode(nodes[2]).Text()
+	if debug {
+		log.With("studio", studio).Info("movie")
+	}
+	detail.studio = strings.TrimSpace(studio)
+	return
+}
+func javbusSearchDetailAnalyzeDirector(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
+	if len(nodes) <= 2 {
+		return errors.New("wrong director node size")
+	}
+	director := goquery.NewDocumentFromNode(nodes[2]).Text()
+	if debug {
+		log.With("director", director).Info("movie")
+	}
+	detail.director = strings.TrimSpace(director)
+	return
+}
+func javbusSearchDetailAnalyzeLength(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
+	if len(nodes) <= 1 {
+		return errors.New("wrong length node size")
+	}
+	length := goquery.NewDocumentFromNode(nodes[1]).Text()
+	if debug {
+		log.With("length", length).Info("movie")
+	}
+	detail.length = strings.TrimSpace(length)
+	return
+}
 func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	nodes := selection.Contents().Nodes
 	if len(nodes) <= 1 {
@@ -188,7 +265,7 @@ func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusS
 	if debug {
 		log.With("release date", date).Info("movie")
 	}
-	detail.date = date
+	detail.date = strings.TrimSpace(date)
 	return
 }
 func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
@@ -200,7 +277,7 @@ func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSea
 	if debug {
 		log.With("id", id).Info("movie")
 	}
-	detail.id = id
+	detail.id = strings.TrimSpace(id)
 	return
 }
 func javbusSearchDetailAnalyze(lan GrabLanguage, result *javbusSearchResult) (*javbusSearchDetail, error) {
@@ -222,7 +299,7 @@ func javbusSearchDetailAnalyze(lan GrabLanguage, result *javbusSearchResult) (*j
 	log.With("bigTitle", bigTitle).Info(exists)
 	deatil := &javbusSearchDetail{}
 	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
-		err := getAnalyzeLanguageFunc(lan, selection.Contents().Nodes)(selection, deatil)
+		err := getAnalyzeLanguageFunc(lan, selection.Find("p > span.header").Nodes)(selection, deatil)
 		if err != nil {
 			log.Error(err)
 		}
