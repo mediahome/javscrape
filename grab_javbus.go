@@ -126,7 +126,7 @@ type javbusSearchDetail struct {
 }
 
 // AnalyzeLanguageFunc ...
-type AnalyzeLanguageFunc func(nodes []*html.Node, detail *javbusSearchDetail) (e error)
+type AnalyzeLanguageFunc func(selection *goquery.Selection, detail *javbusSearchDetail) (e error)
 
 var analyzeLangFuncList = []AnalyzeLanguageFunc{
 	javbusSearchDetailAnalyzeID,
@@ -174,12 +174,13 @@ func getAnalyzeLanguageFunc(language GrabLanguage, nodes []*html.Node) AnalyzeLa
 	}
 	return javbusSearchDetailAnalyzeDummy
 }
-func javbusSearchDetailAnalyzeDummy(nodes []*html.Node, detail *javbusSearchDetail) (e error) {
-	text := goquery.NewDocumentFromNode(nodes[0]).Text()
+func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
 	log.With("size", len(nodes), "text", text).Warn("dummy")
 	return nil
 }
-func javbusSearchDetailAnalyzeDate(nodes []*html.Node, detail *javbusSearchDetail) (e error) {
+func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
 	if len(nodes) <= 1 {
 		return errors.New("wrong date node size")
 	}
@@ -190,7 +191,8 @@ func javbusSearchDetailAnalyzeDate(nodes []*html.Node, detail *javbusSearchDetai
 	detail.date = date
 	return
 }
-func javbusSearchDetailAnalyzeID(nodes []*html.Node, detail *javbusSearchDetail) (e error) {
+func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
+	nodes := selection.Contents().Nodes
 	if len(nodes) <= 2 {
 		return errors.New("wrong id node size")
 	}
@@ -220,11 +222,10 @@ func javbusSearchDetailAnalyze(lan GrabLanguage, result *javbusSearchResult) (*j
 	log.With("bigTitle", bigTitle).Info(exists)
 	deatil := &javbusSearchDetail{}
 	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
-		err := getAnalyzeLanguageFunc(lan, selection.Contents().Nodes)(selection.Contents().Nodes, deatil)
+		err := getAnalyzeLanguageFunc(lan, selection.Contents().Nodes)(selection, deatil)
 		if err != nil {
 			log.Error(err)
 		}
-
 		//switch i {
 		//case 0:
 		//	id := goquery.NewDocumentFromNode(selection.Contents().Nodes[2]).Text()
