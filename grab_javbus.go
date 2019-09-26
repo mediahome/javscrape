@@ -176,7 +176,7 @@ func getAnalyzeLanguageFunc(language GrabLanguage, nodes []*html.Node) AnalyzeLa
 }
 func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
-	log.With("size", len(nodes), "text", text).Warn("dummy")
+	log.With("size", len(selection.Contents().Nodes), "text", text).Warnf("%+v", *detail)
 	return nil
 }
 func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
