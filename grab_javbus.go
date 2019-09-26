@@ -119,12 +119,6 @@ func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) 
 	return res, nil
 }
 
-type Idols struct {
-	Image    string
-	StarLink string
-	Name     string
-}
-
 type javbusSearchDetail struct {
 	id       string
 	date     string

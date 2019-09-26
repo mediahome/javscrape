@@ -15,3 +15,9 @@ type Message struct {
 	Genres        []string
 	Actors        []string
 }
+
+type Idols struct {
+	Image    string
+	StarLink string
+	Name     string
+}
