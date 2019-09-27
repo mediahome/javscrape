@@ -34,6 +34,12 @@ var bp4xGrabList = []string{
 type grabBP4X struct {
 	doc      *goquery.Document
 	grabType GrabBP4XType
+	sample   bool
+}
+
+// Sample ...
+func (g *grabBP4X) Sample(b bool) {
+	g.sample = b
 }
 
 // Name ...
@@ -56,8 +62,6 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 		return g, e
 	}
 	g.doc = document
-	//ret, e := document.Html()
-	//log.Println(ret)
 	return g, nil
 }
 

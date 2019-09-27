@@ -29,6 +29,11 @@ type grabJAVBUS struct {
 	details  []*javbusSearchDetail
 }
 
+// Sample ...
+func (g *grabJAVBUS) Sample(b bool) {
+	g.sample = b
+}
+
 // Name ...
 func (g *grabJAVBUS) Name() string {
 	return "javbus"
@@ -326,15 +331,17 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 		return nil, e
 	}
 
-	title := document.Find("body > div.container > h3").Text()
-	log.With("title", title).Info(result.ID)
-	bigImage, exists := document.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
-	log.With("bigImage", bigImage).Info(exists)
-	image, exists := document.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
-	log.With("image", image).Info(exists)
-	bigTitle, exists := document.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
-	log.With("bigTitle", bigTitle).Info(exists)
 	detail := &javbusSearchDetail{}
+	var exists bool
+	detail.title = document.Find("body > div.container > h3").Text()
+	log.With("title", detail.title).Info(result.ID)
+	detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
+	log.With("image", detail.bigImage).Info(exists)
+	//detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
+	//log.With("bigImage", detail.bigImage).Info(exists)
+	//detail.title, exists = document.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
+	//log.With("bigTitle", detail.title).Info(exists)
+
 	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
 		err := getAnalyzeLanguageFunc(grab.language, selection)(selection, detail)
 		if err != nil {
@@ -347,6 +354,23 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 			})
 		}
 	})
+
+	if grab.sample {
+		document.Find("#sample-waterfall").Each(func(i int, selection *goquery.Selection) {
+			image, _ := selection.Find("a.sample-box").Attr("href")
+			thumb, _ := selection.Find("a.sample-box > div > img").Attr("src")
+			title, _ := selection.Find("a.sample-box > div > img").Attr("title")
+			if debug {
+				log.With("index", i, "image", image, "title", title, "thumb", thumb).Info("sample")
+			}
+			detail.Sample = append(detail.Sample, &Sample{
+				Index: i,
+				Thumb: thumb,
+				Image: image,
+				Title: title,
+			})
+		})
+	}
 
 	return detail, nil
 }
