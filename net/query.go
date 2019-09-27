@@ -3,7 +3,6 @@ package net
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"log"
 	"net/http"
 )
 
