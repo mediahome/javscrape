@@ -14,4 +14,6 @@ type Message struct {
 	Plot          string
 	Genres        []string
 	Actors        []*Star
+	Image         string
+	Thumb         string
 }

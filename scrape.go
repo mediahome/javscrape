@@ -1,22 +1,27 @@
 package scrape
 
+import (
+	"context"
+	"github.com/javscrape/go-scrape/net"
+)
+
 var debug = false
 
 // IScrape ...
 type IScrape interface {
 	GrabSample(b bool)
 	IsGrabSample() (b bool)
-	CacheImage(b bool)
+	CacheImage(path string)
 }
 
 type scrapeImpl struct {
 	grabs  []IGrab
 	sample bool
-	cache  bool
+	cache  string
 }
 
-func (impl *scrapeImpl) CacheImage(b bool) {
-	impl.cache = b
+func (impl *scrapeImpl) CacheImage(path string) {
+	impl.cache = path
 }
 
 // IsGrabSample ...
@@ -59,5 +64,46 @@ func (impl *scrapeImpl) Find(name string) (msg []*Message, e error) {
 			log.With("name", grab.Name()).Error(e)
 		}
 	}
+
+	if impl.cache == "" {
+		c := net.NewCache(impl.cache)
+		e := imageCache(c, msg)
+		if e != nil {
+			return nil, e
+		}
+	}
+
 	return
+}
+
+func imageCache(cache *net.Cache, msg []*Message) (e error) {
+	path := make(chan string)
+	defer close(path)
+	ctx, cancel := context.WithCancel(context.Background())
+	go func(path chan<- string, cancelFunc context.CancelFunc) {
+		defer cancelFunc()
+		for _, m := range msg {
+			path <- m.Image
+			path <- m.Thumb
+			for _, act := range m.Actors {
+				path <- act.Image
+			}
+		}
+	}(path, cancel)
+
+ChanString:
+	for {
+		select {
+		case p := <-path:
+			if p != "" {
+				e = cache.Get(p)
+				if e != nil {
+					log.Error(e)
+				}
+			}
+		case <-ctx.Done():
+			break ChanString
+		}
+	}
+	return nil
 }

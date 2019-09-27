@@ -57,6 +57,8 @@ func (g *grabJAVBUS) Decode(msg []*Message) error {
 			Title:         detail.title,
 			OriginalTitle: "",
 			Year:          strconv.Itoa(detail.date.Year()),
+			Image:         detail.bigImage,
+			Thumb:         detail.thumbImage,
 			ReleaseDate:   detail.date,
 			Studio:        detail.studio,
 			MovieSet:      detail.series,
