@@ -34,10 +34,11 @@ func NewCache(tmp string) *Cache {
 
 // Get ...
 func (c *Cache) Get(url string) (e error) {
-	_, e = os.Stat(filepath.Join(c.tmp, hash(url)))
-	if e == nil || !os.IsNotExist(e) {
-		return e
+	stat, e := os.Stat(filepath.Join(c.tmp, hash(url)))
+	if (e == nil && stat.Size() != 0) || !os.IsNotExist(e) {
+		return os.ErrExist
 	}
+
 	if cli == nil {
 		cli = http.DefaultClient
 	}

@@ -3,6 +3,8 @@ package scrape
 import (
 	"context"
 	"github.com/javscrape/go-scrape/net"
+	"os"
+	"time"
 )
 
 var debug = false
@@ -72,12 +74,11 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Message, e error) {
 			return nil, e
 		}
 	}
-
 	return
 }
 
 func imageCache(cache *net.Cache, msg []*Message) (e error) {
-	path := make(chan string, 3)
+	path := make(chan string)
 	defer close(path)
 	ctx, cancel := context.WithCancel(context.Background())
 	go func(path chan<- string, cancelFunc context.CancelFunc) {
@@ -101,11 +102,13 @@ ChanString:
 		case p := <-path:
 			if p != "" {
 				e = cache.Get(p)
-				if e != nil {
+				if e != nil && !os.IsExist(e) {
 					log.Error(e)
 				}
 			}
 		case <-ctx.Done():
+			log.Info("waiting for done")
+			<-time.After(30 * time.Second)
 			break ChanString
 		}
 	}
