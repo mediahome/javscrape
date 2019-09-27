@@ -3,6 +3,7 @@ package net
 import (
 	"context"
 	"crypto/tls"
+	"github.com/godcong/go-trait"
 	"golang.org/x/net/proxy"
 	"net"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"time"
 )
 
+var log = trait.NewZapSugar()
 var cli *http.Client
 
 type ProxyArgs func(cli *http.Client)

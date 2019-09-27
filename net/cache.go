@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,7 +33,9 @@ func NewCache(tmp string) *Cache {
 
 // Get ...
 func (c *Cache) Get(url string) (e error) {
-	stat, e := os.Stat(filepath.Join(c.tmp, hash(url)))
+	h := hash(url)
+	stat, e := os.Stat(filepath.Join(c.tmp, h))
+	log.With("url", url, "hash", h).Info("cache get")
 	if (e == nil && stat.Size() != 0) || !os.IsNotExist(e) {
 		return os.ErrExist
 	}
