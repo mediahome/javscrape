@@ -12,8 +12,16 @@ import (
 
 var cli *http.Client
 
+type ProxyArgs func(cli *http.Client)
+
+func TimeOut(sec int) ProxyArgs {
+	return func(cli *http.Client) {
+		cli.Timeout = time.Duration(sec) * time.Second
+	}
+}
+
 // RegisterProxy ...
-func RegisterProxy(addr string) (e error) {
+func RegisterProxy(addr string, args ...ProxyArgs) (e error) {
 	u, e := url.Parse(addr)
 	if e != nil {
 		return e
@@ -34,6 +42,10 @@ func RegisterProxy(addr string) (e error) {
 		CheckRedirect: nil,
 		Jar:           nil,
 		Timeout:       60 * time.Second,
+	}
+
+	for _, fn := range args {
+		fn(cli)
 	}
 	return nil
 }
