@@ -51,7 +51,8 @@ func (g *grabJAVBUS) Name() string {
 
 // Decode ...
 func (g *grabJAVBUS) Decode(msg *[]*Message) error {
-	for _, detail := range g.details {
+	for idx, detail := range g.details {
+		log.With("index", idx).Info("decode")
 		*msg = append(*msg, &Message{
 			ID:            detail.id,
 			Title:         detail.title,
@@ -89,11 +90,12 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	for _, r := range results {
 		detail, e := javbusSearchDetailAnalyze(&ug, r)
 		if e != nil {
+			log.Error(e)
 			continue
 		}
 		detail.thumbImage = r.PhotoFrame
 		detail.title = r.Title
-		ug.details = append(g.details, detail)
+		ug.details = append(ug.details, detail)
 		log.Infof("javbus detail:%+v", detail)
 	}
 

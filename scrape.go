@@ -77,7 +77,7 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Message, e error) {
 }
 
 func imageCache(cache *net.Cache, msg []*Message) (e error) {
-	path := make(chan string, 10)
+	path := make(chan string, 3)
 	defer close(path)
 	ctx, cancel := context.WithCancel(context.Background())
 	go func(path chan<- string, cancelFunc context.CancelFunc) {
