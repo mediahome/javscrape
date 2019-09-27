@@ -64,18 +64,29 @@ func (c *Cache) Get(url string) (e error) {
 	return nil
 }
 
-// Move ...
-func (c *Cache) Move(url string, to string) (reader io.Reader, e error) {
+// Save ...
+func (c *Cache) Save(url string, to string) (written int64, e error) {
 	info, e := os.Stat(filepath.Join(c.tmp, hash(url)))
 	if e != nil && os.IsNotExist(e) {
-		return nil, errors.Wrap(e, "cache get error")
+		return written, errors.Wrap(e, "cache get error")
 	}
 	if info.IsDir() {
-		return nil, errors.New("cache get a dir")
+		return written, errors.New("cache get a dir")
 	}
+	s, e := filepath.Abs(to)
+	if e != nil {
+		return written, e
+	}
+	dir, f := filepath.Split(s)
+	_ = os.MkdirAll(dir, os.ModePerm)
 	file, e := os.Open(filepath.Join(c.tmp, hash(url)))
 	if e != nil {
-		return nil, e
+		return written, e
 	}
-	return file, nil
+
+	openFile, e := os.OpenFile(filepath.Join(s), os.O_TRUNC|os.O_CREATE|os.O_RDONLY|os.O_SYNC, os.ModePerm)
+	if e != nil {
+		return written, e
+	}
+	return io.Copy(openFile, file)
 }

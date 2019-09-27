@@ -5,5 +5,9 @@ import "testing"
 // TestNewCache ...
 func TestNewCache(t *testing.T) {
 	cache := NewCache("./tmp")
-	t.Log(cache.Get("https://pics.javbus.com/cover/6qx9_b.jpg"))
+	url := "https://pics.javbus.com/cover/6qx9_b.jpg"
+	t.Log(cache.Get(url))
+
+	t.Log(cache.Save(url, "./save/image.jpg"))
+
 }
