@@ -24,6 +24,7 @@ var grabJavbusLanguageList = []string{
 }
 
 type grabJAVBUS struct {
+	sample   bool
 	language GrabLanguage
 	details  []*javbusSearchDetail
 }
@@ -60,6 +61,10 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 		}
 		g.details = append(g.details, detail)
 		log.Infof("javbus detail:%+v", detail)
+	}
+
+	if g.sample {
+
 	}
 
 	return &ug, nil
@@ -131,6 +136,7 @@ type javbusSearchDetail struct {
 	series   string
 	genre    []string
 	idols    []*Idols
+	Sample   []*Sample
 }
 
 // AnalyzeLanguageFunc ...
