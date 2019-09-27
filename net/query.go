@@ -1,4 +1,4 @@
-package query
+package net
 
 import (
 	"context"

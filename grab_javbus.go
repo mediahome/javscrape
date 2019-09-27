@@ -87,11 +87,11 @@ type javbusSearchResult struct {
 
 func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) {
 	searchURL := fmt.Sprintf(url+javbusCensored, name)
-	document, e := query.New(searchURL)
+	document, e := net.New(searchURL)
 	isUncensored := false
 	if e != nil {
 		searchURL = fmt.Sprintf(url+javbusUncensored, name)
-		document, e = query.New(searchURL)
+		document, e = net.New(searchURL)
 		if e != nil {
 			return nil, e
 		}
@@ -326,7 +326,7 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
-	document, e := query.New(result.DetailLink)
+	document, e := net.New(result.DetailLink)
 	if e != nil {
 		return nil, e
 	}
