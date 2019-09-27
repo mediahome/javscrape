@@ -59,7 +59,7 @@ func (g *grabJAVBUS) Decode(msg []*Message) error {
 			Year:          strconv.Itoa(detail.date.Year()),
 			ReleaseDate:   detail.date,
 			Studio:        detail.studio,
-			MovieSet:      "",
+			MovieSet:      detail.series,
 			Plot:          "",
 			Genres:        detail.genre,
 			Actors:        detail.idols,
@@ -226,7 +226,7 @@ func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbus
 	return nil
 }
 func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
-	var idols []*Idols
+	var idols []*Star
 	log.Info(selection.Next().Html())
 
 	selection.Next().Find("div.star-box.idol-box").Each(func(i int, selection *goquery.Selection) {
