@@ -9,9 +9,20 @@ import (
 func TestGrabBP4X_Find(t *testing.T) {
 	grab := NewGrabBP4X(BP4XTypeJAV)
 	doc, err := grab.Find("abp-874")
-	msg := *new([]*Message)
+	if err != nil {
+		t.Fatal(err)
+	}
+	msg := new([]*Message)
 	err = doc.Decode(msg)
-	t.Log(err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cache := net.NewCache("./tmp")
+
+	err = imageCache(cache, *msg)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // TestGrabJAVBUS_Find ...
@@ -24,11 +35,19 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	grab := NewGrabJAVBUS(LanguageEnglish)
 	grab.Sample(true)
 	doc, err := grab.Find("gah-11")
-	msg := *new([]*Message)
+	msg := new([]*Message)
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = doc.Decode(msg)
-	t.Logf("%+v", msg)
-	t.Error(err)
+	t.Logf("%+v", *msg)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cache := net.NewCache("./tmp")
+
+	err = imageCache(cache, *msg)
+	if err != nil {
+		t.Fatal(err)
+	}
 }

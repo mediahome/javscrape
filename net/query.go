@@ -72,8 +72,8 @@ func getSOCKS5Transport(addr string) *http.Transport {
 	}
 }
 
-// New ...
-func New(url string) (*goquery.Document, error) {
+// NewQuery ...
+func NewQuery(url string) (*goquery.Document, error) {
 	if cli == nil {
 		cli = http.DefaultClient
 	}

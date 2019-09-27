@@ -6,10 +6,10 @@ type IGrab interface {
 	Sample(bool)
 	Name() string
 	Find(string) (IGrab, error)
-	Decode([]*Message) error
+	Decode(*[]*Message) error
 }
 
-// Sample ...
+// sample ...
 type Sample struct {
 	Index int
 	Thumb string

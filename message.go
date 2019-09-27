@@ -16,4 +16,5 @@ type Message struct {
 	Actors        []*Star
 	Image         string
 	Thumb         string
+	Sample        []*Sample
 }

@@ -39,7 +39,7 @@ func (g *grabJAVBUS) MainPage(url string) {
 	g.mainPage = url
 }
 
-// Sample ...
+// sample ...
 func (g *grabJAVBUS) Sample(b bool) {
 	g.sample = b
 }
@@ -50,9 +50,9 @@ func (g *grabJAVBUS) Name() string {
 }
 
 // Decode ...
-func (g *grabJAVBUS) Decode(msg []*Message) error {
+func (g *grabJAVBUS) Decode(msg *[]*Message) error {
 	for _, detail := range g.details {
-		msg = append(msg, &Message{
+		*msg = append(*msg, &Message{
 			ID:            detail.id,
 			Title:         detail.title,
 			OriginalTitle: "",
@@ -65,6 +65,7 @@ func (g *grabJAVBUS) Decode(msg []*Message) error {
 			Plot:          "",
 			Genres:        detail.genre,
 			Actors:        detail.idols,
+			Sample:        detail.sample,
 		})
 	}
 	return nil
@@ -72,9 +73,10 @@ func (g *grabJAVBUS) Decode(msg []*Message) error {
 
 // Find ...
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
-	name = strings.ToUpper(name)
 	ug := *g
-	url := g.mainPage + grabJavbusLanguageList[g.language]
+
+	name = strings.ToUpper(name)
+	url := ug.mainPage + grabJavbusLanguageList[ug.language]
 	results, e := javbusSearchResultAnalyze(url, name)
 	if e != nil {
 		return nil, e
@@ -85,16 +87,14 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 		}
 	}
 	for _, r := range results {
-		detail, e := javbusSearchDetailAnalyze(g, r)
+		detail, e := javbusSearchDetailAnalyze(&ug, r)
 		if e != nil {
 			continue
 		}
-		g.details = append(g.details, detail)
+		detail.thumbImage = r.PhotoFrame
+		detail.title = r.Title
+		ug.details = append(g.details, detail)
 		log.Infof("javbus detail:%+v", detail)
-	}
-
-	if g.sample {
-
 	}
 
 	return &ug, nil
@@ -112,11 +112,11 @@ type javbusSearchResult struct {
 
 func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) {
 	searchURL := fmt.Sprintf(url+javbusCensored, name)
-	document, e := net.New(searchURL)
+	document, e := net.NewQuery(searchURL)
 	isUncensored := false
 	if e != nil {
 		searchURL = fmt.Sprintf(url+javbusUncensored, name)
-		document, e = net.New(searchURL)
+		document, e = net.NewQuery(searchURL)
 		if e != nil {
 			return nil, e
 		}
@@ -169,7 +169,7 @@ type javbusSearchDetail struct {
 	series     string
 	genre      []string
 	idols      []*Star
-	Sample     []*Sample
+	sample     []*Sample
 }
 
 // AnalyzeLanguageFunc ...
@@ -358,15 +358,15 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
-	document, e := net.New(result.DetailLink)
+	document, e := net.NewQuery(result.DetailLink)
 	if e != nil {
 		return nil, e
 	}
 
 	detail := &javbusSearchDetail{}
 	var exists bool
-	detail.title = document.Find("body > div.container > h3").Text()
-	log.With("title", detail.title).Info(result.ID)
+	//detail.title = document.Find("body > div.container > h3").Text()
+	//log.With("title", detail.title).Info(result.ID)
 	detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
 	log.With("image", detail.bigImage).Info(exists)
 	//detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
@@ -395,7 +395,7 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 			if debug {
 				log.With("index", i, "image", image, "title", title, "thumb", thumb).Info("sample")
 			}
-			detail.Sample = append(detail.Sample, &Sample{
+			detail.sample = append(detail.sample, &Sample{
 				Index: i,
 				Thumb: thumb,
 				Image: image,

@@ -42,7 +42,7 @@ func (g *grabBP4X) MainPage(url string) {
 	panic("implement me")
 }
 
-// Sample ...
+// sample ...
 func (g *grabBP4X) Sample(b bool) {
 	g.sample = b
 }
@@ -53,7 +53,7 @@ func (g *grabBP4X) Name() string {
 }
 
 // Decode ...
-func (g *grabBP4X) Decode([]*Message) error {
+func (g *grabBP4X) Decode(*[]*Message) error {
 	panic("implement me")
 }
 
@@ -62,7 +62,7 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	url := bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
-	document, e := net.New(url)
+	document, e := net.NewQuery(url)
 	if e != nil {
 		return g, e
 	}
