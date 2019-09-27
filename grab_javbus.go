@@ -55,7 +55,7 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 		}
 	}
 	for _, r := range results {
-		detail, e := javbusSearchDetailAnalyze(g.language, r)
+		detail, e := javbusSearchDetailAnalyze(g, r)
 		if e != nil {
 			continue
 		}
@@ -127,16 +127,19 @@ func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) 
 }
 
 type javbusSearchDetail struct {
-	id       string
-	date     string
-	length   string
-	director string
-	studio   string
-	label    string
-	series   string
-	genre    []string
-	idols    []*Idols
-	Sample   []*Sample
+	title      string
+	thumbImage string
+	bigImage   string
+	id         string
+	date       string
+	length     string
+	director   string
+	studio     string
+	label      string
+	series     string
+	genre      []string
+	idols      []*Idols
+	Sample     []*Sample
 }
 
 // AnalyzeLanguageFunc ...
@@ -314,7 +317,7 @@ func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSea
 	detail.id = strings.TrimSpace(id)
 	return
 }
-func javbusSearchDetailAnalyze(lan GrabLanguage, result *javbusSearchResult) (*javbusSearchDetail, error) {
+func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*javbusSearchDetail, error) {
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
@@ -333,7 +336,7 @@ func javbusSearchDetailAnalyze(lan GrabLanguage, result *javbusSearchResult) (*j
 	log.With("bigTitle", bigTitle).Info(exists)
 	detail := &javbusSearchDetail{}
 	document.Find("body > div.container > div.row.movie > div.col-md-3.info > p").Each(func(i int, selection *goquery.Selection) {
-		err := getAnalyzeLanguageFunc(lan, selection)(selection, detail)
+		err := getAnalyzeLanguageFunc(grab.language, selection)(selection, detail)
 		if err != nil {
 			log.Error(err)
 		}
