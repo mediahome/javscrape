@@ -4,13 +4,19 @@ var debug = false
 
 // IScrape ...
 type IScrape interface {
-	GrabSample(bool)
-	IsGrabSample() bool
+	GrabSample(b bool)
+	IsGrabSample() (b bool)
+	CacheImage(b bool)
 }
 
 type scrapeImpl struct {
 	grabs  []IGrab
 	sample bool
+	cache  bool
+}
+
+func (impl *scrapeImpl) CacheImage(b bool) {
+	impl.cache = b
 }
 
 // IsGrabSample ...
