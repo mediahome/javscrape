@@ -25,7 +25,7 @@ var grabJavbusLanguageList = []string{
 
 type grabJAVBUS struct {
 	language GrabLanguage
-	res      []*javbusSearchResult
+	details  []*javbusSearchDetail
 }
 
 // Name ...
@@ -35,13 +35,7 @@ func (g *grabJAVBUS) Name() string {
 
 // Decode ...
 func (g *grabJAVBUS) Decode([]*Message) error {
-	for _, r := range g.res {
-		detail, e := javbusSearchDetailAnalyze(g.language, r)
-		if e != nil {
-			return e
-		}
-		log.Infof("javbus detail:%+v", detail)
-	}
+
 	return nil
 }
 
@@ -59,7 +53,15 @@ func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 			log.Infof("%+v", r)
 		}
 	}
-	ug.res = results
+	for _, r := range results {
+		detail, e := javbusSearchDetailAnalyze(g.language, r)
+		if e != nil {
+			continue
+		}
+		g.details = append(g.details, detail)
+		log.Infof("javbus detail:%+v", detail)
+	}
+
 	return &ug, nil
 }
 
@@ -173,24 +175,12 @@ var analyzeLanguageList = map[GrabLanguage][]string{
 }
 
 func getAnalyzeLanguageFunc(language GrabLanguage, selection *goquery.Selection) AnalyzeLanguageFunc {
-	//text := selection.Find("p > span.header").Text()
-	//genre := selection.Text()
 	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
 	for idx, list := range analyzeLanguageList[language] {
 		if strings.Compare(text, list) == 0 {
 			return analyzeLangFuncList[idx]
 		}
-		if debug {
-			//log.With("source", list, "target", text).Info(strings.Compare(text, list))
-		}
 	}
-	//6 is genre
-	//if strings.Compare(analyzeLanguageList[language][6], genre) == 0 {
-	//	return analyzeLangFuncList[6]
-	//}
-	//if debug {
-	//	log.With("source", analyzeLanguageList[language][6], "target", genre).Info(strings.Compare(analyzeLanguageList[language][6], genre))
-	//}
 	return javbusSearchDetailAnalyzeDummy
 }
 func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
@@ -202,7 +192,6 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 	var idols []*Idols
 	log.Info(selection.Next().Html())
 
-	//a.avatar-box:nth-child(1)
 	selection.Next().Find("div.star-box.idol-box").Each(func(i int, selection *goquery.Selection) {
 		starLink, _ := selection.Find("li > a").Attr("href")
 		image, _ := selection.Find("li > a > img").Attr("src")

@@ -16,6 +16,7 @@ type Message struct {
 	Actors        []string
 }
 
+// Idols ...
 type Idols struct {
 	Image    string
 	StarLink string
