@@ -77,7 +77,7 @@ func (c *Cache) Save(url string, to string) (written int64, e error) {
 	if e != nil {
 		return written, e
 	}
-	dir, f := filepath.Split(s)
+	dir, _ := filepath.Split(s)
 	_ = os.MkdirAll(dir, os.ModePerm)
 	file, e := os.Open(filepath.Join(c.tmp, hash(url)))
 	if e != nil {
