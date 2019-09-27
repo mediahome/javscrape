@@ -21,6 +21,12 @@ func (impl *scrapeImpl) IsGrabSample() bool {
 // GrabSample ...
 func (impl *scrapeImpl) GrabSample(b bool) {
 	impl.sample = b
+	if !impl.sample {
+		return
+	}
+	for _, grab := range impl.grabs {
+		grab.Sample(b)
+	}
 }
 
 // DebugOn ...
