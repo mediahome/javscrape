@@ -13,12 +13,5 @@ type Message struct {
 	MovieSet      string
 	Plot          string
 	Genres        []string
-	Actors        []string
-}
-
-// Idols ...
-type Idols struct {
-	Image    string
-	StarLink string
-	Name     string
+	Actors        []*Idols
 }

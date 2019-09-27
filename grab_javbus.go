@@ -3,7 +3,9 @@ package scrape
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/net"
@@ -48,8 +50,21 @@ func (g *grabJAVBUS) Name() string {
 }
 
 // Decode ...
-func (g *grabJAVBUS) Decode([]*Message) error {
-
+func (g *grabJAVBUS) Decode(msg []*Message) error {
+	for _, detail := range g.details {
+		msg = append(msg, &Message{
+			ID:            detail.id,
+			Title:         detail.title,
+			OriginalTitle: "",
+			Year:          strconv.Itoa(detail.date.Year()),
+			ReleaseDate:   detail.date,
+			Studio:        detail.studio,
+			MovieSet:      "",
+			Plot:          "",
+			Genres:        detail.genre,
+			Actors:        detail.idols,
+		})
+	}
 	return nil
 }
 
@@ -144,7 +159,7 @@ type javbusSearchDetail struct {
 	thumbImage string
 	bigImage   string
 	id         string
-	date       string
+	date       time.Time
 	length     string
 	director   string
 	studio     string
@@ -306,6 +321,9 @@ func javbusSearchDetailAnalyzeLength(selection *goquery.Selection, detail *javbu
 	detail.length = strings.TrimSpace(length)
 	return
 }
+
+const javbusTimeFormat = "2006-01-02"
+
 func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	nodes := selection.Contents().Nodes
 	if len(nodes) <= 1 {
@@ -315,7 +333,11 @@ func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusS
 	if debug {
 		log.With("release date", date).Info("movie")
 	}
-	detail.date = strings.TrimSpace(date)
+	parse, e := time.Parse(javbusTimeFormat, date)
+	if e != nil {
+		return e
+	}
+	detail.date = parse
 	return
 }
 func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
