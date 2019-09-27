@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/javscrape/go-scrape/query"
+	"github.com/javscrape/go-scrape/net"
 )
 
 const bp4xJavURL = "https://www.bp4x.com/?q=%s"

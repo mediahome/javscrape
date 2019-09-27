@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/javscrape/go-scrape/query"
+	"github.com/javscrape/go-scrape/net"
 )
 
 const javbusCNURL = "https://www.javbus.com/"
