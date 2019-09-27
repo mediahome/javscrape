@@ -5,11 +5,17 @@ var debug = false
 // IScrape ...
 type IScrape interface {
 	GrabSample(bool)
+	IsGrabSample() bool
 }
 
 type scrapeImpl struct {
 	grabs  []IGrab
 	sample bool
+}
+
+// IsGrabSample ...
+func (impl *scrapeImpl) IsGrabSample() bool {
+	return impl.sample
 }
 
 // GrabSample ...
