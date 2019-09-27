@@ -2,6 +2,7 @@ package scrape
 
 // IGrab ...
 type IGrab interface {
+	MainPage(url string)
 	Sample(bool)
 	Name() string
 	Find(string) (IGrab, error)

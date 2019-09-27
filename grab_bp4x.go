@@ -37,6 +37,11 @@ type grabBP4X struct {
 	sample   bool
 }
 
+// MainPage ...
+func (g *grabBP4X) MainPage(url string) {
+	panic("implement me")
+}
+
 // Sample ...
 func (g *grabBP4X) Sample(b bool) {
 	g.sample = b

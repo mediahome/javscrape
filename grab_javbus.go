@@ -9,10 +9,12 @@ import (
 	"github.com/javscrape/go-scrape/net"
 )
 
-const javbusCNURL = "https://www.javbus.com/"
-const javbusJAURL = "https://www.javbus.com/ja/"
-const javbusENURL = "https://www.javbus.com/en/"
-const javbusKOURL = "https://www.javbus.com/ko/"
+// DefaultJavbusMainPage ...
+const DefaultJavbusMainPage = "https://www.javbus.com"
+const javbusCNURL = "/"
+const javbusJAURL = "/ja/"
+const javbusENURL = "/en/"
+const javbusKOURL = "/ko/"
 const javbusUncensored = "uncensored/search/%s&type=1"
 const javbusCensored = "search/%s&type=1"
 
@@ -24,9 +26,15 @@ var grabJavbusLanguageList = []string{
 }
 
 type grabJAVBUS struct {
+	mainPage string
 	sample   bool
 	language GrabLanguage
 	details  []*javbusSearchDetail
+}
+
+// MainPage ...
+func (g *grabJAVBUS) MainPage(url string) {
+	g.mainPage = url
 }
 
 // Sample ...
@@ -49,7 +57,7 @@ func (g *grabJAVBUS) Decode([]*Message) error {
 func (g *grabJAVBUS) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	ug := *g
-	url := grabJavbusLanguageList[g.language]
+	url := g.mainPage + grabJavbusLanguageList[g.language]
 	results, e := javbusSearchResultAnalyze(url, name)
 	if e != nil {
 		return nil, e
@@ -378,6 +386,7 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 // NewGrabJAVBUS ...
 func NewGrabJAVBUS(language GrabLanguage) IGrab {
 	return &grabJAVBUS{
+		mainPage: DefaultJavbusMainPage,
 		language: language,
 	}
 }
