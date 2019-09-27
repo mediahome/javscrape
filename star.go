@@ -1,7 +1,7 @@
 package scrape
 
-// Idols ...
-type Idols struct {
+// Star ...
+type Star struct {
 	Image    string
 	StarLink string
 	Name     string   //english name
