@@ -4,10 +4,17 @@ var debug = false
 
 // IScrape ...
 type IScrape interface {
+	GrabSample(bool)
 }
 
 type scrapeImpl struct {
-	grabs []IGrab
+	grabs  []IGrab
+	sample bool
+}
+
+// GrabSample ...
+func (impl *scrapeImpl) GrabSample(b bool) {
+	impl.sample = b
 }
 
 // DebugOn ...
@@ -17,7 +24,7 @@ func DebugOn() {
 
 // NewScrape ...
 func NewScrape(grabs ...IGrab) IScrape {
-	return scrapeImpl{grabs: grabs}
+	return &scrapeImpl{grabs: grabs}
 }
 
 // Find ...
