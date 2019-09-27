@@ -33,7 +33,7 @@ func RegisterProxy(addr string) (e error) {
 		Transport:     transport,
 		CheckRedirect: nil,
 		Jar:           nil,
-		Timeout:       15 * time.Second,
+		Timeout:       60 * time.Second,
 	}
 	return nil
 }
