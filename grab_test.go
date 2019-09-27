@@ -21,6 +21,7 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	//	return
 	//}
 	grab := NewGrabJAVBUS(LanguageEnglish)
+	grab.Sample(true)
 	doc, err := grab.Find("gah-11")
 	msg := *new([]*Message)
 	if err != nil {

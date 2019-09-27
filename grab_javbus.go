@@ -356,10 +356,10 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 	})
 
 	if grab.sample {
-		document.Find("#sample-waterfall").Each(func(i int, selection *goquery.Selection) {
-			image, _ := selection.Find("a.sample-box").Attr("href")
-			thumb, _ := selection.Find("a.sample-box > div > img").Attr("src")
-			title, _ := selection.Find("a.sample-box > div > img").Attr("title")
+		document.Find("#sample-waterfall > a.sample-box").Each(func(i int, selection *goquery.Selection) {
+			image, _ := selection.Attr("href")
+			thumb, _ := selection.Find("div > img").Attr("src")
+			title, _ := selection.Find("div > img").Attr("title")
 			if debug {
 				log.With("index", i, "image", image, "title", title, "thumb", thumb).Info("sample")
 			}
