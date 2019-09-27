@@ -166,7 +166,7 @@ type javbusSearchDetail struct {
 	label      string
 	series     string
 	genre      []string
-	idols      []*Idols
+	idols      []*Star
 	Sample     []*Sample
 }
 
@@ -235,7 +235,7 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 		name := selection.Find("li > div.star-name > a").Text()
 		name = strings.TrimSpace(name)
 		log.With("name", name, "image", image, "star", starLink).Info("idols")
-		idols = append(idols, &Idols{
+		idols = append(idols, &Star{
 			StarLink: starLink,
 			Image:    image,
 			Name:     name,

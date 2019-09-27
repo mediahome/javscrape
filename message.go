@@ -13,5 +13,5 @@ type Message struct {
 	MovieSet      string
 	Plot          string
 	Genres        []string
-	Actors        []*Idols
+	Actors        []*Star
 }
