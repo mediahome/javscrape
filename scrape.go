@@ -22,6 +22,7 @@ type scrapeImpl struct {
 	cache  string
 }
 
+// CacheImage ...
 func (impl *scrapeImpl) CacheImage(path string) {
 	impl.cache = path
 }

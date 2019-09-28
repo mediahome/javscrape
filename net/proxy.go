@@ -14,8 +14,10 @@ import (
 var log = trait.NewZapSugar()
 var cli *http.Client
 
+// ProxyArgs ...
 type ProxyArgs func(cli *http.Client)
 
+// TimeOut ...
 func TimeOut(sec int) ProxyArgs {
 	return func(cli *http.Client) {
 		cli.Timeout = time.Duration(sec) * time.Second

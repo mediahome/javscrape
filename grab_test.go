@@ -7,6 +7,10 @@ import (
 
 // TestGrabBP4X_Find ...
 func TestGrabBP4X_Find(t *testing.T) {
+	e := net.RegisterProxy("socks5://localhost:11080")
+	if e != nil {
+		return
+	}
 	grab := NewGrabBP4X(BP4XTypeJAV)
 	doc, err := grab.Find("abp-874")
 	if err != nil {

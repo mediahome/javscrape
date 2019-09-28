@@ -9,7 +9,7 @@ type IGrab interface {
 	Decode(*[]*Message) error
 }
 
-// sample ...
+// Sample ...
 type Sample struct {
 	Index int
 	Thumb string
