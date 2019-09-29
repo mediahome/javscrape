@@ -2,9 +2,10 @@ package scrape
 
 import (
 	"context"
-	"github.com/javscrape/go-scrape/net"
 	"os"
 	"time"
+
+	"github.com/javscrape/go-scrape/net"
 )
 
 var debug = false
@@ -14,6 +15,7 @@ type IScrape interface {
 	GrabSample(b bool)
 	IsGrabSample() (b bool)
 	CacheImage(path string)
+	SortOut(path string)
 }
 
 type scrapeImpl struct {
