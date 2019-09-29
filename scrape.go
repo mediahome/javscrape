@@ -22,6 +22,12 @@ type scrapeImpl struct {
 	grabs  []IGrab
 	sample bool
 	cache  string
+	out    string
+}
+
+// SortOut ...
+func (impl *scrapeImpl) SortOut(path string) {
+	impl.out = path
 }
 
 // CacheImage ...
