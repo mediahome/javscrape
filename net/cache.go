@@ -66,8 +66,8 @@ func (c *Cache) Get(url string) (e error) {
 	name := hash(url)
 	stat, e := os.Stat(filepath.Join(c.tmp, name))
 	log.With("url", url, "hash", name).Info("cache get")
-	if (e == nil && stat.Size() != 0) || !os.IsNotExist(e) {
-		return os.ErrExist
+	if e == nil && stat.Size() != 0 {
+		return nil
 	}
 
 	if cli == nil {

@@ -1,5 +1,12 @@
 package scrape
 
+import (
+	"fmt"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/javscrape/go-scrape/net"
+)
+
 // DefaultJavdbMainPage ...
 const DefaultJavdbMainPage = "https://javdb2.com"
 const javdbSearch = "/search?q=%s&f=all"
@@ -35,6 +42,15 @@ type javdbSearchResult struct {
 }
 
 func javdbSearchResultAnalyze(url, name string) (result *javdbSearchResult, e error) {
+	document, e := net.Query(fmt.Sprintf(url, name))
+	if e != nil {
+		return nil, e
+	}
+	document.Find("#videos > div > div.grid-item.column").Each(func(i int, selection *goquery.Selection) {
+		if debug {
+			log.With("index", i, "text", selection.Text())
+		}
+	})
 	return &javdbSearchResult{}, nil
 }
 
