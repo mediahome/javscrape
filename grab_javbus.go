@@ -27,7 +27,7 @@ var grabJavbusLanguageList = []string{
 	LanguageKorea:    javbusKOURL,
 }
 
-type grabJAVBUS struct {
+type grabJavbus struct {
 	mainPage string
 	sample   bool
 	language GrabLanguage
@@ -35,22 +35,22 @@ type grabJAVBUS struct {
 }
 
 // MainPage ...
-func (g *grabJAVBUS) MainPage(url string) {
+func (g *grabJavbus) MainPage(url string) {
 	g.mainPage = url
 }
 
 // sample ...
-func (g *grabJAVBUS) Sample(b bool) {
+func (g *grabJavbus) Sample(b bool) {
 	g.sample = b
 }
 
 // Name ...
-func (g *grabJAVBUS) Name() string {
+func (g *grabJavbus) Name() string {
 	return "javbus"
 }
 
 // Decode ...
-func (g *grabJAVBUS) Decode(msg *[]*Message) error {
+func (g *grabJavbus) Decode(msg *[]*Message) error {
 	for idx, detail := range g.details {
 		log.With("index", idx).Info("decode")
 		*msg = append(*msg, &Message{
@@ -73,7 +73,7 @@ func (g *grabJAVBUS) Decode(msg *[]*Message) error {
 }
 
 // Find ...
-func (g *grabJAVBUS) Find(name string) (IGrab, error) {
+func (g *grabJavbus) Find(name string) (IGrab, error) {
 	ug := *g
 
 	name = strings.ToUpper(name)
@@ -356,7 +356,7 @@ func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSea
 	detail.id = strings.TrimSpace(id)
 	return
 }
-func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*javbusSearchDetail, error) {
+func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*javbusSearchDetail, error) {
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
@@ -409,10 +409,24 @@ func javbusSearchDetailAnalyze(grab *grabJAVBUS, result *javbusSearchResult) (*j
 	return detail, nil
 }
 
-// NewGrabJAVBUS ...
-func NewGrabJAVBUS(language GrabLanguage) IGrab {
-	return &grabJAVBUS{
-		mainPage: DefaultJavbusMainPage,
-		language: language,
+// GrabJavbusOptions ...
+type GrabJavbusOptions func(javbus *grabJavbus)
+
+// JavbusLang ...
+func JavbusLang(language GrabLanguage) GrabJavbusOptions {
+	return func(javbus *grabJavbus) {
+		javbus.language = language
 	}
+}
+
+// NewGrabJAVBUS ...
+func NewGrabJAVBUS(ops ...GrabJavbusOptions) IGrab {
+	grab := &grabJavbus{
+		mainPage: DefaultJavbusMainPage,
+		language: LanguageJapanese,
+	}
+	for _, op := range ops {
+		op(grab)
+	}
+	return grab
 }
