@@ -50,10 +50,10 @@ func (g *grabJavbus) Name() string {
 }
 
 // Decode ...
-func (g *grabJavbus) Decode(msg *[]*Message) error {
+func (g *grabJavbus) Decode(msg *[]*Content) error {
 	for idx, detail := range g.details {
 		log.With("index", idx).Info("decode")
-		*msg = append(*msg, &Message{
+		*msg = append(*msg, &Content{
 			ID:            detail.id,
 			Title:         detail.title,
 			OriginalTitle: "",
@@ -93,6 +93,7 @@ func (g *grabJavbus) Find(name string) (IGrab, error) {
 			log.Error(e)
 			continue
 		}
+		detail.uncensored = r.Uncensored
 		detail.thumbImage = r.PhotoFrame
 		detail.title = r.Title
 		ug.details = append(ug.details, detail)
@@ -160,9 +161,10 @@ type javbusSearchDetail struct {
 	studio     string
 	label      string
 	series     string
-	genre      []string
+	genre      []*Genre
 	idols      []*Star
 	sample     []*Sample
+	uncensored bool
 }
 
 // AnalyzeLanguageFunc ...
@@ -255,11 +257,12 @@ func javbusSearchDetailAnalyzeSeries(selection *goquery.Selection, detail *javbu
 	return
 }
 func javbusSearchDetailAnalyzeGenre(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
-	var genre []string
+	var genre []*Genre
 	selection.Next().Find("p > span.genre > a").Each(func(i int, selection *goquery.Selection) {
 		log.With("text", selection.Text()).Info("genre")
-		g := selection.Text()
-		g = strings.TrimSpace(g)
+		g := new(Genre)
+		g.Content = strings.TrimSpace(selection.Text())
+		g.URL = selection.AttrOr("href", "")
 		genre = append(genre, g)
 	})
 	if debug {

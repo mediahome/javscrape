@@ -2,8 +2,16 @@ package scrape
 
 import "time"
 
-// Message ...
-type Message struct {
+// Genre ...
+type Genre struct {
+	URL     string
+	Content string
+}
+
+// Content ...
+type Content struct {
+	From          string //where this
+	Uncensored    string
 	ID            string
 	Title         string
 	OriginalTitle string
@@ -12,7 +20,7 @@ type Message struct {
 	Studio        string
 	MovieSet      string
 	Plot          string
-	Genres        []string
+	Genres        []*Genre
 	Actors        []*Star
 	Image         string
 	Thumb         string

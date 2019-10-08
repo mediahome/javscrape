@@ -3,6 +3,8 @@ package scrape
 import (
 	"errors"
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/javscrape/go-scrape/net"
@@ -15,7 +17,7 @@ const javdbSearch = "/search?q=%s&f=all"
 type grabJavdb struct {
 	mainPage string
 	sample   bool
-	//details  []*javdbSearchDetail
+	details  []*javdbSearchDetail
 }
 
 // Sample ...
@@ -30,7 +32,8 @@ func (g *grabJavdb) Name() string {
 
 // Find ...
 func (g *grabJavdb) Find(name string) (IGrab, error) {
-	url := g.mainPage + javdbSearch
+	ug := *g
+	url := ug.mainPage + javdbSearch
 	results, e := javdbSearchResultAnalyze(url, name)
 	if e != nil {
 		return nil, e
@@ -40,7 +43,84 @@ func (g *grabJavdb) Find(name string) (IGrab, error) {
 			log.Infof("%+v", r)
 		}
 	}
-	return g, nil
+	for _, r := range results {
+		detail, e := javdbSearchDetailAnalyze(&ug, r)
+		if e != nil {
+			log.Error(e)
+			continue
+		}
+		detail.thumbImage = r.Thumb
+		detail.title = r.Title
+		ug.details = append(ug.details, detail)
+		log.Infof("javbus detail:%+v", detail)
+	}
+
+	return &ug, nil
+}
+
+type javdbSearchDetail struct {
+	title      string
+	thumbImage string
+	bigImage   string
+	id         string
+	date       time.Time
+	length     string
+	director   string
+	studio     string
+	label      string
+	series     string
+	genre      []*Genre
+	idols      []*Star
+	sample     []*Sample
+	uncensored bool
+}
+
+const javdbTimeFormat = "2006-01-02"
+
+func javdbSearchDetailAnalyze(javdb *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
+	if result == nil || result.DetailLink == "" {
+		return nil, errors.New("javdb search result is null")
+	}
+	document, e := net.Query(javdb.mainPage + result.DetailLink)
+	if e != nil {
+		return nil, e
+	}
+	detail = new(javdbSearchDetail)
+	detail.uncensored = strings.Index(document.Find("h2.title > strong").Text(), "無碼") > 0
+	detail.bigImage, _ = document.Find("div.columns.item-content > div.column.column-video-cover > a > img").Attr("src")
+	document.Find("div.columns.item-content > div > nav.panel > div.panel-block > span.value").Each(func(i int, selection *goquery.Selection) {
+		switch i {
+		case 0:
+			detail.id = selection.Text()
+		case 1:
+			detail.date, _ = time.Parse(javdbTimeFormat, selection.Text())
+		case 2:
+			detail.length = selection.Text()
+		case 3:
+			detail.studio = selection.Text()
+		case 4:
+			var genre []*Genre
+			selection.Find("a").Each(func(i int, selection *goquery.Selection) {
+				g := new(Genre)
+				g.Content = strings.TrimSpace(selection.Text())
+				g.URL = javdb.mainPage + selection.AttrOr("href", "")
+				genre = append(genre, g)
+			})
+			detail.genre = genre
+		case 5:
+			var idols []*Star
+			selection.Find("a").Each(func(i int, selection *goquery.Selection) {
+				s := new(Star)
+				s.Name = strings.TrimSpace(selection.Text())
+				s.StarLink = javdb.mainPage + selection.AttrOr("href", "")
+				idols = append(idols, s)
+			})
+			detail.idols = idols
+		}
+
+	})
+	log.Infof("%+v", detail)
+	return &javdbSearchDetail{}, nil
 }
 
 type javdbSearchResult struct {
@@ -83,7 +163,7 @@ func javdbSearchResultAnalyze(url, name string) (result []*javdbSearchResult, e 
 }
 
 // Decode ...
-func (g *grabJavdb) Decode(*[]*Message) error {
+func (g *grabJavdb) Decode(*[]*Content) error {
 	panic("implement me")
 }
 
