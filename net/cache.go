@@ -11,9 +11,26 @@ import (
 	"github.com/pkg/errors"
 )
 
+// DefaultCachePath ...
+var DefaultCachePath = "tmp"
+var cache = NewCache(DefaultCachePath)
+
+// CacheDisable ...
+var CacheDisable = false
+
 // Cache ...
 type Cache struct {
 	tmp string
+}
+
+// CacheOff ...
+func CacheOff() {
+	CacheDisable = true
+}
+
+// HasCache ...
+func HasCache() bool {
+	return !CacheDisable
 }
 
 func hash(url string) string {
@@ -67,8 +84,8 @@ func (c *Cache) Get(url string) (e error) {
 }
 
 // Save ...
-func (c *Cache) Save(url string, to string) (written int64, e error) {
-	info, e := os.Stat(filepath.Join(c.tmp, hash(url)))
+func Save(path, url, to string) (written int64, e error) {
+	info, e := os.Stat(filepath.Join(path, hash(url)))
 	if e != nil && os.IsNotExist(e) {
 		return written, errors.Wrap(e, "cache get error")
 	}
@@ -81,7 +98,7 @@ func (c *Cache) Save(url string, to string) (written int64, e error) {
 	}
 	dir, _ := filepath.Split(s)
 	_ = os.MkdirAll(dir, os.ModePerm)
-	file, e := os.Open(filepath.Join(c.tmp, hash(url)))
+	file, e := os.Open(filepath.Join(path, hash(url)))
 	if e != nil {
 		return written, e
 	}

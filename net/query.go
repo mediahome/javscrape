@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-// NewQuery ...
-func NewQuery(url string) (*goquery.Document, error) {
+// Query ...
+func Query(url string) (*goquery.Document, error) {
 	if cli == nil {
 		cli = http.DefaultClient
 	}

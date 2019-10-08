@@ -66,7 +66,7 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	url := g.mainPage + bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
-	document, e := net.NewQuery(url)
+	document, e := net.Query(url)
 	if e != nil {
 		return g, e
 	}

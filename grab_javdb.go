@@ -2,12 +2,12 @@ package scrape
 
 // DefaultJavdbMainPage ...
 const DefaultJavdbMainPage = "https://javdb2.com"
-const search = "/search?q=%s&f=all"
+const javdbSearch = "/search?q=%s&f=all"
 
 type grabJavdb struct {
 	mainPage string
 	sample   bool
-	details  []*javdbSearchDetail
+	//details  []*javdbSearchDetail
 }
 
 // Sample ...
@@ -21,8 +21,21 @@ func (g *grabJavdb) Name() string {
 }
 
 // Find ...
-func (g *grabJavdb) Find(string) (IGrab, error) {
-	panic("implement me")
+func (g *grabJavdb) Find(name string) (IGrab, error) {
+	url := g.mainPage + javdbSearch
+	results, e := javdbSearchResultAnalyze(url, name)
+	if e != nil {
+		return nil, e
+	}
+	log.Info(results)
+	return g, nil
+}
+
+type javdbSearchResult struct {
+}
+
+func javdbSearchResultAnalyze(url, name string) (result *javdbSearchResult, e error) {
+	return &javdbSearchResult{}, nil
 }
 
 // Decode ...
@@ -40,6 +53,5 @@ func NewJavdb() IGrab {
 	return &grabJavdb{
 		mainPage: DefaultJavdbMainPage,
 		sample:   false,
-		details:  nil,
 	}
 }
