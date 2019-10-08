@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/PuerkitoBio/goquery"
@@ -34,7 +35,11 @@ func (g *grabJavdb) Find(name string) (IGrab, error) {
 	if e != nil {
 		return nil, e
 	}
-	log.Info(results)
+	if debug {
+		for _, r := range results {
+			log.Infof("%+v", r)
+		}
+	}
 	return g, nil
 }
 
@@ -71,6 +76,9 @@ func javdbSearchResultAnalyze(url, name string) (result []*javdbSearchResult, e 
 			res = append(res, resTmp)
 		}
 	})
+	if res == nil || len(res) == 0 {
+		return nil, errors.New("no data found")
+	}
 	return res, nil
 }
 

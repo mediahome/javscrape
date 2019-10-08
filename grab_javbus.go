@@ -129,18 +129,9 @@ func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) 
 	document.Find("#waterfall > div > a.movie-box").Each(func(i int, selection *goquery.Selection) {
 		resTmp := new(javbusSearchResult)
 		resTmp.Uncensored = isUncensored
-		link, b := selection.Attr("href")
-		if b {
-			resTmp.DetailLink = link
-		}
-		src, b := selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("src")
-		if b {
-			resTmp.PhotoFrame = src
-		}
-		title, b := selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("title")
-		if b {
-			resTmp.Title = title
-		}
+		resTmp.DetailLink, _ = selection.Attr("href")
+		resTmp.PhotoFrame, _ = selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("src")
+		resTmp.Title, _ = selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("title")
 		selection.Find("#waterfall > div > a.movie-box > div.photo-info > span > date").Each(func(i int, selection *goquery.Selection) {
 			if i == 0 {
 				resTmp.ID = selection.Text()
