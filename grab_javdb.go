@@ -119,8 +119,7 @@ func javdbSearchDetailAnalyze(javdb *grabJavdb, result *javdbSearchResult) (deta
 		}
 
 	})
-	log.Infof("%+v", detail)
-	return &javdbSearchDetail{}, nil
+	return detail, nil
 }
 
 type javdbSearchResult struct {
