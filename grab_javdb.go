@@ -39,19 +39,39 @@ func (g *grabJavdb) Find(name string) (IGrab, error) {
 }
 
 type javdbSearchResult struct {
+	ID         string
+	Title      string
+	DetailLink string
+	Thumb      string
+	Tags       []string
+	Date       string
 }
 
-func javdbSearchResultAnalyze(url, name string) (result *javdbSearchResult, e error) {
+func javdbSearchResultAnalyze(url, name string) (result []*javdbSearchResult, e error) {
 	document, e := net.Query(fmt.Sprintf(url, name))
 	if e != nil {
 		return nil, e
 	}
+	var res []*javdbSearchResult
 	document.Find("#videos > div > div.grid-item.column").Each(func(i int, selection *goquery.Selection) {
+		resTmp := new(javdbSearchResult)
 		if debug {
-			log.With("index", i, "text", selection.Text())
+			log.With("index", i, "text", selection.Text()).Info("javdb")
+		}
+		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
+		resTmp.DetailLink, _ = selection.Find("a.box").Attr("href")
+		resTmp.Thumb, _ = selection.Find("a.box > div.item-image > img").Attr("src")
+		resTmp.ID = selection.Find("a.box > div.uid").Text()
+		resTmp.Title = selection.Find("a.box >div.video-title").Text()
+		selection.Find("a.box > div.tags > span.tag").Each(func(i int, selection *goquery.Selection) {
+			resTmp.Tags = append(resTmp.Tags, selection.Text())
+		})
+		resTmp.Date = selection.Find("a.box >div.meta").Text()
+		if resTmp.ID != "" {
+			res = append(res, resTmp)
 		}
 	})
-	return &javdbSearchResult{}, nil
+	return res, nil
 }
 
 // Decode ...
