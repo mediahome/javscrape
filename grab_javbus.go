@@ -224,11 +224,13 @@ func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbus
 }
 func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	var idols []*Star
-	log.Info(selection.Next().Html())
+	if debug {
+		log.Info(selection.Next().Html())
+	}
 
 	selection.Next().Find("div.star-box.idol-box").Each(func(i int, selection *goquery.Selection) {
-		starLink, _ := selection.Find("li > a").Attr("href")
-		image, _ := selection.Find("li > a > img").Attr("src")
+		starLink := selection.Find("li > a").AttrOr("href", "")
+		image := selection.Find("li > a > img").AttrOr("src", "")
 		name := selection.Find("li > div.star-name > a").Text()
 		name = strings.TrimSpace(name)
 		log.With("name", name, "image", image, "star", starLink).Info("idols")
@@ -360,11 +362,10 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 	}
 
 	detail := &javbusSearchDetail{}
-	var exists bool
 	//detail.title = document.Find("body > div.container > h3").Text()
 	//log.With("title", detail.title).Info(result.ID)
-	detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a > img").Attr("src")
-	log.With("image", detail.bigImage).Info(exists)
+	detail.bigImage = document.Find("body > div.container > div.row.movie > div > a > img").AttrOr("src", "")
+	log.With("image", detail.bigImage).Info("movie")
 	//detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
 	//log.With("bigImage", detail.bigImage).Info(exists)
 	//detail.title, exists = document.Find("body > div.container > div.row.movie > div > a > img").Attr("title")
@@ -385,9 +386,9 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 
 	if grab.sample {
 		document.Find("#sample-waterfall > a.sample-box").Each(func(i int, selection *goquery.Selection) {
-			image, _ := selection.Attr("href")
-			thumb, _ := selection.Find("div > img").Attr("src")
-			title, _ := selection.Find("div > img").Attr("title")
+			image := selection.AttrOr("href", "")
+			thumb := selection.Find("div > img").AttrOr("src", "")
+			title := selection.Find("div > img").AttrOr("title", "")
 			if debug {
 				log.With("index", i, "image", image, "title", title, "thumb", thumb).Info("sample")
 			}

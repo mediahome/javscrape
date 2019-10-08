@@ -143,14 +143,14 @@ func javdbSearchResultAnalyze(url, name string) (result []*javdbSearchResult, e 
 			log.With("index", i, "text", selection.Text()).Info("javdb")
 		}
 		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
-		resTmp.DetailLink, _ = selection.Find("a.box").Attr("href")
-		resTmp.Thumb, _ = selection.Find("a.box > div.item-image > img").Attr("src")
+		resTmp.DetailLink = selection.Find("a.box").AttrOr("href", "")
+		resTmp.Thumb = "https" + selection.Find("a.box > div.item-image > img").AttrOr("src", "")
 		resTmp.ID = selection.Find("a.box > div.uid").Text()
 		resTmp.Title = selection.Find("a.box >div.video-title").Text()
 		selection.Find("a.box > div.tags > span.tag").Each(func(i int, selection *goquery.Selection) {
 			resTmp.Tags = append(resTmp.Tags, selection.Text())
 		})
-		resTmp.Date = selection.Find("a.box >div.meta").Text()
+		resTmp.Date = strings.TrimSpace(selection.Find("a.box >div.meta").Text())
 		if resTmp.ID != "" {
 			res = append(res, resTmp)
 		}

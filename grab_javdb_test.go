@@ -6,6 +6,6 @@ import "testing"
 func TestNewJavdb(t *testing.T) {
 	DebugOn()
 	javdb := NewJavdb()
-	grab, e := javdb.Find("heyzo-2097")
+	grab, e := javdb.Find("abp-874")
 	t.Log(grab, e)
 }
