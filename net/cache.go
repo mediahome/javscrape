@@ -48,11 +48,24 @@ func NewCache(tmp string) *Cache {
 	return &Cache{tmp: s}
 }
 
+// Reader ...
+func (c *Cache) Reader(url string) (io.ReadCloser, error) {
+	e := c.Get(url)
+	if e != nil {
+		return nil, e
+	}
+	file, e := os.Open(filepath.Join(c.tmp, hash(url)))
+	if e != nil {
+		return nil, e
+	}
+	return file, nil
+}
+
 // Get ...
 func (c *Cache) Get(url string) (e error) {
-	h := hash(url)
-	stat, e := os.Stat(filepath.Join(c.tmp, h))
-	log.With("url", url, "hash", h).Info("cache get")
+	name := hash(url)
+	stat, e := os.Stat(filepath.Join(c.tmp, name))
+	log.With("url", url, "hash", name).Info("cache get")
 	if (e == nil && stat.Size() != 0) || !os.IsNotExist(e) {
 		return os.ErrExist
 	}
@@ -69,11 +82,11 @@ func (c *Cache) Get(url string) (e error) {
 	if res.StatusCode != 200 {
 		return fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
-	name := hash(url)
 	file, e := os.OpenFile(filepath.Join(c.tmp, name), os.O_TRUNC|os.O_CREATE|os.O_RDONLY|os.O_SYNC, os.ModePerm)
 	if e != nil {
 		return e
 	}
+	defer file.Close()
 	written, e := io.Copy(file, res.Body)
 	if e != nil {
 		return e
@@ -83,8 +96,8 @@ func (c *Cache) Get(url string) (e error) {
 	return nil
 }
 
-// Save ...
-func Save(path, url, to string) (written int64, e error) {
+// MoveCache ...
+func MoveCache(path, url, to string) (written int64, e error) {
 	info, e := os.Stat(filepath.Join(path, hash(url)))
 	if e != nil && os.IsNotExist(e) {
 		return written, errors.Wrap(e, "cache get error")

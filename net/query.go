@@ -2,12 +2,20 @@ package net
 
 import (
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"net/http"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 // Query ...
 func Query(url string) (*goquery.Document, error) {
+	if HasCache() {
+		closer, e := cache.Reader(url)
+		if e != nil {
+			return nil, e
+		}
+		return goquery.NewDocumentFromReader(closer)
+	}
 	if cli == nil {
 		cli = http.DefaultClient
 	}
