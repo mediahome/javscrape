@@ -17,8 +17,8 @@ const javbusCNURL = "/"
 const javbusJAURL = "/ja/"
 const javbusENURL = "/en/"
 const javbusKOURL = "/ko/"
-const javbusUncensored = "uncensored/search/%s&type=1"
-const javbusCensored = "search/%s&type=1"
+const javbusUncensored = "uncensored/search/%s"
+const javbusCensored = "search/%s"
 
 var grabJavbusLanguageList = []string{
 	LanguageChinese:  javbusCNURL,
@@ -32,6 +32,16 @@ type grabJavbus struct {
 	sample   bool
 	language GrabLanguage
 	details  []*javbusSearchDetail
+}
+
+// HasNext ...
+func (g *grabJavbus) HasNext() bool {
+	panic("implement me")
+}
+
+// Next ...
+func (g *grabJavbus) Next() (IGrab, error) {
+	panic("implement me")
 }
 
 // MainPage ...
@@ -104,11 +114,10 @@ func (g *grabJavbus) Find(name string) (IGrab, error) {
 }
 
 type javbusSearchResult struct {
-	Uncensored bool
-	DetailLink string
-	Title      string
-	PhotoFrame string
-	//PhotoInfo   string
+	Uncensored  bool
+	DetailLink  string
+	Title       string
+	PhotoFrame  string
 	ID          string
 	ReleaseDate string
 }

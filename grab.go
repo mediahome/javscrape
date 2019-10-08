@@ -6,6 +6,8 @@ type IGrab interface {
 	Sample(bool)
 	Name() string
 	Find(string) (IGrab, error)
+	HasNext() bool
+	Next() (IGrab, error)
 	Decode(*[]*Content) error
 }
 
