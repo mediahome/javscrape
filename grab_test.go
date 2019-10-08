@@ -1,8 +1,9 @@
 package scrape
 
 import (
-	"github.com/javscrape/go-scrape/net"
 	"testing"
+
+	"github.com/javscrape/go-scrape/net"
 )
 
 // TestGrabBP4X_Find ...
@@ -16,7 +17,7 @@ func TestGrabBP4X_Find(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	msg := new([]*Message)
+	msg := new([]*Content)
 	err = doc.Decode(msg)
 	if err != nil {
 		t.Fatal(err)
@@ -39,7 +40,7 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	grab := NewGrabJAVBUS()
 	grab.Sample(true)
 	doc, err := grab.Find("gah-11")
-	msg := new([]*Message)
+	msg := new([]*Content)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -62,8 +62,8 @@ func NewScrape(grabs ...IGrab) IScrape {
 }
 
 // Find ...
-func (impl *scrapeImpl) Find(name string) (msg *[]*Message, e error) {
-	msg = new([]*Message)
+func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
+	msg = new([]*Content)
 	for _, grab := range impl.grabs {
 		iGrab, e := grab.Find(name)
 		if e != nil {
@@ -86,7 +86,7 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Message, e error) {
 	return
 }
 
-func imageCache(cache *net.Cache, msg []*Message) (e error) {
+func imageCache(cache *net.Cache, msg []*Content) (e error) {
 	path := make(chan string)
 	defer close(path)
 	ctx, cancel := context.WithCancel(context.Background())

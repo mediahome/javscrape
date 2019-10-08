@@ -57,7 +57,7 @@ func (g *grabBP4X) Name() string {
 }
 
 // Decode ...
-func (g *grabBP4X) Decode(*[]*Message) error {
+func (g *grabBP4X) Decode(*[]*Content) error {
 	return nil
 }
 

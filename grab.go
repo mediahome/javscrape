@@ -6,7 +6,7 @@ type IGrab interface {
 	Sample(bool)
 	Name() string
 	Find(string) (IGrab, error)
-	Decode(*[]*Message) error
+	Decode(*[]*Content) error
 }
 
 // Sample ...
