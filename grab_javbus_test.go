@@ -4,9 +4,9 @@ import "testing"
 
 // TestNewGrabJAVBUS ...
 func TestNewGrabJAVBUS(t *testing.T) {
-	DebugOn()
+	//DebugOn()
 	javdb := NewGrabJavbus()
-	grab, e := javdb.Find("snis-998")
+	grab, e := javdb.Find("snis")
 	t.Log(grab, e)
 	t.Log(grab.HasNext())
 	count := 0
