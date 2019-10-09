@@ -15,12 +15,12 @@ const bp4xAmateurURL = "/?c=amateur&q=%s"
 const bp4xIVURL = "/?c=iv&q=%s"
 const bp4xHentaiURL = "/?c=hentai&q=%s"
 
-// GrabBP4XType ...
-type GrabBP4XType int
+// GrabBp4xType ...
+type GrabBp4xType int
 
 // BP4XTypeJAV ...
 const (
-	BP4XTypeJAV GrabBP4XType = iota
+	BP4XTypeJAV GrabBp4xType = iota
 	BP4XTypeAMATEUR
 	BP4XTypeIV
 	BP4XTypeHENTAI
@@ -33,51 +33,51 @@ var bp4xGrabList = []string{
 	BP4XTypeHENTAI:  bp4xHentaiURL,
 }
 
-type grabBP4X struct {
+type grabBp4x struct {
 	doc      *goquery.Document
 	language GrabLanguage
-	grabType GrabBP4XType
+	grabType GrabBp4xType
 	sample   bool
 	mainPage string
 }
 
 // Clone ...
-func (g *grabBP4X) Clone() IGrab {
+func (g *grabBp4x) Clone() IGrab {
 	panic("implement me")
 }
 
 // HasNext ...
-func (g *grabBP4X) HasNext() bool {
+func (g *grabBp4x) HasNext() bool {
 	panic("implement me")
 }
 
 // Next ...
-func (g *grabBP4X) Next() (IGrab, error) {
+func (g *grabBp4x) Next() (IGrab, error) {
 	panic("implement me")
 }
 
 // MainPage ...
-func (g *grabBP4X) MainPage(url string) {
+func (g *grabBp4x) MainPage(url string) {
 	g.mainPage = url
 }
 
 // sample ...
-func (g *grabBP4X) Sample(b bool) {
+func (g *grabBp4x) Sample(b bool) {
 	g.sample = b
 }
 
 // Name ...
-func (g *grabBP4X) Name() string {
+func (g *grabBp4x) Name() string {
 	return "bp4x"
 }
 
 // Decode ...
-func (g *grabBP4X) Decode(*[]*Content) error {
+func (g *grabBp4x) Decode(*[]*Content) error {
 	return nil
 }
 
 // Find ...
-func (g *grabBP4X) Find(name string) (IGrab, error) {
+func (g *grabBp4x) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	url := g.mainPage + bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
@@ -90,10 +90,24 @@ func (g *grabBP4X) Find(name string) (IGrab, error) {
 	return g, nil
 }
 
-// NewGrabBP4X ...
-func NewGrabBP4X(grabType GrabBP4XType) IGrab {
-	return &grabBP4X{
-		mainPage: DefaulBp4xMainPage,
-		grabType: grabType,
+// GrabBp4xOptions ...
+type GrabBp4xOptions func(javbus *grabBp4x)
+
+// GrabBp4xTypeOption ...
+func GrabBp4xTypeOption(grabType GrabBp4xType) GrabBp4xOptions {
+	return func(grab *grabBp4x) {
+		grab.grabType = grabType
 	}
+}
+
+// NewGrabBp4x ...
+func NewGrabBp4x(ops ...GrabBp4xOptions) IGrab {
+	grab := &grabBp4x{
+		mainPage: DefaulBp4xMainPage,
+		grabType: BP4XTypeJAV,
+	}
+	for _, op := range ops {
+		op(grab)
+	}
+	return grab
 }
