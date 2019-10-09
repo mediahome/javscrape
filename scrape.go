@@ -1,9 +1,7 @@
 package scrape
 
 import (
-	"context"
 	"os"
-	"time"
 
 	"github.com/javscrape/go-scrape/net"
 )
@@ -89,10 +87,8 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 
 func imageCache(cache *net.Cache, msg []*Content) (e error) {
 	path := make(chan string)
-	defer close(path)
-	ctx, cancel := context.WithCancel(context.Background())
-	go func(path chan<- string, cancelFunc context.CancelFunc) {
-		defer cancelFunc()
+	go func(path chan<- string) {
+		defer close(path)
 		for _, m := range msg {
 			path <- m.Image
 			path <- m.Thumb
@@ -104,22 +100,14 @@ func imageCache(cache *net.Cache, msg []*Content) (e error) {
 				path <- s.Thumb
 			}
 		}
-	}(path, cancel)
+	}(path)
 
-ChanString:
-	for {
-		select {
-		case p := <-path:
-			if p != "" {
-				e = cache.Get(p)
-				if e != nil && !os.IsExist(e) {
-					log.Error(e)
-				}
+	for p := range path {
+		if p != "" {
+			e = cache.Get(p)
+			if e != nil && !os.IsExist(e) {
+				log.Error(e)
 			}
-		case <-ctx.Done():
-			log.Info("waiting for done")
-			<-time.After(30 * time.Second)
-			break ChanString
 		}
 	}
 	return nil

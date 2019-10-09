@@ -40,6 +40,9 @@ func hash(url string) string {
 
 // NewCache ...
 func NewCache(tmp string) *Cache {
+	if tmp == "" {
+		tmp = DefaultCachePath
+	}
 	s, e := filepath.Abs(tmp)
 	if e != nil {
 		panic(e)

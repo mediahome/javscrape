@@ -32,6 +32,8 @@ type grabJavbus struct {
 	next       string
 	uncensored bool
 	sample     bool
+	exact      bool
+	finder     string
 	language   GrabLanguage
 	details    []*javbusSearchDetail
 }
@@ -466,6 +468,13 @@ type GrabJavbusOptions func(javbus *grabJavbus)
 func JavbusLang(language GrabLanguage) GrabJavbusOptions {
 	return func(javbus *grabJavbus) {
 		javbus.language = language
+	}
+}
+
+// JavbusExact ...
+func JavbusExact(b bool) GrabJavbusOptions {
+	return func(javbus *grabJavbus) {
+		javbus.exact = b
 	}
 }
 

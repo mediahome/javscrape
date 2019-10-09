@@ -19,6 +19,8 @@ type grabJavdb struct {
 	mainPage string
 	next     string
 	sample   bool
+	exact    bool
+	finder   string
 	details  []*javdbSearchDetail
 }
 
@@ -27,6 +29,8 @@ func (g *grabJavdb) clone() *grabJavdb {
 	clone.mainPage = g.mainPage
 	clone.sample = g.sample
 	clone.next = g.next
+	clone.finder = g.finder
+	clone.exact = g.exact
 	//clone.details = make([]*javdbSearchDetail, len(g.details))
 	//copy(clone.details, g.details)
 	return clone
@@ -65,6 +69,10 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 	}
 
 	for _, r := range results {
+		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
+			log.With("id", r.ID, "find", clone.finder).Info("continue")
+			continue
+		}
 		detail, e := javdbSearchDetailAnalyze(clone, r)
 		if e != nil {
 			log.Error(e)
@@ -83,6 +91,7 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 
 // Find ...
 func (g *grabJavdb) Find(name string) (IGrab, error) {
+	g.finder = name
 	url := fmt.Sprintf(g.mainPage+javdbSearch, name)
 	return g.find(url)
 }
@@ -242,15 +251,30 @@ func (g *grabJavdb) Decode(msg *[]*Content) error {
 	return nil
 }
 
+// GrabJavbusOptions ...
+type GrabJavdbOptions func(javdb *grabJavdb)
+
+// JavdbExact ...
+func JavdbExact(b bool) GrabJavdbOptions {
+	return func(javdb *grabJavdb) {
+		javdb.exact = b
+	}
+}
+
 // MainPage ...
 func (g *grabJavdb) MainPage(url string) {
 	g.mainPage = url
 }
 
 // NewGrabJavdb ...
-func NewGrabJavdb() IGrab {
-	return &grabJavdb{
+func NewGrabJavdb(ops ...GrabJavdbOptions) IGrab {
+	grab := &grabJavdb{
 		mainPage: DefaultJavdbMainPage,
 		sample:   false,
+		exact:    true,
 	}
+	for _, op := range ops {
+		op(grab)
+	}
+	return grab
 }
