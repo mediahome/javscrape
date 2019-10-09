@@ -9,6 +9,7 @@ type IGrab interface {
 	HasNext() bool
 	Next() (IGrab, error)
 	Decode(*[]*Content) error
+	Clone() IGrab
 }
 
 // Sample ...

@@ -34,6 +34,11 @@ type grabJavbus struct {
 	details  []*javbusSearchDetail
 }
 
+// Clone ...
+func (g *grabJavbus) Clone() IGrab {
+	panic("implement me")
+}
+
 // HasNext ...
 func (g *grabJavbus) HasNext() bool {
 	panic("implement me")

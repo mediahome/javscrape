@@ -41,6 +41,21 @@ type grabBP4X struct {
 	mainPage string
 }
 
+// Clone ...
+func (g *grabBP4X) Clone() IGrab {
+	panic("implement me")
+}
+
+// HasNext ...
+func (g *grabBP4X) HasNext() bool {
+	panic("implement me")
+}
+
+// Next ...
+func (g *grabBP4X) Next() (IGrab, error) {
+	panic("implement me")
+}
+
 // MainPage ...
 func (g *grabBP4X) MainPage(url string) {
 	g.mainPage = url

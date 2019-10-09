@@ -20,6 +20,21 @@ type grabJavdb struct {
 	details  []*javdbSearchDetail
 }
 
+// Clone ...
+func (g *grabJavdb) Clone() IGrab {
+	panic("implement me")
+}
+
+// HasNext ...
+func (g *grabJavdb) HasNext() bool {
+	panic("implement me")
+}
+
+// Next ...
+func (g *grabJavdb) Next() (IGrab, error) {
+	panic("implement me")
+}
+
 // Sample ...
 func (g *grabJavdb) Sample(b bool) {
 	g.sample = b
