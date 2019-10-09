@@ -227,6 +227,7 @@ var analyzeLanguageList = map[GrabLanguage][]string{
 		"監督:",
 		"メーカー:",
 		"レーベル:",
+		"シリーズ",
 		"ジャンル:",
 		"出演者",
 	},
@@ -272,10 +273,14 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 }
 func javbusSearchDetailAnalyzeSeries(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	nodes := selection.Contents().Nodes
-	if len(nodes) <= 2 {
-		return errors.New("wrong director node size")
+	series := ""
+	if len(nodes) == 3 {
+		series = goquery.NewDocumentFromNode(nodes[2]).Text()
+		//} else if len(nodes) == 2 {
+		//	series = goquery.NewDocumentFromNode(nodes[1]).Text()
+	} else {
+		return errors.New("wrong series node size")
 	}
-	series := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
 		log.With("series", series).Info("movie")
 	}
@@ -323,10 +328,14 @@ func javbusSearchDetailAnalyzeStudio(selection *goquery.Selection, detail *javbu
 }
 func javbusSearchDetailAnalyzeDirector(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	nodes := selection.Contents().Nodes
-	if len(nodes) <= 2 {
+	director := ""
+	if len(nodes) == 3 {
+		director = goquery.NewDocumentFromNode(nodes[2]).Text()
+		//} else if len(nodes) == 2 {
+		//	director = goquery.NewDocumentFromNode(nodes[1]).Text()
+	} else {
 		return errors.New("wrong director node size")
 	}
-	director := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
 		log.With("director", director).Info("movie")
 	}
