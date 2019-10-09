@@ -137,6 +137,14 @@ func copyFile(cache *net.Cache, source, path string) error {
 	}
 	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	ext := filepath.Ext(source)
+	info, e := os.Stat(path + ext)
+	if e != nil && !os.IsNotExist(e) {
+		return e
+	}
+	if e == nil && info.Size() != 0 {
+		return nil
+	}
+
 	file, e := os.OpenFile(path+ext, os.O_SYNC|os.O_RDONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
 	if e != nil {
 		return e
