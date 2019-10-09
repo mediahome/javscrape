@@ -209,8 +209,8 @@ func (g *grabJavdb) MainPage(url string) {
 	g.mainPage = url
 }
 
-// NewJavdb ...
-func NewJavdb() IGrab {
+// NewGrabJavdb ...
+func NewGrabJavdb() IGrab {
 	return &grabJavdb{
 		mainPage: DefaultJavdbMainPage,
 		sample:   false,

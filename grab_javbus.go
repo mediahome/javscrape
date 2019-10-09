@@ -87,6 +87,7 @@ func (g *grabJavbus) clone() *grabJavbus {
 	clone.mainPage = g.mainPage
 	clone.sample = g.sample
 	clone.language = g.language
+	clone.next = g.next
 	return clone
 }
 
@@ -111,7 +112,7 @@ func (g *grabJavbus) Find(name string) (IGrab, error) {
 		}
 	}
 	for _, r := range results {
-		detail, e := javbusSearchDetailAnalyze(&ug, r)
+		detail, e := javbusSearchDetailAnalyze(clone, r)
 		if e != nil {
 			log.Error(e)
 			continue
@@ -123,7 +124,7 @@ func (g *grabJavbus) Find(name string) (IGrab, error) {
 		log.Infof("javbus detail:%+v", detail)
 	}
 
-	return &ug, nil
+	return clone, nil
 }
 
 type javbusSearchResult struct {
@@ -160,9 +161,9 @@ func javbusSearchResultAnalyze(grab *grabJavbus, url string, uncensored bool) ([
 		res = append(res, resTmp)
 	})
 	next, b := document.Find("body > div.text-center.hidden-xs > ul > li#next").Attr("href")
-	if debug {
-		log.With("next", next, "exist", b).Info("pagination")
-	}
+	//if debug {
+	log.With("next", next, "exist", b).Info("pagination")
+	//}
 	grab.next = ""
 	if b && next != "" {
 		grab.next = grab.mainPage + next
@@ -356,7 +357,7 @@ func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusS
 	if debug {
 		log.With("release date", date).Info("movie")
 	}
-	parse, e := time.Parse(javbusTimeFormat, date)
+	parse, e := time.Parse(javbusTimeFormat, strings.TrimSpace(date))
 	if e != nil {
 		return e
 	}
@@ -437,8 +438,8 @@ func JavbusLang(language GrabLanguage) GrabJavbusOptions {
 	}
 }
 
-// NewGrabJAVBUS ...
-func NewGrabJAVBUS(ops ...GrabJavbusOptions) IGrab {
+// NewGrabJavbus ...
+func NewGrabJavbus(ops ...GrabJavbusOptions) IGrab {
 	grab := &grabJavbus{
 		mainPage: DefaultJavbusMainPage,
 		language: LanguageJapanese,

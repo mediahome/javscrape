@@ -37,7 +37,7 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	if e != nil {
 		return
 	}
-	grab := NewGrabJAVBUS()
+	grab := NewGrabJavbus()
 	grab.Sample(true)
 	doc, err := grab.Find("abp/10")
 	msg := new([]*Content)

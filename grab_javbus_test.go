@@ -2,10 +2,10 @@ package scrape
 
 import "testing"
 
-// TestNewJavdb ...
-func TestNewJavdb(t *testing.T) {
-	//DebugOn()
-	javdb := NewGrabJavdb()
+// TestNewGrabJAVBUS ...
+func TestNewGrabJAVBUS(t *testing.T) {
+	DebugOn()
+	javdb := NewGrabJavbus()
 	grab, e := javdb.Find("snis")
 	t.Log(grab, e)
 	t.Log(grab.HasNext())
