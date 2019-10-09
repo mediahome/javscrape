@@ -108,6 +108,10 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 		}
 	}
 	for _, r := range results {
+		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
+			log.With("id", r.ID, "find", clone.finder).Info("continue")
+			continue
+		}
 		detail, e := javbusSearchDetailAnalyze(clone, r)
 		if e != nil {
 			log.Error(e)
@@ -125,6 +129,7 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 
 // Find ...
 func (g *grabJavbus) Find(name string) (IGrab, error) {
+	g.finder = name
 	url := g.mainPage + grabJavbusLanguageList[g.language]
 	g.uncensored = false
 	grab, e := g.find(fmt.Sprintf(url+javbusCensored, name))
@@ -483,6 +488,7 @@ func NewGrabJavbus(ops ...GrabJavbusOptions) IGrab {
 	grab := &grabJavbus{
 		mainPage: DefaultJavbusMainPage,
 		language: LanguageJapanese,
+		exact:    true,
 	}
 	for _, op := range ops {
 		op(grab)
