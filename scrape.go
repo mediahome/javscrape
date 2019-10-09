@@ -135,8 +135,8 @@ func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
 
 func copyInfo(msg *Content, path string) error {
 	pid := filepath.Join(path, msg.ID)
-	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	inf := filepath.Join(pid, "inf.json")
+	_ = os.MkdirAll(filepath.Dir(inf), os.ModePerm)
 	info, e := os.Stat(inf)
 	if e != nil && !os.IsNotExist(e) {
 		return e

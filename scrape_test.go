@@ -22,7 +22,7 @@ func TestNewScrape(t *testing.T) {
 	scrape.ImageCache("")
 	msg, e := scrape.Find("abp-90")
 	if e != nil {
-		return
+		t.Fatal(e)
 	}
 	for _, m := range *msg {
 		log.Infof("%+v", m)
