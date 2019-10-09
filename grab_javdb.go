@@ -185,9 +185,9 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 	})
 
 	next, b := document.Find("body > section > div > nav.pagination > a.pagination-next").Attr("href")
-	//if debug {
-	log.With("next", next, "exist", b).Info("pagination")
-	//}
+	if debug {
+		log.With("next", next, "exist", b).Info("pagination")
+	}
 	grab.next = ""
 	if b && next != "" {
 		grab.next = grab.mainPage + next

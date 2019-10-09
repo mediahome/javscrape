@@ -29,19 +29,15 @@ var grabJavbusLanguageList = []string{
 
 type grabJavbus struct {
 	mainPage string
+	next     string
 	sample   bool
 	language GrabLanguage
 	details  []*javbusSearchDetail
 }
 
-// Clone ...
-func (g *grabJavbus) Clone() IGrab {
-	panic("implement me")
-}
-
 // HasNext ...
 func (g *grabJavbus) HasNext() bool {
-	panic("implement me")
+	return g.next != ""
 }
 
 // Next ...
@@ -86,16 +82,28 @@ func (g *grabJavbus) Decode(msg *[]*Content) error {
 	}
 	return nil
 }
+func (g *grabJavbus) clone() *grabJavbus {
+	clone := new(grabJavbus)
+	clone.mainPage = g.mainPage
+	clone.sample = g.sample
+	clone.language = g.language
+	return clone
+}
 
 // Find ...
 func (g *grabJavbus) Find(name string) (IGrab, error) {
-	ug := *g
+	clone := g.clone()
 
 	name = strings.ToUpper(name)
-	url := ug.mainPage + grabJavbusLanguageList[ug.language]
-	results, e := javbusSearchResultAnalyze(url, name)
+	url := clone.mainPage + grabJavbusLanguageList[clone.language]
+	searchURL := fmt.Sprintf(url+javbusCensored, name)
+	results, e := javbusSearchResultAnalyze(clone, searchURL, false)
 	if e != nil {
-		return nil, e
+		searchURL := fmt.Sprintf(url+javbusUncensored, name)
+		results, e = javbusSearchResultAnalyze(clone, searchURL, true)
+		if e != nil {
+			return nil, e
+		}
 	}
 	if debug {
 		for _, r := range results {
@@ -111,7 +119,7 @@ func (g *grabJavbus) Find(name string) (IGrab, error) {
 		detail.uncensored = r.Uncensored
 		detail.thumbImage = r.PhotoFrame
 		detail.title = r.Title
-		ug.details = append(ug.details, detail)
+		clone.details = append(clone.details, detail)
 		log.Infof("javbus detail:%+v", detail)
 	}
 
@@ -127,23 +135,16 @@ type javbusSearchResult struct {
 	ReleaseDate string
 }
 
-func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) {
-	searchURL := fmt.Sprintf(url+javbusCensored, name)
-	document, e := net.Query(searchURL)
-	isUncensored := false
+func javbusSearchResultAnalyze(grab *grabJavbus, url string, uncensored bool) ([]*javbusSearchResult, error) {
+	document, e := net.Query(url)
 	if e != nil {
-		searchURL = fmt.Sprintf(url+javbusUncensored, name)
-		document, e = net.Query(searchURL)
-		if e != nil {
-			return nil, e
-		}
-		isUncensored = true
+		return nil, e
 	}
 
 	var res []*javbusSearchResult
 	document.Find("#waterfall > div > a.movie-box").Each(func(i int, selection *goquery.Selection) {
 		resTmp := new(javbusSearchResult)
-		resTmp.Uncensored = isUncensored
+		resTmp.Uncensored = uncensored
 		resTmp.DetailLink, _ = selection.Attr("href")
 		resTmp.PhotoFrame, _ = selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("src")
 		resTmp.Title, _ = selection.Find("#waterfall > div > a.movie-box > div.photo-frame > img").Attr("title")
@@ -158,6 +159,14 @@ func javbusSearchResultAnalyze(url, name string) ([]*javbusSearchResult, error) 
 		})
 		res = append(res, resTmp)
 	})
+	next, b := document.Find("body > div.text-center.hidden-xs > ul > li#next").Attr("href")
+	if debug {
+		log.With("next", next, "exist", b).Info("pagination")
+	}
+	grab.next = ""
+	if b && next != "" {
+		grab.next = grab.mainPage + next
+	}
 	if res == nil || len(res) == 0 {
 		return nil, errors.New("no data found")
 	}
