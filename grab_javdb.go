@@ -3,6 +3,7 @@ package scrape
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -189,7 +190,7 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 		}
 		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
 		resTmp.DetailLink = selection.Find("a.box").AttrOr("href", "")
-		resTmp.Thumb = "https" + selection.Find("a.box > div.item-image > img").AttrOr("src", "")
+		resTmp.Thumb = "https:" + selection.Find("a.box > div.item-image > img").AttrOr("src", "")
 		resTmp.ID = selection.Find("a.box > div.uid").Text()
 		resTmp.Title = selection.Find("a.box >div.video-title").Text()
 		selection.Find("a.box > div.tags > span.tag").Each(func(i int, selection *goquery.Selection) {
@@ -217,8 +218,28 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 }
 
 // Decode ...
-func (g *grabJavdb) Decode(*[]*Content) error {
-	panic("implement me")
+func (g *grabJavdb) Decode(msg *[]*Content) error {
+	for idx, detail := range g.details {
+		log.With("index", idx).Info("decode")
+		*msg = append(*msg, &Content{
+			From:          g.Name(),
+			Uncensored:    detail.uncensored,
+			ID:            detail.id,
+			Title:         detail.title,
+			OriginalTitle: "",
+			Year:          strconv.Itoa(detail.date.Year()),
+			Image:         detail.bigImage,
+			Thumb:         detail.thumbImage,
+			ReleaseDate:   detail.date,
+			Studio:        detail.studio,
+			MovieSet:      detail.series,
+			Plot:          "",
+			Genres:        detail.genre,
+			Actors:        detail.idols,
+			Sample:        detail.sample,
+		})
+	}
+	return nil
 }
 
 // MainPage ...

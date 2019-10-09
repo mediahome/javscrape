@@ -11,7 +11,7 @@ type Genre struct {
 // Content ...
 type Content struct {
 	From          string //where this
-	Uncensored    string
+	Uncensored    bool
 	ID            string
 	Title         string
 	OriginalTitle string

@@ -16,6 +16,7 @@ type IScrape interface {
 	IsGrabSample() (b bool)
 	CacheImage(path string)
 	SortOut(path string)
+	Find(name string) (msg *[]*Content, e error)
 }
 
 type scrapeImpl struct {
@@ -67,12 +68,12 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	for _, grab := range impl.grabs {
 		iGrab, e := grab.Find(name)
 		if e != nil {
-			log.With("name", grab.Name()).Error(e)
+			log.With("name", grab.Name(), "find", name).Error(e)
 			continue
 		}
 		e = iGrab.Decode(msg)
 		if e != nil {
-			log.With("name", grab.Name()).Error(e)
+			log.With("name", grab.Name(), "find", name).Error(e)
 		}
 	}
 
