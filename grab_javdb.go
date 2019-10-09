@@ -16,6 +16,7 @@ const javdbSearch = "/search?q=%s&f=all"
 
 type grabJavdb struct {
 	mainPage string
+	next     bool
 	sample   bool
 	details  []*javdbSearchDetail
 }
