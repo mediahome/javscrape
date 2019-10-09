@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/javscrape/go-scrape/net"
 )
@@ -113,11 +114,11 @@ func copyCache(cache *net.Cache, msg []*Content, output string) (e error) {
 			}
 		}
 		for _, s := range m.Sample {
-			e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", s.Image))
+			e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "image"+strconv.Itoa(s.Index)))
 			if e != nil {
 				return e
 			}
-			e = copyFile(cache, s.Thumb, filepath.Join(pid, ".sample", s.Thumb))
+			e = copyFile(cache, s.Thumb, filepath.Join(pid, ".sample", "thumb"+strconv.Itoa(s.Index)))
 			if e != nil {
 				return e
 			}

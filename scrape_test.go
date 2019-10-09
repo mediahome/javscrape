@@ -17,9 +17,9 @@ func TestNewScrape(t *testing.T) {
 	//if err != nil {
 	//	t.Fatal(err)
 	scrape := NewScrape(grab2, grab3)
-
+	scrape.Output("video")
 	scrape.GrabSample(true)
-
+	scrape.ImageCache("")
 	msg, e := scrape.Find("abp-874")
 	if e != nil {
 		return
