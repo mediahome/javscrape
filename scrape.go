@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"encoding/json"
 	"io"
 	"os"
 	"path/filepath"
@@ -87,44 +88,69 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	}
 
 	if impl.output != "" {
-		e := copyCache(impl.cache, *msg, impl.output)
-		if e != nil {
-			return nil, e
+		for _, m := range *msg {
+			e = copyInfo(m, impl.output)
+			if e != nil {
+				return nil, e
+			}
+			e = copyCache(impl.cache, m, impl.output)
+			if e != nil {
+				return nil, e
+			}
+
 		}
 	}
 
 	return msg, nil
 }
 
-func copyCache(cache *net.Cache, msg []*Content, output string) (e error) {
-	for _, m := range msg {
-		pid := filepath.Join(output, m.ID)
-		e = copyFile(cache, m.Image, filepath.Join(pid, "image"))
+func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
+	pid := filepath.Join(output, msg.ID)
+	e = copyFile(cache, msg.Image, filepath.Join(pid, "image"))
+	if e != nil {
+		return e
+	}
+	e = copyFile(cache, msg.Thumb, filepath.Join(pid, "thumb"))
+	if e != nil {
+		return e
+	}
+	for _, act := range msg.Actors {
+		e = copyFile(cache, act.Image, filepath.Join(pid, ".actor", act.Name))
 		if e != nil {
 			return e
 		}
-		e = copyFile(cache, m.Thumb, filepath.Join(pid, "thumb"))
+	}
+	for _, s := range msg.Sample {
+		e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "image"+strconv.Itoa(s.Index)))
 		if e != nil {
 			return e
 		}
-		for _, act := range m.Actors {
-			e = copyFile(cache, act.Image, filepath.Join(pid, ".actor", act.Name))
-			if e != nil {
-				return e
-			}
-		}
-		for _, s := range m.Sample {
-			e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "image"+strconv.Itoa(s.Index)))
-			if e != nil {
-				return e
-			}
-			e = copyFile(cache, s.Thumb, filepath.Join(pid, ".sample", "thumb"+strconv.Itoa(s.Index)))
-			if e != nil {
-				return e
-			}
+		e = copyFile(cache, s.Thumb, filepath.Join(pid, ".sample", "thumb"+strconv.Itoa(s.Index)))
+		if e != nil {
+			return e
 		}
 	}
 	return nil
+}
+
+func copyInfo(msg *Content, path string) error {
+	pid := filepath.Join(path, msg.ID)
+	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
+	inf := filepath.Join(pid, "inf.json")
+	info, e := os.Stat(inf)
+	if e != nil && !os.IsNotExist(e) {
+		return e
+	}
+	if e == nil && info.Size() != 0 {
+		return nil
+	}
+	file, e := os.OpenFile(inf, os.O_SYNC|os.O_RDONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	if e != nil {
+		return e
+	}
+	defer file.Close()
+	enc := json.NewEncoder(file)
+	return enc.Encode(msg)
 }
 
 func copyFile(cache *net.Cache, source, path string) error {
