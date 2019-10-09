@@ -20,9 +20,13 @@ type grabJavdb struct {
 	details  []*javdbSearchDetail
 }
 
-// Clone ...
-func (g *grabJavdb) Clone() IGrab {
-	panic("implement me")
+func (g *grabJavdb) clone() *grabJavdb {
+	clone := new(grabJavdb)
+	clone.mainPage = g.mainPage
+	clone.sample = g.sample
+	clone.details = make([]*javdbSearchDetail, len(g.details))
+	copy(clone.details, g.details)
+	return clone
 }
 
 // HasNext ...
@@ -47,8 +51,8 @@ func (g *grabJavdb) Name() string {
 
 // Find ...
 func (g *grabJavdb) Find(name string) (IGrab, error) {
-	ug := *g
-	url := ug.mainPage + javdbSearch
+	clone := g.clone()
+	url := clone.mainPage + javdbSearch
 	results, e := javdbSearchResultAnalyze(url, name)
 	if e != nil {
 		return nil, e
@@ -59,18 +63,18 @@ func (g *grabJavdb) Find(name string) (IGrab, error) {
 		}
 	}
 	for _, r := range results {
-		detail, e := javdbSearchDetailAnalyze(&ug, r)
+		detail, e := javdbSearchDetailAnalyze(clone, r)
 		if e != nil {
 			log.Error(e)
 			continue
 		}
 		detail.thumbImage = r.Thumb
 		detail.title = r.Title
-		ug.details = append(ug.details, detail)
+		clone.details = append(clone.details, detail)
 		log.Infof("javbus detail:%+v", detail)
 	}
 
-	return &ug, nil
+	return clone, nil
 }
 
 type javdbSearchDetail struct {
