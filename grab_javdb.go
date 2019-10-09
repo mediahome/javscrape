@@ -16,7 +16,7 @@ const javdbSearch = "/search?q=%s&f=all"
 
 type grabJavdb struct {
 	mainPage string
-	next     bool
+	next     string
 	sample   bool
 	details  []*javdbSearchDetail
 }
@@ -32,12 +32,12 @@ func (g *grabJavdb) clone() *grabJavdb {
 
 // HasNext ...
 func (g *grabJavdb) HasNext() bool {
-	panic("implement me")
+	return g.next == ""
 }
 
 // Next ...
 func (g *grabJavdb) Next() (IGrab, error) {
-	panic("implement me")
+	return g.find(g.next)
 }
 
 // Sample ...
@@ -50,11 +50,9 @@ func (g *grabJavdb) Name() string {
 	return "javdb"
 }
 
-// Find ...
-func (g *grabJavdb) Find(name string) (IGrab, error) {
+func (g *grabJavdb) find(url string) (IGrab, error) {
 	clone := g.clone()
-	url := clone.mainPage + javdbSearch
-	results, e := javdbSearchResultAnalyze(url, name)
+	results, e := javdbSearchResultAnalyze(clone, url)
 	if e != nil {
 		return nil, e
 	}
@@ -63,6 +61,7 @@ func (g *grabJavdb) Find(name string) (IGrab, error) {
 			log.Infof("%+v", r)
 		}
 	}
+
 	for _, r := range results {
 		detail, e := javdbSearchDetailAnalyze(clone, r)
 		if e != nil {
@@ -76,6 +75,12 @@ func (g *grabJavdb) Find(name string) (IGrab, error) {
 	}
 
 	return clone, nil
+}
+
+// Find ...
+func (g *grabJavdb) Find(name string) (IGrab, error) {
+	url := fmt.Sprintf(g.mainPage+javdbSearch, name)
+	return g.find(url)
 }
 
 type javdbSearchDetail struct {
@@ -151,8 +156,8 @@ type javdbSearchResult struct {
 	Date       string
 }
 
-func javdbSearchResultAnalyze(url, name string) (result []*javdbSearchResult, e error) {
-	document, e := net.Query(fmt.Sprintf(url, name))
+func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearchResult, e error) {
+	document, e := net.Query(url)
 	if e != nil {
 		return nil, e
 	}
@@ -175,6 +180,16 @@ func javdbSearchResultAnalyze(url, name string) (result []*javdbSearchResult, e 
 			res = append(res, resTmp)
 		}
 	})
+
+	next, b := document.Find("body > section > div > nav.pagination > a.pagination-next").Attr("href")
+	if debug {
+		log.With("next", next, "exist", b).Info("pagination")
+	}
+	grab.next = ""
+	if b && next != "" {
+		grab.next = grab.mainPage + next
+	}
+
 	if res == nil || len(res) == 0 {
 		return nil, errors.New("no data found")
 	}
