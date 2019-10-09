@@ -12,7 +12,7 @@ func TestGrabBP4X_Find(t *testing.T) {
 	if e != nil {
 		return
 	}
-	grab := NewGrabBp4x(BP4XTypeJAV)
+	grab := NewGrabBp4x(GrabBp4xTypeOption(BP4XTypeJAV))
 	doc, err := grab.Find("abp-874")
 	if err != nil {
 		t.Fatal(err)

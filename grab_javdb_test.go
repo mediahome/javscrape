@@ -4,9 +4,10 @@ import "testing"
 
 // TestNewJavdb ...
 func TestNewJavdb(t *testing.T) {
-	//DebugOn()
+	DebugOn()
 	javdb := NewGrabJavdb()
-	grab, e := javdb.Find("snis")
+	javdb.Sample(true)
+	grab, e := javdb.Find("FCH-041")
 	t.Log(grab, e)
 	t.Log(grab.HasNext())
 	count := 0

@@ -105,11 +105,11 @@ type javdbSearchDetail struct {
 
 const javdbTimeFormat = "2006-01-02"
 
-func javdbSearchDetailAnalyze(javdb *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
+func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javdb search result is null")
 	}
-	document, e := net.Query(javdb.mainPage + result.DetailLink)
+	document, e := net.Query(grab.mainPage + result.DetailLink)
 	if e != nil {
 		return nil, e
 	}
@@ -131,7 +131,7 @@ func javdbSearchDetailAnalyze(javdb *grabJavdb, result *javdbSearchResult) (deta
 			selection.Find("a").Each(func(i int, selection *goquery.Selection) {
 				g := new(Genre)
 				g.Content = strings.TrimSpace(selection.Text())
-				g.URL = javdb.mainPage + selection.AttrOr("href", "")
+				g.URL = grab.mainPage + selection.AttrOr("href", "")
 				genre = append(genre, g)
 			})
 			detail.genre = genre
@@ -140,13 +140,30 @@ func javdbSearchDetailAnalyze(javdb *grabJavdb, result *javdbSearchResult) (deta
 			selection.Find("a").Each(func(i int, selection *goquery.Selection) {
 				s := new(Star)
 				s.Name = strings.TrimSpace(selection.Text())
-				s.StarLink = javdb.mainPage + selection.AttrOr("href", "")
+				s.StarLink = grab.mainPage + selection.AttrOr("href", "")
 				idols = append(idols, s)
 			})
 			detail.idols = idols
 		}
-
 	})
+
+	if grab.sample {
+		document.Find("div.message-body > div.tile-images.preview-images > a.tile-item").Each(func(i int, selection *goquery.Selection) {
+			image := selection.AttrOr("href", "")
+			//thumb := selection.Find("div > img").AttrOr("src", "")
+			title := selection.AttrOr("data-caption", "")
+			if debug {
+				log.With("index", i, "image", image, "title", title, "thumb", "").Info("sample")
+			}
+			detail.sample = append(detail.sample, &Sample{
+				Index: i,
+				//Thumb: thumb,
+				Image: image,
+				Title: title,
+			})
+		})
+	}
+
 	return detail, nil
 }
 
