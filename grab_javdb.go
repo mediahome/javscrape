@@ -25,14 +25,15 @@ func (g *grabJavdb) clone() *grabJavdb {
 	clone := new(grabJavdb)
 	clone.mainPage = g.mainPage
 	clone.sample = g.sample
-	clone.details = make([]*javdbSearchDetail, len(g.details))
-	copy(clone.details, g.details)
+	clone.next = g.next
+	//clone.details = make([]*javdbSearchDetail, len(g.details))
+	//copy(clone.details, g.details)
 	return clone
 }
 
 // HasNext ...
 func (g *grabJavdb) HasNext() bool {
-	return g.next == ""
+	return g.next != ""
 }
 
 // Next ...
@@ -54,7 +55,7 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 	clone := g.clone()
 	results, e := javdbSearchResultAnalyze(clone, url)
 	if e != nil {
-		return nil, e
+		return clone, e
 	}
 	if debug {
 		for _, r := range results {
@@ -71,7 +72,9 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 		detail.thumbImage = r.Thumb
 		detail.title = r.Title
 		clone.details = append(clone.details, detail)
-		log.Infof("javbus detail:%+v", detail)
+		if debug {
+			log.Infof("javbus detail:%+v", detail)
+		}
 	}
 
 	return clone, nil
@@ -182,9 +185,9 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 	})
 
 	next, b := document.Find("body > section > div > nav.pagination > a.pagination-next").Attr("href")
-	if debug {
-		log.With("next", next, "exist", b).Info("pagination")
-	}
+	//if debug {
+	log.With("next", next, "exist", b).Info("pagination")
+	//}
 	grab.next = ""
 	if b && next != "" {
 		grab.next = grab.mainPage + next

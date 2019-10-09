@@ -4,13 +4,19 @@ import "testing"
 
 // TestNewJavdb ...
 func TestNewJavdb(t *testing.T) {
-	DebugOn()
+	//DebugOn()
 	javdb := NewJavdb()
-	grab, e := javdb.Find("abp")
+	grab, e := javdb.Find("snis")
 	t.Log(grab, e)
+	t.Log(grab.HasNext())
+	count := 0
 	for grab.HasNext() {
-		iGrab, e := grab.Next()
-		t.Log(iGrab, e)
+		if count > 2 {
+			return
+		}
+		grab, e = grab.Next()
+		t.Log(grab, e)
+		count++
 	}
 
 }
