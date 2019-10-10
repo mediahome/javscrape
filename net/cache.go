@@ -77,9 +77,9 @@ func (c *Cache) Get(url string) (e error) {
 		cli = http.DefaultClient
 	}
 
-	res, err := cli.Get(url)
-	if err != nil {
-		log.Fatal(err)
+	res, e := cli.Get(url)
+	if e != nil {
+		return e
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
