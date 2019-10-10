@@ -199,7 +199,11 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 		}
 		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
 		resTmp.DetailLink = selection.Find("a.box").AttrOr("href", "")
-		resTmp.Thumb = "https:" + selection.Find("a.box > div.item-image > img").AttrOr("src", "")
+
+		resTmp.Thumb = selection.Find("a.box > div.item-image > img").AttrOr("src", "")
+		if strings.Index(resTmp.Thumb, "//") == 0 {
+			resTmp.Thumb = "https:" + resTmp.Thumb
+		}
 		resTmp.ID = selection.Find("a.box > div.uid").Text()
 		resTmp.Title = selection.Find("a.box >div.video-title").Text()
 		selection.Find("a.box > div.tags > span.tag").Each(func(i int, selection *goquery.Selection) {
