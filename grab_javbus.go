@@ -95,6 +95,7 @@ func (g *grabJavbus) clone() *grabJavbus {
 	clone.sample = g.sample
 	clone.language = g.language
 	clone.next = g.next
+	clone.uncensored = g.uncensored
 	return clone
 }
 
