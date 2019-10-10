@@ -87,21 +87,22 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 		}
 	}
 
+	var err error
 	if impl.output != "" {
 		for _, m := range *msg {
 			e = copyInfo(m, impl.output)
 			if e != nil {
-				return nil, e
+				log.With("msg1", m).Error(e)
+				err = e
 			}
 			e = copyCache(impl.cache, m, impl.output)
 			if e != nil {
-				return nil, e
+				log.With("msg2", m).Error(e)
+				err = e
 			}
-
 		}
 	}
-
-	return msg, nil
+	return msg, err
 }
 
 func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
@@ -203,9 +204,9 @@ func imageCache(cache *net.Cache, msg []*Content) (e error) {
 
 	for p := range path {
 		if p != "" {
-			e = cache.Get(p)
-			if e != nil && !os.IsExist(e) {
-				log.Error(e)
+			err := cache.Get(p)
+			if err != nil && !os.IsExist(err) {
+				log.Error(err)
 			}
 		}
 	}
