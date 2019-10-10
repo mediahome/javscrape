@@ -85,7 +85,7 @@ func (c *Cache) Get(url string) (e error) {
 	if res.StatusCode != 200 {
 		return fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
-	file, e := os.OpenFile(filepath.Join(c.tmp, name), os.O_TRUNC|os.O_CREATE|os.O_RDONLY|os.O_SYNC, os.ModePerm)
+	file, e := os.OpenFile(filepath.Join(c.tmp, name), os.O_TRUNC|os.O_CREATE|os.O_RDWR|os.O_SYNC, os.ModePerm)
 	if e != nil {
 		return e
 	}
@@ -119,7 +119,7 @@ func MoveCache(path, url, to string) (written int64, e error) {
 		return written, e
 	}
 
-	openFile, e := os.OpenFile(filepath.Join(s), os.O_TRUNC|os.O_CREATE|os.O_RDONLY|os.O_SYNC, os.ModePerm)
+	openFile, e := os.OpenFile(filepath.Join(s), os.O_TRUNC|os.O_CREATE|os.O_RDWR|os.O_SYNC, os.ModePerm)
 	if e != nil {
 		return written, e
 	}
