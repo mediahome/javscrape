@@ -145,7 +145,7 @@ func copyInfo(msg *Content, path string) error {
 	if e == nil && info.Size() != 0 {
 		return nil
 	}
-	file, e := os.OpenFile(inf, os.O_SYNC|os.O_RDONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	file, e := os.OpenFile(inf, os.O_SYNC|os.O_RDWR|os.O_TRUNC|os.O_CREATE, os.ModePerm)
 	if e != nil {
 		return e
 	}
@@ -172,7 +172,7 @@ func copyFile(cache *net.Cache, source, path string) error {
 		return nil
 	}
 
-	file, e := os.OpenFile(path+ext, os.O_SYNC|os.O_RDONLY|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	file, e := os.OpenFile(path+ext, os.O_SYNC|os.O_RDWR|os.O_TRUNC|os.O_CREATE, os.ModePerm)
 	if e != nil {
 		return e
 	}
