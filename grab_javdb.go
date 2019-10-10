@@ -26,11 +26,8 @@ type grabJavdb struct {
 
 func (g *grabJavdb) clone() *grabJavdb {
 	clone := new(grabJavdb)
-	clone.mainPage = g.mainPage
-	clone.sample = g.sample
-	clone.next = g.next
-	clone.finder = g.finder
-	clone.exact = g.exact
+	*clone = *g
+	clone.details = nil
 	//clone.details = make([]*javdbSearchDetail, len(g.details))
 	//copy(clone.details, g.details)
 	return clone

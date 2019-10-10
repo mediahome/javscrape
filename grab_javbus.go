@@ -91,11 +91,8 @@ func (g *grabJavbus) Decode(msg *[]*Content) error {
 }
 func (g *grabJavbus) clone() *grabJavbus {
 	clone := new(grabJavbus)
-	clone.mainPage = g.mainPage
-	clone.sample = g.sample
-	clone.language = g.language
-	clone.next = g.next
-	clone.uncensored = g.uncensored
+	*clone = *g
+	clone.details = nil
 	return clone
 }
 
