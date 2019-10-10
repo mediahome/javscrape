@@ -122,11 +122,11 @@ func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
 		}
 	}
 	for _, s := range msg.Sample {
-		e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "image"+strconv.Itoa(s.Index)))
+		e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "image"+"_"+strconv.Itoa(s.Index)))
 		if e != nil {
 			return e
 		}
-		e = copyFile(cache, s.Thumb, filepath.Join(pid, ".sample", "thumb"+strconv.Itoa(s.Index)))
+		e = copyFile(cache, s.Thumb, filepath.Join(pid, ".sample", "thumb"+"_", strconv.Itoa(s.Index)))
 		if e != nil {
 			return e
 		}
