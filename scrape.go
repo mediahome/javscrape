@@ -2,6 +2,7 @@ package scrape
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -76,8 +77,12 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 		}
 		e = iGrab.Decode(msg)
 		if e != nil {
-			log.With("name", grab.Name(), "find", name).Error(e)
+			log.With("name", grab.Name(), "decode", name).Error(e)
 		}
+	}
+
+	if len(*msg) == 0 {
+		return nil, fmt.Errorf("[%s] not found", name)
 	}
 
 	if impl.cache != nil {
