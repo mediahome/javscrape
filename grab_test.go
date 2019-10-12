@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"os"
 	"testing"
 
 	"github.com/javscrape/go-scrape/net"
@@ -31,4 +32,15 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+func TestStat(t *testing.T) {
+	info, e := os.Stat("grab_test.go")
+	t.Log(os.IsNotExist(e))
+	t.Log(os.IsExist(e))
+	t.Log(info, e)
+
+	info1, e1 := os.Stat("grab_test1.go")
+	t.Log(os.IsNotExist(e1))
+	t.Log(os.IsExist(e1))
+	t.Log(info1, e1)
 }

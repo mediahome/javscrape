@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 
 	"github.com/javscrape/go-scrape/net"
 )
@@ -111,7 +112,7 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 }
 
 func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
-	pid := filepath.Join(output, msg.ID)
+	pid := filepath.Join(output, strings.ToUpper(msg.ID))
 	e = copyFile(cache, msg.Image, filepath.Join(pid, "image"))
 	if e != nil {
 		return e
@@ -140,7 +141,7 @@ func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
 }
 
 func copyInfo(msg *Content, path string) error {
-	pid := filepath.Join(path, msg.ID)
+	pid := filepath.Join(path, strings.ToUpper(msg.ID))
 	inf := filepath.Join(pid, "inf.json")
 	_ = os.MkdirAll(filepath.Dir(inf), os.ModePerm)
 	info, e := os.Stat(inf)
