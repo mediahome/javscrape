@@ -234,7 +234,7 @@ func (g *grabJavdb) Decode(msg *[]*Content) error {
 		*msg = append(*msg, &Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,
-			ID:            detail.id,
+			ID:            strings.ToUpper(detail.id),
 			Title:         detail.title,
 			OriginalTitle: "",
 			Year:          strconv.Itoa(detail.date.Year()),
