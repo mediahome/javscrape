@@ -20,7 +20,7 @@ func TestNewScrape(t *testing.T) {
 	scrape.Output("video")
 	scrape.GrabSample(true)
 	scrape.ImageCache("")
-	msg, e := scrape.Find("abp-90")
+	msg, e := scrape.Find("abp-890")
 	if e != nil {
 		t.Fatal(e)
 	}

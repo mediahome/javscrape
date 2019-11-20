@@ -1,7 +1,9 @@
 package scrape
 
 import (
-	"github.com/godcong/go-trait"
+	"github.com/goextension/log/zap"
 )
 
-var log = trait.NewZapSugar()
+func init() {
+	zap.InitZapFileSugar()
+}
