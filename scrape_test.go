@@ -2,7 +2,14 @@ package scrape
 
 import (
 	"testing"
+
+	"github.com/goextension/log"
+	"github.com/goextension/log/zap"
 )
+
+func init() {
+	zap.InitZapFileSugar()
+}
 
 // TestNewScrape ...
 func TestNewScrape(t *testing.T) {

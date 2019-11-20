@@ -33,6 +33,8 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+// TestStat ...
 func TestStat(t *testing.T) {
 	info, e := os.Stat("grab_test.go")
 	t.Log(os.IsNotExist(e))
