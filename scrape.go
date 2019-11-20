@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/goextension/log"
 	"github.com/javscrape/go-scrape/net"
 )
 
