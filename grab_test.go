@@ -3,14 +3,12 @@ package scrape
 import (
 	"os"
 	"testing"
-
-	"github.com/javscrape/go-scrape/net"
 )
 
 // TestGrabJAVBUS_Find ...
 func TestGrabJAVBUS_Find(t *testing.T) {
 	DebugOn()
-	e := net.RegisterProxy("socks5://localhost:10808")
+	e := RegisterProxy("socks5://localhost:10808")
 	if e != nil {
 		return
 	}
