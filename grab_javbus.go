@@ -9,7 +9,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/goextension/log"
-	"github.com/javscrape/go-scrape/net"
 )
 
 // DefaultJavbusMainPage ...
@@ -151,7 +150,7 @@ type javbusSearchResult struct {
 }
 
 func javbusSearchResultAnalyze(grab *grabJavbus, url string) ([]*javbusSearchResult, error) {
-	document, e := net.Query(url)
+	document, e := Query(url)
 	if e != nil {
 		return nil, e
 	}
@@ -415,7 +414,7 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
-	document, e := net.Query(result.DetailLink)
+	document, e := Query(result.DetailLink)
 	if e != nil {
 		return nil, e
 	}

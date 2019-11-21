@@ -9,7 +9,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/goextension/log"
-	"github.com/javscrape/go-scrape/net"
 )
 
 // DefaultJavdbMainPage ...
@@ -117,7 +116,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javdb search result is null")
 	}
-	document, e := net.Query(grab.mainPage + result.DetailLink)
+	document, e := Query(grab.mainPage + result.DetailLink)
 	if e != nil {
 		return nil, e
 	}
@@ -185,7 +184,7 @@ type javdbSearchResult struct {
 }
 
 func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearchResult, e error) {
-	document, e := net.Query(url)
+	document, e := Query(url)
 	if e != nil {
 		return nil, e
 	}

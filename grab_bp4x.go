@@ -6,7 +6,6 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/goextension/log"
-	"github.com/javscrape/go-scrape/net"
 )
 
 // DefaulBp4xMainPage ...
@@ -82,7 +81,7 @@ func (g *grabBp4x) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	url := g.mainPage + bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
-	document, e := net.Query(url)
+	document, e := Query(url)
 	if e != nil {
 		return g, e
 	}

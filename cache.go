@@ -10,13 +10,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/gocacher/badger-cache"
 	"github.com/gocacher/cacher"
+	"github.com/gocacher/file-cache"
 	"github.com/goextension/log"
 )
 
 // DefaultCachePath ...
-var DefaultCachePath = "tmp"
+var DefaultCachePath = "/tmp"
 
 // Cache ...
 type Cache struct {
@@ -25,13 +25,18 @@ type Cache struct {
 
 var _cache *Cache
 
+// HasCache ...
+var HasCache bool
+
 func init() {
+	HasCache = true
 	_cache = newCache()
 }
 
 func newCache() *Cache {
+	cache.DefaultPath = DefaultCachePath
 	return &Cache{
-		cache: cache.NewBadgerCache(DefaultCachePath),
+		cache: &cache.FileCache{},
 	}
 
 }

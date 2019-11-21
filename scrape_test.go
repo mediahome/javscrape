@@ -5,18 +5,20 @@ import (
 
 	"github.com/goextension/log"
 	"github.com/goextension/log/zap"
+	"github.com/javscrape/go-scrape/net"
 )
 
 func init() {
 	zap.InitZapFileSugar()
+
 }
 
 // TestNewScrape ...
 func TestNewScrape(t *testing.T) {
-	//e := net.RegisterProxy("socks5://localhost:11080")
-	//if e != nil {
-	//	return
-	//}
+	e := net.RegisterProxy("socks5://localhost:11080")
+	if e != nil {
+		return
+	}
 	//grab1 := NewGrabBp4x(GrabBp4xTypeOption(BP4XTypeJAV))
 	grab2 := NewGrabJavbus(JavbusExact(false))
 	grab3 := NewGrabJavdb(JavdbExact(false))
