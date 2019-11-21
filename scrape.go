@@ -135,7 +135,7 @@ func copyCache(cache *Cache, msg *Content, output string) (e error) {
 		if e != nil {
 			return e
 		}
-		e = copyFile(cache, s.Thumb, filepath.Join(pid, ".thumb", "thumb"+"@", strconv.Itoa(s.Index)))
+		e = copyFile(cache, s.Thumb, filepath.Join(pid, ".thumb", "thumb"+"@"+strconv.Itoa(s.Index)))
 		if e != nil {
 			return e
 		}
@@ -163,14 +163,14 @@ func copyInfo(msg *Content, path string) error {
 	return enc.Encode(msg)
 }
 
-// Path ...
-func Path(source string) string {
+// TrimEnd ...
+func TrimEnd(source string) string {
 	return strings.Split(source, "?")[0]
 }
 
 // Ext ...
 func Ext(source string) string {
-	ext := filepath.Ext(Path(source))
+	ext := filepath.Ext(TrimEnd(source))
 	if debug {
 		log.Infow("ext", "source", source, "ext", ext)
 	}
@@ -185,7 +185,10 @@ func copyFile(cache *Cache, source, path string) error {
 	if e != nil {
 		return e
 	}
-	path = Path(path)
+	path = TrimEnd(path)
+	if debug {
+		log.Infow("copy", "dir", filepath.Dir(path), "path", path)
+	}
 	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	info, e := os.Stat(path + Ext(source))
 	if e != nil && !os.IsNotExist(e) {
