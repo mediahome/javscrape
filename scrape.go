@@ -163,17 +163,17 @@ func copyInfo(msg *Content, path string) error {
 	return enc.Encode(msg)
 }
 
+// Path ...
+func Path(source string) string {
+	return strings.Split(source, "?")[0]
+}
+
 // Ext ...
 func Ext(source string) string {
+	ext := filepath.Ext(Path(source))
 	if debug {
-		log.Infow("ext", "source", source)
+		log.Infow("ext", "source", source, "ext", ext)
 	}
-	//end := strings.Index(source, "?")
-	ext := filepath.Ext(strings.TrimRight(source, "?"))
-	//ext := filepath.Ext(source)
-	//if end != -1 {
-	//	ext = filepath.Ext(source[:end-1])
-	//}
 	return ext
 }
 
@@ -185,6 +185,7 @@ func copyFile(cache *Cache, source, path string) error {
 	if e != nil {
 		return e
 	}
+	path = Path(path)
 	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	info, e := os.Stat(path + Ext(source))
 	if e != nil && !os.IsNotExist(e) {
