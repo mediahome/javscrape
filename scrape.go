@@ -74,15 +74,17 @@ func NewScrape(grabs ...IGrab) IScrape {
 func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	msg = new([]*Content)
 	for _, grab := range impl.grabs {
+		var c Content
 		iGrab, e := grab.Find(name)
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
 			continue
 		}
-		e = iGrab.Decode(msg)
+		e = iGrab.Decode(&c)
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
 		}
+		*msg = append(*msg, &c)
 	}
 
 	if len(*msg) == 0 {
@@ -90,10 +92,13 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	}
 
 	if impl.cache != nil {
-		e := imageCache(impl.cache, *msg)
-		if e != nil {
-			return nil, e
+		for _, m := range *msg {
+			e := imageCache(impl.cache, m)
+			if e != nil {
+				return nil, e
+			}
 		}
+
 	}
 
 	var err error
@@ -212,21 +217,21 @@ func copyFile(cache *Cache, source, path string) error {
 	return nil
 }
 
-func imageCache(cache *Cache, msg []*Content) (e error) {
+func imageCache(cache *Cache, m *Content) (e error) {
 	path := make(chan string)
 	go func(path chan<- string) {
 		defer close(path)
-		for _, m := range msg {
-			path <- m.Image
-			path <- m.Thumb
-			for _, act := range m.Actors {
-				path <- act.Image
-			}
-			for _, s := range m.Sample {
-				path <- s.Image
-				path <- s.Thumb
-			}
+		//for _, m := range msg {
+		path <- m.Image
+		path <- m.Thumb
+		for _, act := range m.Actors {
+			path <- act.Image
 		}
+		for _, s := range m.Sample {
+			path <- s.Image
+			path <- s.Thumb
+		}
+		//}
 	}(path)
 
 	for p := range path {

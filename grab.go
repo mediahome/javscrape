@@ -8,7 +8,7 @@ type IGrab interface {
 	Find(string) (IGrab, error)
 	HasNext() bool
 	Next() (IGrab, error)
-	Decode(*[]*Content) error
+	Decode(*Content) error
 	//Clone() IGrab
 }
 

@@ -64,12 +64,12 @@ func (g *grabJavbus) Name() string {
 }
 
 // Decode ...
-func (g *grabJavbus) Decode(msg *[]*Content) error {
+func (g *grabJavbus) Decode(msg *Content) error {
 	for idx, detail := range g.details {
 		if debug {
 			log.Info("decode", "index", idx, "id", detail.id)
 		}
-		*msg = append(*msg, &Content{
+		*msg = Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,
 			ID:            strings.ToUpper(detail.id),
@@ -85,7 +85,7 @@ func (g *grabJavbus) Decode(msg *[]*Content) error {
 			Genres:        detail.genre,
 			Actors:        detail.idols,
 			Sample:        detail.sample,
-		})
+		}
 	}
 	return nil
 }

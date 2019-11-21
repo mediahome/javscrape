@@ -15,18 +15,19 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	grab := NewGrabJavbus()
 	grab.Sample(true)
 	doc, err := grab.Find("abp-874")
-	msg := new([]*Content)
+
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = doc.Decode(msg)
-	t.Logf("%+v", *msg)
+	var msg Content
+	err = doc.Decode(&msg)
+	t.Logf("%+v", msg)
 	if err != nil {
 		t.Fatal(err)
 	}
 	cache := newCache()
 
-	err = imageCache(cache, *msg)
+	err = imageCache(cache, &msg)
 	if err != nil {
 		t.Fatal(err)
 	}
