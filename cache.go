@@ -16,7 +16,7 @@ import (
 )
 
 // DefaultCachePath ...
-var DefaultCachePath = "/tmp"
+var DefaultCachePath = "tmp"
 
 // Cache ...
 type Cache struct {
@@ -58,7 +58,11 @@ func (c *Cache) Get(url string) (reader io.Reader, e error) {
 	log.Infow("cache get", "url", url, "hash", name)
 	b, e := c.cache.Has(name)
 	if e == nil && b {
-		return nil, nil
+		getted, e := c.cache.Get(name)
+		if e != nil {
+			return nil, e
+		}
+		return bytes.NewReader(getted), nil
 	}
 
 	if cli == nil {
