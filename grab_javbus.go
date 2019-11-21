@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/goextension/log"
 	"github.com/javscrape/go-scrape/net"
 )
 
@@ -67,7 +68,7 @@ func (g *grabJavbus) Name() string {
 func (g *grabJavbus) Decode(msg *[]*Content) error {
 	for idx, detail := range g.details {
 		if debug {
-			log.With("index", idx, "id", detail.id).Info("decode")
+			log.Info("decode", "index", idx, "id", detail.id)
 		}
 		*msg = append(*msg, &Content{
 			From:          g.Name(),
@@ -109,7 +110,7 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 	}
 	for _, r := range results {
 		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
-			log.With("id", r.ID, "find", clone.finder).Info("continue")
+			log.Infow("continue", "id", r.ID, "find", clone.finder)
 			continue
 		}
 		detail, e := javbusSearchDetailAnalyze(clone, r)
@@ -175,7 +176,7 @@ func javbusSearchResultAnalyze(grab *grabJavbus, url string) ([]*javbusSearchRes
 	})
 	next, b := document.Find("body > div.text-center.hidden-xs > ul > li > a#next").Attr("href")
 	//if debug {
-	log.With("next", next, "exist", b).Info("pagination")
+	log.Infow("pagination", "next", next, "exist", b)
 	//}
 	grab.next = ""
 	if b && next != "" {
@@ -257,7 +258,7 @@ func getAnalyzeLanguageFunc(language GrabLanguage, selection *goquery.Selection)
 }
 func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
-	log.With("size", len(selection.Contents().Nodes), "text", text).Warnf("%+v", *detail)
+	log.Warnw("javbusSearchDetailAnalyzeDummy", "detail", *detail, "size", len(selection.Contents().Nodes), "text", text)
 	return nil
 }
 func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
@@ -271,9 +272,7 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 		image := selection.Find("li > a > img").AttrOr("src", "")
 		name := selection.Find("li > div.star-name > a").Text()
 		name = strings.TrimSpace(name)
-		if debug {
-			log.With("name", name, "image", image, "star", starLink).Info("idols")
-		}
+		log.Infow("idols", "name", name, "image", image, "star", starLink)
 		idols = append(idols, &Star{
 			StarLink: starLink,
 			Image:    image,
@@ -281,7 +280,7 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 		})
 	})
 	if debug {
-		log.With("idols", idols).Info("movie")
+		log.Infow("movie", "idols", idols)
 	}
 	detail.idols = idols
 	return
@@ -297,7 +296,7 @@ func javbusSearchDetailAnalyzeSeries(selection *goquery.Selection, detail *javbu
 	}
 	series = goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
-		log.With("series", series).Info("movie")
+		log.Infow("movie", "series", series)
 	}
 	detail.series = series
 	return
@@ -305,17 +304,17 @@ func javbusSearchDetailAnalyzeSeries(selection *goquery.Selection, detail *javbu
 func javbusSearchDetailAnalyzeGenre(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	var genre []*Genre
 	if debug {
-		log.Info(selection.Next().Html())
+		log.Infow(selection.Next().Html())
 	}
 	selection.Next().Find("p > span.genre > a").Each(func(i int, selection *goquery.Selection) {
-		log.With("text", selection.Text()).Info("genre")
+		log.Infow("genre", "text", selection.Text())
 		g := new(Genre)
 		g.Content = strings.TrimSpace(selection.Text())
 		g.URL = selection.AttrOr("href", "")
 		genre = append(genre, g)
 	})
 	if debug {
-		log.With("genre", genre).Info("movie")
+		log.Infow("movie", "genre", genre)
 	}
 	detail.genre = genre
 	return
@@ -330,7 +329,7 @@ func javbusSearchDetailAnalyzeLabel(selection *goquery.Selection, detail *javbus
 	}
 	label := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
-		log.With("label", label).Info("movie")
+		log.Infow("movie", "label", label)
 	}
 	detail.label = strings.TrimSpace(label)
 	return
@@ -345,7 +344,7 @@ func javbusSearchDetailAnalyzeStudio(selection *goquery.Selection, detail *javbu
 	}
 	studio := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
-		log.With("studio", studio).Info("movie")
+		log.Infow("movie", "studio", studio)
 	}
 	detail.studio = strings.TrimSpace(studio)
 	return
@@ -361,7 +360,7 @@ func javbusSearchDetailAnalyzeDirector(selection *goquery.Selection, detail *jav
 	}
 	director = goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
-		log.With("director", director).Info("movie")
+		log.Infow("movie", "director", director)
 	}
 	detail.director = strings.TrimSpace(director)
 	return
@@ -376,7 +375,7 @@ func javbusSearchDetailAnalyzeLength(selection *goquery.Selection, detail *javbu
 	}
 	length := goquery.NewDocumentFromNode(nodes[1]).Text()
 	if debug {
-		log.With("length", length).Info("movie")
+		log.Infow("movie", "length", length)
 	}
 	detail.length = strings.TrimSpace(length)
 	return
@@ -391,7 +390,7 @@ func javbusSearchDetailAnalyzeDate(selection *goquery.Selection, detail *javbusS
 	}
 	date := goquery.NewDocumentFromNode(nodes[1]).Text()
 	if debug {
-		log.With("release date", date).Info("movie")
+		log.Infow("movie", "release date", date)
 	}
 	parse, e := time.Parse(javbusTimeFormat, strings.TrimSpace(date))
 	if e != nil {
@@ -407,7 +406,7 @@ func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSea
 	}
 	id := goquery.NewDocumentFromNode(nodes[2]).Text()
 	if debug {
-		log.With("id", id).Info("movie")
+		log.Infow("movie", "id", id)
 	}
 	detail.id = strings.TrimSpace(id)
 	return
@@ -426,7 +425,7 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 	//log.With("title", detail.title).Info(result.ID)
 	detail.bigImage = document.Find("body > div.container > div.row.movie > div > a > img").AttrOr("src", "")
 	if debug {
-		log.With("image", detail.bigImage).Info("movie")
+		log.Infow("movie", "image", detail.bigImage)
 	}
 	//detail.bigImage, exists = document.Find("body > div.container > div.row.movie > div > a.bigImage").Attr("href")
 	//log.With("bigImage", detail.bigImage).Info(exists)
@@ -439,9 +438,9 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 			log.Error(err)
 		}
 		if debug {
-			log.With("index", i, "text", selection.Text()).Info("info movie")
+			log.Infow("info movie", "index", i, "text", selection.Text())
 			selection.Contents().Each(func(i int, selection *goquery.Selection) {
-				log.With("content", selection.Text()).Info("info contents")
+				log.Infow("info contents", "content", selection.Text())
 			})
 		}
 	})
@@ -452,7 +451,7 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 			thumb := selection.Find("div > img").AttrOr("src", "")
 			title := selection.Find("div > img").AttrOr("title", "")
 			if debug {
-				log.With("index", i, "image", image, "title", title, "thumb", thumb).Info("sample")
+				log.Infow("sample", "index", i, "image", image, "title", title, "thumb", thumb)
 			}
 			detail.sample = append(detail.sample, &Sample{
 				Index: i,

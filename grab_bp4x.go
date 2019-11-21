@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/goextension/log"
 	"github.com/javscrape/go-scrape/net"
 )
 
