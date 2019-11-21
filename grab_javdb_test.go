@@ -2,9 +2,13 @@ package scrape
 
 import "testing"
 
+func init() {
+	DebugOn()
+}
+
 // TestNewJavdb ...
 func TestNewJavdb(t *testing.T) {
-	DebugOn()
+
 	javdb := NewGrabJavdb()
 	javdb.Sample(true)
 	grab, e := javdb.Find("FCH-041")
