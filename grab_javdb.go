@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/goextension/log"
 	"github.com/javscrape/go-scrape/net"
 )
 
@@ -67,7 +68,7 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 
 	for _, r := range results {
 		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
-			log.With("id", r.ID, "find", clone.finder).Info("continue")
+			log.Infow("continue", "id", r.ID, "find", clone.finder)
 			continue
 		}
 		detail, e := javdbSearchDetailAnalyze(clone, r)
@@ -160,7 +161,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 			//thumb := selection.Find("div > img").AttrOr("src", "")
 			title := selection.AttrOr("data-caption", "")
 			if debug {
-				log.With("index", i, "image", image, "title", title, "thumb", "").Info("sample")
+				log.Infow("sample", "index", i, "image", image, "title", title, "thumb", "")
 			}
 			detail.sample = append(detail.sample, &Sample{
 				Index: i,
@@ -192,7 +193,7 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 	document.Find("#videos > div > div.grid-item.column").Each(func(i int, selection *goquery.Selection) {
 		resTmp := new(javdbSearchResult)
 		if debug {
-			log.With("index", i, "text", selection.Text()).Info("javdb")
+			log.Infow("javdb", "index", i, "text", selection.Text())
 		}
 		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
 		resTmp.DetailLink = selection.Find("a.box").AttrOr("href", "")
@@ -214,7 +215,7 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 
 	next, b := document.Find("body > section > div > nav.pagination > a.pagination-next").Attr("href")
 	if debug {
-		log.With("next", next, "exist", b).Info("pagination")
+		log.Infow("pagination", "next", next, "exist", b)
 	}
 	grab.next = ""
 	if b && next != "" {
@@ -230,7 +231,7 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 // Decode ...
 func (g *grabJavdb) Decode(msg *[]*Content) error {
 	for idx, detail := range g.details {
-		log.With("index", idx).Info("decode")
+		log.Infof("decode", "index", idx)
 		*msg = append(*msg, &Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,

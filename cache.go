@@ -15,6 +15,9 @@ import (
 	"github.com/goextension/log"
 )
 
+// DefaultCachePath ...
+var DefaultCachePath = "tmp"
+
 // Cache ...
 type Cache struct {
 	cache cacher.Cacher
@@ -28,7 +31,7 @@ func init() {
 
 func newCache() *Cache {
 	return &Cache{
-		cache: cache.NewBadgerCache("tmp"),
+		cache: cache.NewBadgerCache(DefaultCachePath),
 	}
 
 }

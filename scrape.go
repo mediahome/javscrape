@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/goextension/log"
-	"github.com/javscrape/go-scrape/net"
 )
 
 var debug = false
@@ -28,7 +27,7 @@ type scrapeImpl struct {
 	grabs  []IGrab
 	sample bool
 	//cache  string
-	cache  *net.Cache
+	cache  *Cache
 	output string
 }
 
@@ -39,7 +38,10 @@ func (impl *scrapeImpl) Output(path string) {
 
 // ImageCache ...
 func (impl *scrapeImpl) ImageCache(path string) {
-	impl.cache = net.NewCache(path)
+	if path != "" {
+		DefaultCachePath = path
+	}
+	impl.cache = newCache()
 }
 
 // IsGrabSample ...
@@ -74,12 +76,12 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	for _, grab := range impl.grabs {
 		iGrab, e := grab.Find(name)
 		if e != nil {
-			log.With("name", grab.Name(), "find", name).Error(e)
+			log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
 			continue
 		}
 		e = iGrab.Decode(msg)
 		if e != nil {
-			log.With("name", grab.Name(), "decode", name).Error(e)
+			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
 		}
 	}
 
@@ -99,12 +101,12 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 		for _, m := range *msg {
 			e = copyInfo(m, impl.output)
 			if e != nil {
-				log.With("msg1", m).Error(e)
+				log.Errorw("error", "error1", e, "msg", m)
 				err = e
 			}
 			e = copyCache(impl.cache, m, impl.output)
 			if e != nil {
-				log.With("msg2", m).Error(e)
+				log.Errorw("error", "error2", e, "msg", m)
 				err = e
 			}
 		}
@@ -112,7 +114,7 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	return msg, err
 }
 
-func copyCache(cache *net.Cache, msg *Content, output string) (e error) {
+func copyCache(cache *Cache, msg *Content, output string) (e error) {
 	pid := filepath.Join(output, strings.ToUpper(msg.ID))
 	e = copyFile(cache, msg.Image, filepath.Join(pid, "image"))
 	if e != nil {
@@ -161,7 +163,7 @@ func copyInfo(msg *Content, path string) error {
 	return enc.Encode(msg)
 }
 
-func copyFile(cache *net.Cache, source, path string) error {
+func copyFile(cache *Cache, source, path string) error {
 	if source == "" {
 		return nil
 	}
@@ -192,7 +194,7 @@ func copyFile(cache *net.Cache, source, path string) error {
 	return nil
 }
 
-func imageCache(cache *net.Cache, msg []*Content) (e error) {
+func imageCache(cache *Cache, msg []*Content) (e error) {
 	path := make(chan string)
 	go func(path chan<- string) {
 		defer close(path)
@@ -211,7 +213,7 @@ func imageCache(cache *net.Cache, msg []*Content) (e error) {
 
 	for p := range path {
 		if p != "" {
-			err := cache.Get(p)
+			_, err := cache.Get(p)
 			if err != nil && !os.IsExist(err) {
 				log.Error(err)
 			}
