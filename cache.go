@@ -79,7 +79,7 @@ func (c *Cache) Get(url string) (reader io.Reader, e error) {
 	return bytes.NewReader(bys), nil
 }
 
-// MoveCache ...
+// Save ...
 func (c *Cache) Save(path, url, to string) (written int64, e error) {
 	s, e := filepath.Abs(to)
 	if e != nil {
