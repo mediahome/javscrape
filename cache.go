@@ -2,7 +2,17 @@ package scrape
 
 import (
 	_ "github.com/gocacher/badger-cache/easy"
-	"github.com/gocacher/cacher"
 )
 
-var _ cacher.Cacher
+type cacheImpl struct {
+}
+
+var cache *cacheImpl
+
+func init() {
+	cache = newCache()
+}
+
+func newCache() *cacheImpl {
+	return &cacheImpl{}
+}
