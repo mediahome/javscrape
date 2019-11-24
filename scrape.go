@@ -12,8 +12,6 @@ import (
 	"github.com/goextension/log"
 )
 
-var debug = false
-
 // IScrape ...
 type IScrape interface {
 	GrabSample(b bool)
@@ -31,6 +29,9 @@ type scrapeImpl struct {
 	output   string
 	infoName string
 }
+
+var debug = false
+var DefaultInfoName = "inf.json"
 
 // Output ...
 func (impl *scrapeImpl) Output(path string) {
@@ -73,7 +74,7 @@ func NewScrape(grabs ...IGrab) IScrape {
 		//sample:   false,
 		//cache:    nil,
 		//output:   "",
-		infoName: "inf.json",
+		infoName: DefaultInfoName,
 	}
 }
 
