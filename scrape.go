@@ -27,8 +27,9 @@ type scrapeImpl struct {
 	grabs  []IGrab
 	sample bool
 	//cache  string
-	cache  *Cache
-	output string
+	cache    *Cache
+	output   string
+	infoName string
 }
 
 // Output ...
