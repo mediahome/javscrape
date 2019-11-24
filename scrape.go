@@ -68,7 +68,13 @@ func DebugOn() {
 
 // NewScrape ...
 func NewScrape(grabs ...IGrab) IScrape {
-	return &scrapeImpl{grabs: grabs}
+	return &scrapeImpl{
+		grabs: grabs,
+		//sample:   false,
+		//cache:    nil,
+		//output:   "",
+		infoName: "inf.json",
+	}
 }
 
 // Find ...
