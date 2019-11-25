@@ -15,7 +15,7 @@ func init() {
 // TestNewScrape ...
 func TestNewScrape(t *testing.T) {
 
-	e := RegisterProxy("socks5://localhost:11080")
+	e := RegisterProxy("socks5://localhost:10808")
 	if e != nil {
 		return
 	}

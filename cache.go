@@ -34,9 +34,9 @@ func init() {
 }
 
 func newCache() *Cache {
-	cache.DefaultPath = DefaultCachePath
+	cache.DefaultCachePath = DefaultCachePath
 	return &Cache{
-		cache: &cache.FileCache{},
+		cache: cache.New(),
 	}
 
 }

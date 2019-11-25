@@ -82,6 +82,9 @@ func NewScrape(opts ...Options) IScrape {
 	for _, opt := range opts {
 		opt(scrape)
 	}
+
+	scrape.init()
+
 	return scrape
 }
 
@@ -130,6 +133,12 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 		}
 	}
 	return msg, err
+}
+
+func (impl *scrapeImpl) init() {
+	if impl.cache == nil {
+		impl.cache = newCache()
+	}
 }
 
 func copyCache(cache *Cache, msg *Content, output string) (e error) {
