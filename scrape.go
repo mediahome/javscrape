@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -181,14 +182,11 @@ func copyInfo(msg *Content, path string, name string) error {
 	if e == nil && info.Size() != 0 {
 		return nil
 	}
-	file, e := os.OpenFile(inf, os.O_SYNC|os.O_RDWR|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	bytes, e := json.MarshalIndent(msg, "", " ")
 	if e != nil {
 		return e
 	}
-	defer file.Close()
-	enc := json.NewEncoder(file)
-	enc.SetIndent("", " ")
-	return enc.Encode(msg)
+	return ioutil.WriteFile(inf, bytes, 0755)
 }
 
 // TrimEnd ...
