@@ -135,7 +135,7 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 		contents = append(contents, &c)
 	}
 
-	if len(impl.contents) == 0 {
+	if len(contents) == 0 {
 		return fmt.Errorf("[%s] not found", name)
 	}
 	impl.contents[name] = contents

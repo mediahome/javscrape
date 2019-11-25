@@ -239,10 +239,11 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 }
 
 // Decode ...
-func (g *grabJavdb) Decode(msg *Content) error {
+func (g *grabJavdb) Result() (c []*Content, e error) {
+
 	for idx, detail := range g.details {
 		log.Infow("decode", "index", idx)
-		*msg = Content{
+		c = append(c, &Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,
 			ID:            strings.ToUpper(detail.id),
@@ -258,9 +259,9 @@ func (g *grabJavdb) Decode(msg *Content) error {
 			Genres:        detail.genre,
 			Actors:        detail.idols,
 			Sample:        detail.sample,
-		}
+		})
 	}
-	return nil
+	return
 }
 
 // GrabJavdbOptions ...

@@ -75,12 +75,12 @@ func (g *grabJavbus) Name() string {
 }
 
 // Decode ...
-func (g *grabJavbus) Decode(msg *Content) error {
+func (g *grabJavbus) Result() (c []*Content, e error) {
 	for idx, detail := range g.details {
 		if debug {
 			log.Info("decode", "index", idx, "id", detail.id)
 		}
-		*msg = Content{
+		c = append(c, &Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,
 			ID:            strings.ToUpper(detail.id),
@@ -96,9 +96,9 @@ func (g *grabJavbus) Decode(msg *Content) error {
 			Genres:        detail.genre,
 			Actors:        detail.idols,
 			Sample:        detail.sample,
-		}
+		})
 	}
-	return nil
+	return
 }
 func (g *grabJavbus) clone() *grabJavbus {
 	clone := new(grabJavbus)
@@ -268,8 +268,7 @@ func getAnalyzeLanguageFunc(language GrabLanguage, selection *goquery.Selection)
 }
 func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
-	log.Warnw("dummy", "text", text)
-	//, "detail", detail, "size", len(selection.Contents().Nodes), "text", text)
+	log.Warnw("dummy", "text", text, "detail", detail, "size", len(selection.Contents().Nodes))
 	return nil
 }
 func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
@@ -315,7 +314,7 @@ func javbusSearchDetailAnalyzeSeries(selection *goquery.Selection, detail *javbu
 func javbusSearchDetailAnalyzeGenre(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	var genre []*Genre
 	if debug {
-		log.Infow(selection.Next().Html())
+		log.Info(selection.Next().Html())
 	}
 	selection.Next().Find("p > span.genre > a").Each(func(i int, selection *goquery.Selection) {
 		log.Infow("genre", "text", selection.Text())
