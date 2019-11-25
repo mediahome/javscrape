@@ -35,7 +35,7 @@ var debug = false
 var DefaultInfoName = "inf.json"
 
 // DefaultOutputPath ...
-var DefaultOutputPath = "tmp"
+var DefaultOutputPath = "video"
 
 // ImageCache ...
 func (impl *scrapeImpl) ImageCache(path string) {
