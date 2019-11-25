@@ -64,6 +64,13 @@ func (impl *scrapeImpl) GrabSample(b bool) {
 	}
 }
 
+// ScrapeSample ...
+func ScrapeSample(b bool) Options {
+	return func(impl *scrapeImpl) {
+		impl.sample = b
+	}
+}
+
 // Grab ...
 func Grab(grab IGrab) Options {
 	return func(impl *scrapeImpl) {
@@ -77,7 +84,7 @@ func DebugOn() {
 }
 
 // NewScrape ...
-func NewScrape(opts ...Options /*grabs ...IGrab*/) IScrape {
+func NewScrape(opts ...Options) IScrape {
 	scrape := &scrapeImpl{
 		//grabs: grabs,
 		//sample:   false,
