@@ -17,7 +17,6 @@ type IScrape interface {
 	GrabSample(b bool)
 	IsGrabSample() (b bool)
 	ImageCache(path string)
-	Output(path string)
 	Find(name string) (msg *[]*Content, e error)
 }
 
@@ -35,10 +34,8 @@ var debug = false
 // DefaultInfoName ...
 var DefaultInfoName = "inf.json"
 
-// Output ...
-func (impl *scrapeImpl) Output(path string) {
-	impl.output = path
-}
+// DefaultOutputPath ...
+var DefaultOutputPath = "tmp"
 
 // ImageCache ...
 func (impl *scrapeImpl) ImageCache(path string) {
@@ -75,7 +72,7 @@ func NewScrape(grabs ...IGrab) IScrape {
 		grabs: grabs,
 		//sample:   false,
 		//cache:    nil,
-		//output:   "",
+		output:   DefaultOutputPath,
 		infoName: DefaultInfoName,
 	}
 }
