@@ -37,6 +37,9 @@ var DefaultInfoName = "inf.json"
 // DefaultOutputPath ...
 var DefaultOutputPath = "video"
 
+// Options ...
+type Options func(impl *scrapeImpl)
+
 // ImageCache ...
 func (impl *scrapeImpl) ImageCache(path string) {
 	if path != "" {
@@ -61,20 +64,30 @@ func (impl *scrapeImpl) GrabSample(b bool) {
 	}
 }
 
+// Grab ...
+func Grab() {
+
+}
+
 // DebugOn ...
 func DebugOn() {
 	debug = true
 }
 
 // NewScrape ...
-func NewScrape(grabs ...IGrab) IScrape {
-	return &scrapeImpl{
-		grabs: grabs,
+func NewScrape(opts ...Options /*grabs ...IGrab*/) IScrape {
+	scrape := &scrapeImpl{
+		//grabs: grabs,
 		//sample:   false,
 		//cache:    nil,
 		output:   DefaultOutputPath,
 		infoName: DefaultInfoName,
 	}
+
+	for _, opt := range opts {
+		opt(scrape)
+	}
+	return scrape
 }
 
 // Find ...
