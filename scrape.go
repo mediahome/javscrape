@@ -14,7 +14,6 @@ import (
 
 // IScrape ...
 type IScrape interface {
-	GrabSample(b bool)
 	IsGrabSample() (b bool)
 	ImageCache(path string)
 	Find(name string) (msg *[]*Content, e error)
@@ -53,26 +52,22 @@ func (impl *scrapeImpl) IsGrabSample() bool {
 	return impl.sample
 }
 
-// GrabSample ...
-func (impl *scrapeImpl) GrabSample(b bool) {
-	impl.sample = b
-	if !impl.sample {
-		return
-	}
-	for _, grab := range impl.grabs {
-		grab.Sample(b)
+// CacheOption ...
+func CacheOption(cache *Cache) Options {
+	return func(impl *scrapeImpl) {
+		impl.cache = cache
 	}
 }
 
-// ScrapeSample ...
-func ScrapeSample(b bool) Options {
+// SampleOption ...
+func SampleOption(b bool) Options {
 	return func(impl *scrapeImpl) {
 		impl.sample = b
 	}
 }
 
-// Grab ...
-func Grab(grab IGrab) Options {
+// GrabOption ...
+func GrabOption(grab IGrab) Options {
 	return func(impl *scrapeImpl) {
 		impl.grabs = append(impl.grabs, grab)
 	}
