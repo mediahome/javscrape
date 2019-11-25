@@ -23,15 +23,13 @@ type Cache struct {
 	cache cacher.Cacher
 }
 
-var _cache *Cache
-
 // HasCache ...
 var HasCache bool
 
-func init() {
-	HasCache = true
-	_cache = newCache()
-}
+//func init() {
+//	HasCache = true
+//_cache = newCache()
+//}
 
 func newCache() *Cache {
 	cache.DefaultCachePath = DefaultCachePath
