@@ -15,7 +15,6 @@ import (
 // IScrape ...
 type IScrape interface {
 	IsGrabSample() (b bool)
-	ImageCache(path string)
 	Find(name string) (msg *[]*Content, e error)
 }
 
@@ -38,14 +37,6 @@ var DefaultOutputPath = "video"
 
 // Options ...
 type Options func(impl *scrapeImpl)
-
-// ImageCache ...
-func (impl *scrapeImpl) ImageCache(path string) {
-	if path != "" {
-		DefaultCachePath = path
-	}
-	impl.cache = newCache()
-}
 
 // IsGrabSample ...
 func (impl *scrapeImpl) IsGrabSample() bool {
