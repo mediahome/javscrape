@@ -31,6 +31,8 @@ type scrapeImpl struct {
 }
 
 var debug = false
+
+// DefaultInfoName ...
 var DefaultInfoName = "inf.json"
 
 // Output ...
@@ -112,7 +114,7 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 	var err error
 	if impl.output != "" {
 		for _, m := range *msg {
-			e = copyInfo(m, impl.output)
+			e = copyInfo(m, impl.output, impl.infoName)
 			if e != nil {
 				log.Errorw("error", "error1", e, "msg", m)
 				err = e
@@ -156,9 +158,9 @@ func copyCache(cache *Cache, msg *Content, output string) (e error) {
 	return nil
 }
 
-func copyInfo(msg *Content, path string) error {
+func copyInfo(msg *Content, path string, name string) error {
 	pid := filepath.Join(path, strings.ToUpper(msg.ID))
-	inf := filepath.Join(pid, "inf.json")
+	inf := filepath.Join(pid, name)
 	_ = os.MkdirAll(filepath.Dir(inf), os.ModePerm)
 	info, e := os.Stat(inf)
 	if e != nil && !os.IsNotExist(e) {
