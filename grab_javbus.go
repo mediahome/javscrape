@@ -229,7 +229,7 @@ var analyzeLangFuncList = []AnalyzeLanguageFunc{
 	javbusSearchDetailAnalyzeGenre,
 	javbusSearchDetailAnalyzeIdols,
 	javbusSearchDetailAnalyzeDummy,
-	javbusSearchDetailAnalyzeDummy,
+	//javbusSearchDetailAnalyzeDummy,
 }
 
 var analyzeLanguageList = map[GrabLanguage][]string{

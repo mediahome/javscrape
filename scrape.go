@@ -18,7 +18,7 @@ type RangeFunc func(key string, content Content) error
 
 // IScrape ...
 type IScrape interface {
-	Cache() Cache
+	Cache() *Cache
 	IsGrabSample() (b bool)
 	Find(name string) (e error)
 	Range(rangeFunc RangeFunc) error
@@ -84,6 +84,7 @@ func SampleOption(b bool) Options {
 // GrabOption ...
 func GrabOption(grab IGrab) Options {
 	return func(impl *scrapeImpl) {
+		grab.SetScrape(impl)
 		impl.grabs = append(impl.grabs, grab)
 	}
 }

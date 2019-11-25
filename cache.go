@@ -106,30 +106,9 @@ func (c *Cache) Save(path, url, to string) (written int64, e error) {
 
 // Query ...
 func (c *Cache) Query(url string) (*goquery.Document, error) {
-	if HasCache {
-		closer, e := c.Reader(url)
-		if e != nil {
-			return nil, e
-		}
-		return goquery.NewDocumentFromReader(closer)
+	closer, e := c.Reader(url)
+	if e != nil {
+		return nil, e
 	}
-	if cli == nil {
-		cli = http.DefaultClient
-	}
-
-	res, err := cli.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
-	}
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	return doc, err
+	return goquery.NewDocumentFromReader(closer)
 }

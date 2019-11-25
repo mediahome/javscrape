@@ -241,7 +241,7 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 // Decode ...
 func (g *grabJavdb) Decode(msg *Content) error {
 	for idx, detail := range g.details {
-		log.Infof("decode", "index", idx)
+		log.Infow("decode", "index", idx)
 		*msg = Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,
