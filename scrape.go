@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/goextension/log"
+	"github.com/goextension/log/zap"
 )
 
 // RangeFunc ...
@@ -31,6 +32,10 @@ type scrapeImpl struct {
 	cache    *Cache
 	output   string
 	infoName string
+}
+
+func init() {
+	zap.InitZapSugar()
 }
 
 // Cache ...

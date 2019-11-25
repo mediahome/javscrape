@@ -3,12 +3,10 @@ package scrape
 import (
 	"log"
 	"testing"
-
-	"github.com/goextension/log/zap"
 )
 
 func init() {
-	zap.InitZapSugar()
+	//zap.InitZapSugar()
 	DebugOn()
 }
 

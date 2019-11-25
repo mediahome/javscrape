@@ -268,7 +268,8 @@ func getAnalyzeLanguageFunc(language GrabLanguage, selection *goquery.Selection)
 }
 func javbusSearchDetailAnalyzeDummy(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
 	text := goquery.NewDocumentFromNode(selection.Contents().Nodes[0]).Text()
-	log.Warnw("javbusSearchDetailAnalyzeDummy", "detail", *detail, "size", len(selection.Contents().Nodes), "text", text)
+	log.Warnw("dummy", "text", text)
+	//, "detail", detail, "size", len(selection.Contents().Nodes), "text", text)
 	return nil
 }
 func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbusSearchDetail) (e error) {
