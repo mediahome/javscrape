@@ -20,9 +20,9 @@ type IScrape interface {
 }
 
 type scrapeImpl struct {
-	grabs  []IGrab
-	sample bool
-	//cache  string
+	contents []*Content
+	grabs    []IGrab
+	sample   bool
 	cache    *Cache
 	output   string
 	infoName string
@@ -96,7 +96,6 @@ func NewScrape(opts ...Options) IScrape {
 
 // Find ...
 func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
-	msg = new([]*Content)
 	for _, grab := range impl.grabs {
 		var c Content
 		iGrab, e := grab.Find(name)
@@ -108,26 +107,25 @@ func (impl *scrapeImpl) Find(name string) (msg *[]*Content, e error) {
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
 		}
-		*msg = append(*msg, &c)
+		impl.contents = append(impl.contents, &c)
 	}
 
-	if len(*msg) == 0 {
+	if len(impl.contents) == 0 {
 		return nil, fmt.Errorf("[%s] not found", name)
 	}
 
 	if impl.cache != nil {
-		for _, m := range *msg {
+		for _, m := range impl.contents {
 			e := imageCache(impl.cache, m)
 			if e != nil {
 				return nil, e
 			}
 		}
-
 	}
 
 	var err error
 	if impl.output != "" {
-		for _, m := range *msg {
+		for _, m := range impl.contents {
 			e = copyInfo(m, impl.output, impl.infoName)
 			if e != nil {
 				log.Errorw("error", "error1", e, "msg", m)

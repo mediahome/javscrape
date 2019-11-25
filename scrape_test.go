@@ -25,10 +25,10 @@ func TestNewScrape(t *testing.T) {
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(grab2, grab3)
-	scrape.Output("video")
-	scrape.GrabSample(true)
-	scrape.ImageCache("")
+	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3))
+	//scrape.Output("video")
+	//scrape.GrabSample(true)
+	//scrape.ImageCache("")
 	msg, e := scrape.Find("abp-890")
 	if e != nil {
 		t.Fatal(e)
