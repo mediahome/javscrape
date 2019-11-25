@@ -122,17 +122,16 @@ func NewScrape(opts ...Options) IScrape {
 func (impl *scrapeImpl) Find(name string) (e error) {
 	var contents []*Content
 	for _, grab := range impl.grabs {
-		var c Content
 		iGrab, e := grab.Find(name)
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
 			continue
 		}
-		e = iGrab.Decode(&c)
+		cs, e := iGrab.Result()
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
 		}
-		contents = append(contents, &c)
+		contents = append(contents, cs...)
 	}
 
 	if len(contents) == 0 {

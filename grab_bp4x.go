@@ -42,6 +42,11 @@ type grabBp4x struct {
 	mainPage string
 }
 
+// Result ...
+func (g *grabBp4x) Result() ([]*Content, error) {
+	panic("implement me")
+}
+
 // SetSample ...
 func (g *grabBp4x) SetSample(bool) {
 	panic("implement me")

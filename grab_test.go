@@ -19,15 +19,14 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var msg Content
-	err = doc.Decode(&msg)
+	msg, err := doc.Result()
 	t.Logf("%+v", msg)
 	if err != nil {
 		t.Fatal(err)
 	}
 	cache := newCache()
 
-	err = imageCache(cache, &msg)
+	err = imageCache(cache, msg[0])
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -18,8 +18,8 @@ func TestNewScrape(t *testing.T) {
 		return
 	}
 	//grab1 := NewGrabBp4x(GrabBp4xTypeOption(BP4XTypeJAV))
-	grab2 := NewGrabJavbus()
-	grab3 := NewGrabJavdb()
+	grab2 := NewGrabJavbus(JavbusExact(true))
+	grab3 := NewGrabJavdb(JavdbExact(true))
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
