@@ -28,6 +28,7 @@ var grabJavbusLanguageList = []string{
 }
 
 type grabJavbus struct {
+	scrape     IScrape
 	mainPage   string
 	next       string
 	uncensored bool
@@ -36,6 +37,16 @@ type grabJavbus struct {
 	finder     string
 	language   GrabLanguage
 	details    []*javbusSearchDetail
+}
+
+// SetSample ...
+func (g *grabJavbus) SetSample(b bool) {
+	g.sample = b
+}
+
+// SetScrape ...
+func (g *grabJavbus) SetScrape(scrape IScrape) {
+	g.scrape = scrape
 }
 
 // HasNext ...
@@ -150,7 +161,7 @@ type javbusSearchResult struct {
 }
 
 func javbusSearchResultAnalyze(grab *grabJavbus, url string) ([]*javbusSearchResult, error) {
-	document, e := Query(url)
+	document, e := grab.scrape.Cache().Query(url)
 	if e != nil {
 		return nil, e
 	}
@@ -414,7 +425,7 @@ func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*j
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
-	document, e := Query(result.DetailLink)
+	document, e := grab.scrape.Cache().Query(result.DetailLink)
 	if e != nil {
 		return nil, e
 	}

@@ -34,11 +34,22 @@ var bp4xGrabList = []string{
 }
 
 type grabBp4x struct {
+	scrape   IScrape
 	doc      *goquery.Document
 	language GrabLanguage
 	grabType GrabBp4xType
 	sample   bool
 	mainPage string
+}
+
+// SetSample ...
+func (g *grabBp4x) SetSample(bool) {
+	panic("implement me")
+}
+
+// SetScrape ...
+func (g *grabBp4x) SetScrape(scrape IScrape) {
+	g.scrape = scrape
 }
 
 // Clone ...
@@ -81,7 +92,7 @@ func (g *grabBp4x) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	url := g.mainPage + bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
-	document, e := Query(url)
+	document, e := g.scrape.Cache().Query(url)
 	if e != nil {
 		return g, e
 	}

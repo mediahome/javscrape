@@ -3,13 +3,13 @@ package scrape
 // IGrab ...
 type IGrab interface {
 	MainPage(url string)
-	Sample(bool)
+	SetSample(bool)
+	SetScrape(scrape IScrape)
 	Name() string
 	Find(string) (IGrab, error)
 	HasNext() bool
 	Next() (IGrab, error)
 	Decode(*Content) error
-	//Clone() IGrab
 }
 
 // Sample ...

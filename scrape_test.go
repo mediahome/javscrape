@@ -1,9 +1,9 @@
 package scrape
 
 import (
+	"log"
 	"testing"
 
-	"github.com/goextension/log"
 	"github.com/goextension/log/zap"
 )
 
@@ -30,10 +30,17 @@ func TestNewScrape(t *testing.T) {
 	//scrape.GrabSample(true)
 	//scrape.ImageCache("")
 	e = scrape.Find("abp-890")
-	if e != nil {
-		t.Fatal(e)
-	}
-	for _, m := range *msg {
-		log.Infof("%+v", m)
+	checkErr(e)
+	e = scrape.Find("abp-894")
+	checkErr(e)
+	e = scrape.Range(func(key string, content Content) error {
+		t.Log("key", key, "info", content)
+		return nil
+	})
+	checkErr(e)
+}
+func checkErr(err error) {
+	if err != nil {
+		log.Fatal(err)
 	}
 }

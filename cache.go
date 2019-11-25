@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gocacher/cacher"
 	"github.com/gocacher/file-cache"
 	"github.com/goextension/log"
@@ -22,14 +23,6 @@ var DefaultCachePath = "tmp"
 type Cache struct {
 	cache cacher.Cacher
 }
-
-// HasCache ...
-var HasCache bool
-
-//func init() {
-//	HasCache = true
-//_cache = newCache()
-//}
 
 func newCache() *Cache {
 	cache.DefaultCachePath = DefaultCachePath
@@ -109,4 +102,34 @@ func (c *Cache) Save(path, url, to string) (written int64, e error) {
 		return 0, e
 	}
 	return int64(n), nil
+}
+
+// Query ...
+func (c *Cache) Query(url string) (*goquery.Document, error) {
+	if HasCache {
+		closer, e := c.Reader(url)
+		if e != nil {
+			return nil, e
+		}
+		return goquery.NewDocumentFromReader(closer)
+	}
+	if cli == nil {
+		cli = http.DefaultClient
+	}
+
+	res, err := cli.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	return doc, err
 }

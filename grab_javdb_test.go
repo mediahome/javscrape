@@ -10,7 +10,7 @@ func init() {
 func TestNewJavdb(t *testing.T) {
 
 	javdb := NewGrabJavdb()
-	javdb.Sample(true)
+	javdb.SetSample(true)
 	grab, e := javdb.Find("FCH-041")
 	t.Log(grab, e)
 	t.Log(grab.HasNext())

@@ -16,12 +16,23 @@ const DefaultJavdbMainPage = "https://javdb2.com"
 const javdbSearch = "/search?q=%s&f=all"
 
 type grabJavdb struct {
+	scrape   IScrape
 	mainPage string
 	next     string
 	sample   bool
 	exact    bool
 	finder   string
 	details  []*javdbSearchDetail
+}
+
+// SetSample ...
+func (g *grabJavdb) SetSample(b bool) {
+	g.sample = b
+}
+
+// SetScrape ...
+func (g *grabJavdb) SetScrape(scrape IScrape) {
+	g.scrape = scrape
 }
 
 func (g *grabJavdb) clone() *grabJavdb {
@@ -43,7 +54,7 @@ func (g *grabJavdb) Next() (IGrab, error) {
 	return g.find(g.next)
 }
 
-// Sample ...
+// SetSample ...
 func (g *grabJavdb) Sample(b bool) {
 	g.sample = b
 }
@@ -116,7 +127,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javdb search result is null")
 	}
-	document, e := Query(grab.mainPage + result.DetailLink)
+	document, e := grab.scrape.Cache().Query(grab.mainPage + result.DetailLink)
 	if e != nil {
 		return nil, e
 	}
@@ -184,7 +195,7 @@ type javdbSearchResult struct {
 }
 
 func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearchResult, e error) {
-	document, e := Query(url)
+	document, e := grab.scrape.Cache().Query(url)
 	if e != nil {
 		return nil, e
 	}

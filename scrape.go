@@ -18,6 +18,7 @@ type RangeFunc func(key string, content Content) error
 
 // IScrape ...
 type IScrape interface {
+	Cache() Cache
 	IsGrabSample() (b bool)
 	Find(name string) (e error)
 	Range(rangeFunc RangeFunc) error
@@ -30,6 +31,11 @@ type scrapeImpl struct {
 	cache    *Cache
 	output   string
 	infoName string
+}
+
+// Cache ...
+func (impl *scrapeImpl) Cache() *Cache {
+	return impl.cache
 }
 
 // Range ...

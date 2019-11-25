@@ -13,7 +13,7 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 		return
 	}
 	grab := NewGrabJavbus()
-	grab.Sample(true)
+	grab.SetSample(true)
 	doc, err := grab.Find("abp-874")
 
 	if err != nil {
