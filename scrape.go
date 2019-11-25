@@ -65,8 +65,10 @@ func (impl *scrapeImpl) GrabSample(b bool) {
 }
 
 // Grab ...
-func Grab() {
-
+func Grab(grab IGrab) Options {
+	return func(impl *scrapeImpl) {
+		impl.grabs = append(impl.grabs, grab)
+	}
 }
 
 // DebugOn ...
