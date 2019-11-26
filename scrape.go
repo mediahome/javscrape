@@ -18,7 +18,6 @@ type IScrape interface {
 	Find(name string) (e error)
 	Clear()
 	Range(rangeFunc RangeFunc) error
-	ExactOff()
 	Output() error
 }
 
@@ -30,6 +29,7 @@ type scrapeImpl struct {
 	output   string
 	infoName string
 	optimize bool
+	exact    bool
 }
 
 var debug = false
@@ -100,6 +100,13 @@ func SampleOption(b bool) Options {
 	}
 }
 
+// ExactOption ...
+func ExactOption(b bool) Options {
+	return func(impl *scrapeImpl) {
+		impl.exact = b
+	}
+}
+
 // GrabOption ...
 func GrabOption(grab IGrab) Options {
 	return func(impl *scrapeImpl) {
@@ -118,6 +125,8 @@ func NewScrape(opts ...Options) IScrape {
 	scrape := &scrapeImpl{
 		contents: make(map[string][]*Content),
 		sample:   true,
+		exact:    false,
+		optimize: true,
 		output:   DefaultOutputPath,
 		infoName: DefaultInfoName,
 	}
@@ -138,20 +147,17 @@ func (impl *scrapeImpl) Clear() {
 
 // Output ...
 func (impl *scrapeImpl) Output() error {
-	return impl.Range(func(key string, content Content) error {
-		e := copyInfo(&content, DefaultOutputPath, strings.ToUpper(key))
+	return impl.Range(func(key string, content Content) (e error) {
+		e = copyInfo(&content, DefaultOutputPath, DefaultInfoName)
 		if e != nil {
-			return e
+			log.Errorw("copy info", "error", e, "output", key)
 		}
-		return copyCache(impl.cache, &content, impl.sample, DefaultOutputPath)
+		e = copyCache(impl.cache, &content, impl.sample, DefaultOutputPath)
+		if e != nil {
+			log.Errorw("copy cache", "error", e, "output", key)
+		}
+		return nil
 	})
-}
-
-// ExactOff ...
-func (impl *scrapeImpl) ExactOff() {
-	for _, g := range impl.grabs {
-		g.SetExact(false)
-	}
 }
 
 func init() {
@@ -180,6 +186,8 @@ func (impl *scrapeImpl) Range(rangeFunc RangeFunc) error {
 func (impl *scrapeImpl) Find(name string) (e error) {
 	var contents []*Content
 	for _, grab := range impl.grabs {
+		grab.SetExact(impl.exact)
+		grab.SetSample(impl.sample)
 		iGrab, e := grab.Find(name)
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
