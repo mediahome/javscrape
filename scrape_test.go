@@ -26,7 +26,6 @@ func TestNewScrape(t *testing.T) {
 	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), SampleOption(true))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
-	//scrape.ImageCache("")
 	scrape.ExactOff()
 	e = scrape.Find("abp-890")
 	checkErr(e)
@@ -36,6 +35,8 @@ func TestNewScrape(t *testing.T) {
 		t.Log("key", key, "info", content)
 		return nil
 	})
+	checkErr(e)
+	e = scrape.Output()
 	checkErr(e)
 }
 func checkErr(err error) {

@@ -32,13 +32,6 @@ type scrapeImpl struct {
 	optimize bool
 }
 
-// Output ...
-func (impl *scrapeImpl) Output() error {
-	return impl.Range(func(key string, content Content) error {
-		return copyCache(impl.cache, &content, impl.sample, DefaultOutputPath)
-	})
-}
-
 var debug = false
 
 // DefaultInfoName ...
@@ -63,9 +56,9 @@ func CacheOption(cache *Cache) Options {
 }
 
 // OptimizeOption ...
-func OptimizeOption() Options {
+func OptimizeOption(b bool) Options {
 	return func(impl *scrapeImpl) {
-		impl.optimize = true
+		impl.optimize = b
 	}
 }
 
@@ -141,6 +134,17 @@ func NewScrape(opts ...Options) IScrape {
 // Clear ...
 func (impl *scrapeImpl) Clear() {
 	impl.contents = make(map[string][]*Content)
+}
+
+// Output ...
+func (impl *scrapeImpl) Output() error {
+	return impl.Range(func(key string, content Content) error {
+		e := copyInfo(&content, DefaultOutputPath, strings.ToUpper(key))
+		if e != nil {
+			return e
+		}
+		return copyCache(impl.cache, &content, impl.sample, DefaultOutputPath)
+	})
 }
 
 // ExactOff ...

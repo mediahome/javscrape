@@ -37,13 +37,22 @@ func Hash(url string) string {
 	return fmt.Sprintf("%x", sum256)
 }
 
-// Reader ...
-func (c *Cache) Reader(url string) (io.Reader, error) {
+// GetReader ...
+func (c *Cache) GetReader(url string) (io.Reader, error) {
+	bys, e := c.Get(url)
+	if e != nil {
+		return nil, e
+	}
+	return bytes.NewReader(bys), nil
+}
+
+// GetBytes ...
+func (c *Cache) GetBytes(url string) ([]byte, error) {
 	return c.Get(url)
 }
 
 // Get ...
-func (c *Cache) Get(url string) (reader io.Reader, e error) {
+func (c *Cache) Get(url string) (bys []byte, e error) {
 	name := Hash(url)
 	log.Infow("cache get", "url", url, "hash", name)
 	b, e := c.cache.Has(name)
@@ -52,7 +61,7 @@ func (c *Cache) Get(url string) (reader io.Reader, e error) {
 		if e != nil {
 			return nil, e
 		}
-		return bytes.NewReader(getted), nil
+		return getted, nil
 	}
 
 	if cli == nil {
@@ -67,7 +76,7 @@ func (c *Cache) Get(url string) (reader io.Reader, e error) {
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
-	bys, e := ioutil.ReadAll(res.Body)
+	bys, e = ioutil.ReadAll(res.Body)
 	if e != nil {
 		return nil, e
 	}
@@ -75,7 +84,7 @@ func (c *Cache) Get(url string) (reader io.Reader, e error) {
 	if e != nil {
 		return nil, e
 	}
-	return bytes.NewReader(bys), nil
+	return bys, nil
 }
 
 // Save ...
@@ -105,7 +114,7 @@ func (c *Cache) Save(path, url, to string) (written int64, e error) {
 
 // Query ...
 func (c *Cache) Query(url string) (*goquery.Document, error) {
-	closer, e := c.Reader(url)
+	closer, e := c.GetReader(url)
 	if e != nil {
 		return nil, e
 	}

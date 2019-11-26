@@ -2,7 +2,6 @@ package scrape
 
 import (
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -65,10 +64,7 @@ func copyFile(cache *Cache, source, path string) error {
 	if source == "" {
 		return nil
 	}
-	reader, e := cache.Reader(source)
-	if e != nil {
-		return e
-	}
+
 	path = TrimEnd(path)
 	if debug {
 		log.Infow("copy", "dir", filepath.Dir(path), "path", path)
@@ -81,18 +77,11 @@ func copyFile(cache *Cache, source, path string) error {
 	if e == nil && info.Size() != 0 {
 		return nil
 	}
-
-	file, e := os.OpenFile(path+Ext(source), os.O_SYNC|os.O_RDWR|os.O_TRUNC|os.O_CREATE, os.ModePerm)
+	bys, e := cache.GetBytes(source)
 	if e != nil {
 		return e
 	}
-	defer file.Close()
-	written, e := io.Copy(file, reader)
-	if e != nil {
-		return e
-	}
-	_ = written
-	return nil
+	return ioutil.WriteFile(path+Ext(source), bys, 0755)
 }
 
 func imageCache(cache *Cache, m *Content, sample bool) (e error) {
