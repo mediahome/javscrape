@@ -29,7 +29,6 @@ func newCache() *Cache {
 	return &Cache{
 		cache: cache.New(),
 	}
-
 }
 
 // Hash ...
