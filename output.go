@@ -12,7 +12,7 @@ import (
 	"github.com/goextension/log"
 )
 
-func copyCache(cache *Cache, msg *Content, output string) (e error) {
+func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error) {
 	pid := filepath.Join(output, strings.ToUpper(msg.ID))
 	e = copyFile(cache, msg.Image, filepath.Join(pid, "image"))
 	if e != nil {
@@ -28,14 +28,16 @@ func copyCache(cache *Cache, msg *Content, output string) (e error) {
 			return e
 		}
 	}
-	for _, s := range msg.Sample {
-		e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "sample"+"@"+strconv.Itoa(s.Index)))
-		if e != nil {
-			return e
-		}
-		e = copyFile(cache, s.Thumb, filepath.Join(pid, ".thumb", "thumb"+"@"+strconv.Itoa(s.Index)))
-		if e != nil {
-			return e
+	if sample {
+		for _, s := range msg.Sample {
+			e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "sample"+"@"+strconv.Itoa(s.Index)))
+			if e != nil {
+				return e
+			}
+			e = copyFile(cache, s.Thumb, filepath.Join(pid, ".thumb", "thumb"+"@"+strconv.Itoa(s.Index)))
+			if e != nil {
+				return e
+			}
 		}
 	}
 	return nil
@@ -93,21 +95,21 @@ func copyFile(cache *Cache, source, path string) error {
 	return nil
 }
 
-func imageCache(cache *Cache, m *Content) (e error) {
+func imageCache(cache *Cache, m *Content, sample bool) (e error) {
 	path := make(chan string)
 	go func(path chan<- string) {
 		defer close(path)
-		//for _, m := range msg {
 		path <- m.Image
 		path <- m.Thumb
 		for _, act := range m.Actors {
 			path <- act.Image
 		}
-		for _, s := range m.Sample {
-			path <- s.Image
-			path <- s.Thumb
+		if sample {
+			for _, s := range m.Sample {
+				path <- s.Image
+				path <- s.Thumb
+			}
 		}
-		//}
 	}(path)
 
 	for p := range path {

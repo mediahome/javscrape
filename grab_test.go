@@ -26,7 +26,7 @@ func TestGrabJAVBUS_Find(t *testing.T) {
 	}
 	cache := newCache()
 
-	err = imageCache(cache, msg[0])
+	err = imageCache(cache, msg[0], true)
 	if err != nil {
 		t.Fatal(err)
 	}

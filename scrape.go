@@ -18,6 +18,7 @@ type IScrape interface {
 	Clear()
 	Range(rangeFunc RangeFunc) error
 	ExactOff()
+	Output() error
 }
 
 type scrapeImpl struct {
@@ -27,6 +28,11 @@ type scrapeImpl struct {
 	cache    *Cache
 	output   string
 	infoName string
+}
+
+// Output ...
+func (impl *scrapeImpl) Output() error {
+
 }
 
 var debug = false
@@ -76,6 +82,7 @@ func DebugOn() {
 func NewScrape(opts ...Options) IScrape {
 	scrape := &scrapeImpl{
 		contents: make(map[string][]*Content),
+		sample:   true,
 		output:   DefaultOutputPath,
 		infoName: DefaultInfoName,
 	}
@@ -135,6 +142,12 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 		cs, e := iGrab.Result()
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
+		}
+		for _, c := range cs {
+			e := imageCache(impl.cache, c, impl.sample)
+			if e != nil {
+				log.Errorw("error", "cache", c.ID, "error", e)
+			}
 		}
 		contents = append(contents, cs...)
 	}
