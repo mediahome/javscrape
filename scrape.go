@@ -32,7 +32,9 @@ type scrapeImpl struct {
 
 // Output ...
 func (impl *scrapeImpl) Output() error {
-
+	return impl.Range(func(key string, content Content) error {
+		return copyCache(impl.cache, &content, impl.sample, DefaultOutputPath)
+	})
 }
 
 var debug = false
