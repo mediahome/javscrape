@@ -42,6 +42,11 @@ type grabBp4x struct {
 	mainPage string
 }
 
+// SetExact ...
+func (g *grabBp4x) SetExact(bool) {
+	panic("implement me")
+}
+
 // Result ...
 func (g *grabBp4x) Result() ([]*Content, error) {
 	panic("implement me")

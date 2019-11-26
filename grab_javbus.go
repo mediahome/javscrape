@@ -39,6 +39,11 @@ type grabJavbus struct {
 	details    []*javbusSearchDetail
 }
 
+// SetExact ...
+func (g *grabJavbus) SetExact(b bool) {
+	g.exact = b
+}
+
 // SetSample ...
 func (g *grabJavbus) SetSample(b bool) {
 	g.sample = b

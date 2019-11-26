@@ -5,6 +5,7 @@ type IGrab interface {
 	MainPage(url string)
 	SetSample(bool)
 	SetScrape(scrape IScrape)
+	SetExact(bool)
 	Name() string
 	Find(string) (IGrab, error)
 	HasNext() bool

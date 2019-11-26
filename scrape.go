@@ -23,6 +23,7 @@ type IScrape interface {
 	IsGrabSample() (b bool)
 	Find(name string) (e error)
 	Range(rangeFunc RangeFunc) error
+	ExactOff()
 }
 
 type scrapeImpl struct {
@@ -32,6 +33,13 @@ type scrapeImpl struct {
 	cache    *Cache
 	output   string
 	infoName string
+}
+
+// ExactOff ...
+func (impl *scrapeImpl) ExactOff() {
+	for _, g := range impl.grabs {
+		g.SetExact(false)
+	}
 }
 
 func init() {

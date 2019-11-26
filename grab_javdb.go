@@ -25,6 +25,11 @@ type grabJavdb struct {
 	details  []*javdbSearchDetail
 }
 
+// SetExact ...
+func (g *grabJavdb) SetExact(b bool) {
+	g.exact = b
+}
+
 // SetSample ...
 func (g *grabJavdb) SetSample(b bool) {
 	g.sample = b
