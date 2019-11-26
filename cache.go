@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gocacher/badger-cache/v2"
 	"github.com/gocacher/cacher"
-	"github.com/gocacher/file-cache"
 	"github.com/goextension/log"
 )
 

@@ -78,7 +78,7 @@ func (g *grabJavbus) Name() string {
 func (g *grabJavbus) Result() (c []*Content, e error) {
 	for idx, detail := range g.details {
 		if debug {
-			log.Info("decode", "index", idx, "id", detail.id)
+			log.Infow("decode", "index", idx, "id", detail.id)
 		}
 		c = append(c, &Content{
 			From:          g.Name(),
