@@ -2,6 +2,7 @@ package scrape
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/goextension/log"
 	"github.com/goextension/log/zap"
@@ -28,6 +29,7 @@ type scrapeImpl struct {
 	cache    *Cache
 	output   string
 	infoName string
+	optimize bool
 }
 
 // Output ...
@@ -58,6 +60,44 @@ func CacheOption(cache *Cache) Options {
 	return func(impl *scrapeImpl) {
 		impl.cache = cache
 	}
+}
+
+// OptimizeOption ...
+func OptimizeOption() Options {
+	return func(impl *scrapeImpl) {
+		impl.optimize = true
+	}
+}
+
+// MergeOptimize ...
+func MergeOptimize(id string, contents []*Content) *Content {
+	var content *Content
+	for _, c := range contents {
+		if strings.ToUpper(c.ID) == strings.ToUpper(id) {
+			if content == nil {
+				content = c
+				continue
+			}
+		}
+		if content == nil {
+			continue
+		}
+		if strings.ToUpper(content.ID) == strings.ToUpper(c.ID) {
+			if len(content.Sample) < len(c.Sample) {
+				log.Infow("optimize", "field", "sample")
+				content.Sample = c.Sample
+			}
+			if len(content.Genres) < len(c.Genres) {
+				log.Infow("optimize", "field", "genre")
+				content.Genres = c.Genres
+			}
+			if len(content.Actors) < len(c.Actors) {
+				log.Infow("optimize", "field", "actor")
+				content.Actors = c.Actors
+			}
+		}
+	}
+	return content
 }
 
 // SampleOption ...
@@ -145,45 +185,28 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
 		}
-		for _, c := range cs {
-			e := imageCache(impl.cache, c, impl.sample)
+		contents = append(contents, cs...)
+	}
+	if impl.optimize {
+		c := MergeOptimize(name, contents)
+		e = imageCache(impl.cache, c, impl.sample)
+		if e != nil {
+			log.Errorw("error", "cache", c.ID, "error", e)
+		}
+		contents = []*Content{c}
+	} else {
+		for _, c := range contents {
+			e = imageCache(impl.cache, c, impl.sample)
 			if e != nil {
 				log.Errorw("error", "cache", c.ID, "error", e)
 			}
 		}
-		contents = append(contents, cs...)
 	}
-
 	if len(contents) == 0 {
 		return fmt.Errorf("[%s] not found", name)
 	}
 	impl.contents[name] = contents
 	return nil
-	//if impl.cache != nil {
-	//	for _, m := range impl.contents {
-	//		e := imageCache(impl.cache, m)
-	//		if e != nil {
-	//			return nil, e
-	//		}
-	//	}
-	//}
-	//
-	//var err error
-	//if impl.output != "" {
-	//	for _, m := range impl.contents {
-	//		e = copyInfo(m, impl.output, impl.infoName)
-	//		if e != nil {
-	//			log.Errorw("error", "error1", e, "msg", m)
-	//			err = e
-	//		}
-	//		e = copyCache(impl.cache, m, impl.output)
-	//		if e != nil {
-	//			log.Errorw("error", "error2", e, "msg", m)
-	//			err = e
-	//		}
-	//	}
-	//}
-	//return msg, err
 }
 
 func (impl *scrapeImpl) init() {
