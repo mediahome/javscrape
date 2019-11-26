@@ -18,15 +18,16 @@ func TestNewScrape(t *testing.T) {
 		return
 	}
 	//grab1 := NewGrabBp4x(GrabBp4xTypeOption(BP4XTypeJAV))
-	grab2 := NewGrabJavbus(JavbusExact(false))
-	grab3 := NewGrabJavdb(JavdbExact(false))
+	grab2 := NewGrabJavbus()
+	grab3 := NewGrabJavdb()
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3))
+	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), SampleOption(true))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
 	//scrape.ImageCache("")
+	scrape.ExactOff()
 	e = scrape.Find("abp-890")
 	checkErr(e)
 	e = scrape.Find("abp-894")

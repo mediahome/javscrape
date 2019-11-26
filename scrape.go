@@ -22,6 +22,7 @@ type IScrape interface {
 	Cache() *Cache
 	IsGrabSample() (b bool)
 	Find(name string) (e error)
+	Clear()
 	Range(rangeFunc RangeFunc) error
 	ExactOff()
 }
@@ -33,6 +34,11 @@ type scrapeImpl struct {
 	cache    *Cache
 	output   string
 	infoName string
+}
+
+// Clear ...
+func (impl *scrapeImpl) Clear() {
+	impl.contents = make(map[string][]*Content)
 }
 
 // ExactOff ...
@@ -112,7 +118,7 @@ func NewScrape(opts ...Options) IScrape {
 	scrape := &scrapeImpl{
 		//grabs: grabs,
 		//sample:   false,
-		contents: make(map[string][]*Content, 3),
+		contents: make(map[string][]*Content),
 		output:   DefaultOutputPath,
 		infoName: DefaultInfoName,
 	}
