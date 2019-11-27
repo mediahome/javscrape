@@ -11,6 +11,9 @@ import (
 	"github.com/goextension/log"
 )
 
+// DefaultOutputPath ...
+var DefaultOutputPath = "video"
+
 func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error) {
 	pid := filepath.Join(output, strings.ToUpper(msg.ID))
 	e = copyFile(cache, msg.Image, filepath.Join(pid, "image"))

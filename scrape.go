@@ -37,9 +37,6 @@ var debug = false
 // DefaultInfoName ...
 var DefaultInfoName = "inf.json"
 
-// DefaultOutputPath ...
-var DefaultOutputPath = "video"
-
 // Options ...
 type Options func(impl *scrapeImpl)
 
