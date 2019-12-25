@@ -23,12 +23,14 @@ func TestNewScrape(t *testing.T) {
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), OptimizeOption(true))
+	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), OptimizeOption(true), ExactOption(false))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
-	e = scrape.Find("abp-891")
+	e = scrape.Find("abp")
 	checkErr(e)
-	e = scrape.Find("abp-892")
+	e = scrape.Find("snis")
+	checkErr(e)
+	e = scrape.Find("ssni")
 	checkErr(e)
 	e = scrape.Range(func(key string, content Content) error {
 		t.Log("key", key, "info", content)

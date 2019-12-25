@@ -198,9 +198,11 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 	}
 	if impl.optimize {
 		c := MergeOptimize(name, contents)
-		e = imageCache(impl.cache, c, impl.sample)
-		if e != nil {
-			log.Errorw("error", "cache", c.ID, "error", e)
+		if c != nil {
+			e = imageCache(impl.cache, c, impl.sample)
+			if e != nil {
+				log.Errorw("error", "cache", c.ID, "error", e)
+			}
 		}
 		contents = []*Content{c}
 	} else {
