@@ -35,7 +35,7 @@ type scrapeImpl struct {
 var debug = false
 
 // DefaultInfoName ...
-var DefaultInfoName = "inf.json"
+var DefaultInfoName = ".info"
 
 // Options ...
 type Options func(impl *scrapeImpl)
@@ -170,6 +170,9 @@ func (impl *scrapeImpl) Cache() *Cache {
 func (impl *scrapeImpl) Range(rangeFunc RangeFunc) error {
 	for key, value := range impl.contents {
 		for _, v := range value {
+			if v == nil {
+				continue
+			}
 			e := rangeFunc(key, *v)
 			if e != nil {
 				return e
@@ -196,7 +199,7 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 		}
 		contents = append(contents, cs...)
 	}
-	if impl.optimize {
+	if !impl.exact && impl.optimize {
 		c := MergeOptimize(name, contents)
 		if c != nil {
 			e = imageCache(impl.cache, c, impl.sample)

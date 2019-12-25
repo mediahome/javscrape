@@ -7,7 +7,9 @@ import (
 
 func init() {
 	//zap.InitZapSugar()
-	DebugOn()
+	DefaultOutputPath = `D:\workspace\golang\project\go-scrape\video`
+	//DebugOn()
+	debug = false
 }
 
 // TestNewScrape ...

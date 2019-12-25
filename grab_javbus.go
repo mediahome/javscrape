@@ -137,7 +137,9 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 		detail.thumbImage = r.PhotoFrame
 		detail.title = r.Title
 		clone.details = append(clone.details, detail)
-		log.Infof("javbus detail:%+v", detail)
+		if debug {
+			log.Infof("javbus detail:%+v", detail)
+		}
 	}
 
 	return clone, nil
@@ -287,7 +289,9 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 		image := selection.Find("li > a > img").AttrOr("src", "")
 		name := selection.Find("li > div.star-name > a").Text()
 		name = strings.TrimSpace(name)
-		log.Infow("idols", "name", name, "image", image, "star", starLink)
+		if debug {
+			log.Infow("idols", "name", name, "image", image, "star", starLink)
+		}
 		idols = append(idols, &Star{
 			StarLink: starLink,
 			Image:    image,
@@ -322,7 +326,9 @@ func javbusSearchDetailAnalyzeGenre(selection *goquery.Selection, detail *javbus
 		log.Info(selection.Next().Html())
 	}
 	selection.Next().Find("p > span.genre > a").Each(func(i int, selection *goquery.Selection) {
-		log.Infow("genre", "text", selection.Text())
+		if debug {
+			log.Infow("genre", "text", selection.Text())
+		}
 		g := new(Genre)
 		g.Content = strings.TrimSpace(selection.Text())
 		g.URL = selection.AttrOr("href", "")
