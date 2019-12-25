@@ -30,17 +30,19 @@ func TestNewScrape(t *testing.T) {
 	//scrape.GrabSample(true)
 	e = scrape.Find("abp")
 	checkErr(e)
+	e = scrape.Output()
+	checkErr(e)
+	scrape.Clear()
 	e = scrape.Find("snis")
-	checkErr(e)
-	e = scrape.Find("ssni")
-	checkErr(e)
-	e = scrape.Range(func(key string, content Content) error {
-		t.Log("key", key, "info", content)
-		return nil
-	})
 	checkErr(e)
 	e = scrape.Output()
 	checkErr(e)
+	scrape.Clear()
+	e = scrape.Find("ssni")
+	checkErr(e)
+	e = scrape.Output()
+	checkErr(e)
+	scrape.Clear()
 }
 func checkErr(err error) {
 	if err != nil {
