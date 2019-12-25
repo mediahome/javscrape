@@ -169,6 +169,7 @@ func (impl *scrapeImpl) Cache() *Cache {
 // Range ...
 func (impl *scrapeImpl) Range(rangeFunc RangeFunc) error {
 	for key, value := range impl.contents {
+		log.Infow("range", "key", key)
 		for _, v := range value {
 			if v == nil {
 				continue
@@ -197,17 +198,20 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 		if e != nil {
 			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
 		}
+		if debug {
+			log.Infow("find", "result", cs)
+		}
 		contents = append(contents, cs...)
 	}
-	if !impl.exact && impl.optimize {
+	if impl.exact && impl.optimize {
 		c := MergeOptimize(name, contents)
 		if c != nil {
 			e = imageCache(impl.cache, c, impl.sample)
 			if e != nil {
 				log.Errorw("error", "cache", c.ID, "error", e)
 			}
+			contents = []*Content{c}
 		}
-		contents = []*Content{c}
 	} else {
 		for _, c := range contents {
 			e = imageCache(impl.cache, c, impl.sample)
@@ -218,6 +222,9 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 	}
 	if len(contents) == 0 {
 		return fmt.Errorf("[%s] not found", name)
+	}
+	if debug {
+		log.Infow("find", "contents", contents)
 	}
 	impl.contents[name] = contents
 	return nil
