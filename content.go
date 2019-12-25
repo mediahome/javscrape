@@ -8,6 +8,22 @@ type Genre struct {
 	Content string
 }
 
+// Sample ...
+type Sample struct {
+	Index int
+	Thumb string
+	Image string
+	Title string
+}
+
+// Star ...
+type Star struct {
+	Image    string
+	StarLink string
+	Name     string   //english name
+	Alias    []string //other name(katakana,...)
+}
+
 // Content ...
 type Content struct {
 	From          string //where this

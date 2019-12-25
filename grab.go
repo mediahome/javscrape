@@ -13,14 +13,6 @@ type IGrab interface {
 	Result() ([]*Content, error)
 }
 
-// Sample ...
-type Sample struct {
-	Index int
-	Thumb string
-	Image string
-	Title string
-}
-
 // GrabLanguage ...
 type GrabLanguage int
 
