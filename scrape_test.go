@@ -1,6 +1,7 @@
 package scrape
 
 import (
+	"fmt"
 	"log"
 	"testing"
 )
@@ -15,7 +16,7 @@ func init() {
 // TestNewScrape ...
 func TestNewScrape(t *testing.T) {
 
-	e := RegisterProxy("socks5://localhost:10808")
+	e := RegisterProxy("socks5://localhost:1080")
 	if e != nil {
 		return
 	}
@@ -28,21 +29,25 @@ func TestNewScrape(t *testing.T) {
 	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), OptimizeOption(true), ExactOption(false))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
-	e = scrape.Find("abp")
+	e = scrape.Find("abp-888")
 	checkErr(e)
+	scrape.Range(func(key string, content Content) error {
+		fmt.Printf("key:%v,content:%+v", key, content)
+		return nil
+	})
 	e = scrape.Output()
 	checkErr(e)
 	scrape.Clear()
-	e = scrape.Find("snis")
-	checkErr(e)
-	e = scrape.Output()
-	checkErr(e)
-	scrape.Clear()
-	e = scrape.Find("ssni")
-	checkErr(e)
-	e = scrape.Output()
-	checkErr(e)
-	scrape.Clear()
+	//e = scrape.Find("snis")
+	//checkErr(e)
+	//e = scrape.Output()
+	//checkErr(e)
+	//scrape.Clear()
+	//e = scrape.Find("ssni")
+	//checkErr(e)
+	//e = scrape.Output()
+	//checkErr(e)
+	//scrape.Clear()
 }
 func checkErr(err error) {
 	if err != nil {

@@ -15,6 +15,17 @@ import (
 const DefaultJavdbMainPage = "https://javdb2.com"
 const javdbSearch = "/search?q=%s&f=all"
 
+const javdbNo = "番號"
+const javdbTime = "時間"
+const javdbTimeLong = "時長"
+const javdbDirector = "導演"
+const javdbStudio = "片商"
+const javdbPublisher = "發行"
+const javdbIdols = "演員"
+const javdbGenre = "类别"
+
+const javdbTimeFormat = "2006-01-02"
+
 type grabJavdb struct {
 	scrape   IScrape
 	mainPage string
@@ -95,7 +106,7 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 		detail.title = r.Title
 		clone.details = append(clone.details, detail)
 		if debug {
-			log.Infof("javbus detail:%+v", detail)
+			log.Infof("javdb detail:%+v", detail)
 		}
 	}
 
@@ -126,8 +137,6 @@ type javdbSearchDetail struct {
 	uncensored bool
 }
 
-const javdbTimeFormat = "2006-01-02"
-
 func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javdb search result is null")
@@ -139,34 +148,44 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 	detail = new(javdbSearchDetail)
 	detail.uncensored = strings.Index(document.Find("h2.title > strong").Text(), "無碼") > 0
 	detail.bigImage, _ = document.Find("div.columns.item-content > div.column.column-video-cover > a > img").Attr("src")
-	document.Find("div.columns.item-content > div > nav.panel > div.panel-block > span.value").Each(func(i int, selection *goquery.Selection) {
-		switch i {
-		case 0:
-			detail.id = selection.Text()
-		case 1:
-			detail.date, _ = time.Parse(javdbTimeFormat, selection.Text())
-		case 2:
-			detail.length = selection.Text()
-		case 3:
-			detail.studio = selection.Text()
-		case 4:
-			var genre []*Genre
-			selection.Find("a").Each(func(i int, selection *goquery.Selection) {
-				g := new(Genre)
-				g.Content = strings.TrimSpace(selection.Text())
-				g.URL = grab.mainPage + selection.AttrOr("href", "")
-				genre = append(genre, g)
-			})
-			detail.genre = genre
-		case 5:
+	document.Find("div.columns.item-content > div > nav.panel > div.panel-block").Each(func(i int, selection *goquery.Selection) {
+		if debug {
+			log.Infow("javdb", "title", selection.Find("span.item-title > strong").Text(), "value", selection.Find("span.value").Text())
+		}
+		title := strings.TrimSpace(selection.Find("span.item-title > strong").Text())
+		switch title {
+		case javdbNo:
+			detail.id = selection.Find("span.value").Text()
+		case javdbTime:
+			detail.date, _ = time.Parse(javdbTimeFormat, selection.Find("span.value").Text())
+		case javdbTimeLong:
+			detail.length = selection.Find("span.value").Text()
+		case javdbDirector:
+			detail.director = selection.Find("span.value").Text()
+		case javdbStudio:
+			detail.studio = selection.Find("span.value").Text()
+		case javdbPublisher:
+			//nothing
+		case javdbIdols:
 			var idols []*Star
-			selection.Find("a").Each(func(i int, selection *goquery.Selection) {
+			selection.Find("span.value.a").Each(func(i int, selection *goquery.Selection) {
 				s := new(Star)
 				s.Name = strings.TrimSpace(selection.Text())
 				s.StarLink = grab.mainPage + selection.AttrOr("href", "")
 				idols = append(idols, s)
 			})
 			detail.idols = idols
+		case javdbGenre:
+			var genre []*Genre
+			selection.Find("span.value.a").Each(func(i int, selection *goquery.Selection) {
+				g := new(Genre)
+				g.Content = strings.TrimSpace(selection.Text())
+				g.URL = grab.mainPage + selection.AttrOr("href", "")
+				genre = append(genre, g)
+			})
+			detail.genre = genre
+		default:
+			log.Warnw("javdb", "title", title, "val", selection.Text())
 		}
 	})
 
