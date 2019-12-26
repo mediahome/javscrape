@@ -23,7 +23,7 @@ const javdbStudio = "片商"
 const javdbPublisher = "發行"
 const javdbIdols = "演員"
 const javdbGenre = "类别"
-
+const javdbSeries = "系列"
 const javdbTimeFormat = "2006-01-02"
 
 type grabJavdb struct {
@@ -164,6 +164,8 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 			detail.director = selection.Find("span.value").Text()
 		case javdbStudio:
 			detail.studio = selection.Find("span.value").Text()
+		case javdbSeries:
+			detail.series = selection.Find("span.value").Text()
 		case javdbPublisher:
 			//nothing
 		case javdbIdols:
