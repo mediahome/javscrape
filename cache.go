@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocacher/badger-cache/v2"
@@ -21,6 +22,7 @@ var DefaultCachePath = "tmp"
 
 // Cache ...
 type Cache struct {
+	lock  sync.Mutex
 	cache cacher.Cacher
 }
 
@@ -53,10 +55,13 @@ func (c *Cache) GetBytes(url string) ([]byte, error) {
 
 // Get ...
 func (c *Cache) Get(url string) (bys []byte, e error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	name := Hash(url)
 	log.Infow("cache get", "url", url, "hash", name)
 	b, e := c.cache.Has(name)
 	if e == nil && b {
+
 		getted, e := c.cache.Get(name)
 		if e != nil {
 			return nil, e
@@ -88,28 +93,25 @@ func (c *Cache) Get(url string) (bys []byte, e error) {
 }
 
 // Save ...
-func (c *Cache) Save(path, url, to string) (written int64, e error) {
+func (c *Cache) Save(url, to string) (e error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	s, e := filepath.Abs(to)
 	if e != nil {
-		return written, e
+		return e
 	}
 	dir, _ := filepath.Split(s)
 	_ = os.MkdirAll(dir, os.ModePerm)
-	fromData, e := c.cache.Get(Hash(url))
+	fromData, e := c.Get(url)
 	if e != nil {
-		return 0, e
+		return e
 	}
 
-	toFile, e := os.OpenFile(s, os.O_TRUNC|os.O_CREATE|os.O_RDWR|os.O_SYNC, os.ModePerm)
+	e = ioutil.WriteFile(s, fromData, 0755)
 	if e != nil {
-		return written, e
+		return e
 	}
-
-	n, e := toFile.Write(fromData)
-	if e != nil {
-		return 0, e
-	}
-	return int64(n), nil
+	return nil
 }
 
 // Query ...
