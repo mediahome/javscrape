@@ -507,7 +507,7 @@ func JavbusExact(b bool) GrabJavbusOptions {
 func NewGrabJavbus(ops ...GrabJavbusOptions) IGrab {
 	grab := &grabJavbus{
 		mainPage: DefaultJavbusMainPage,
-		language: LanguageJapanese,
+		language: LanguageChinese,
 		exact:    true,
 	}
 	for _, op := range ops {
