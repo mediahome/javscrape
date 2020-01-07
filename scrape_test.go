@@ -15,8 +15,8 @@ func init() {
 
 // TestNewScrape ...
 func TestNewScrape(t *testing.T) {
-
-	e := RegisterProxy("socks5://localhost:1080")
+	DebugOn()
+	e := RegisterProxy("socks5://localhost:11080")
 	if e != nil {
 		return
 	}
@@ -29,7 +29,7 @@ func TestNewScrape(t *testing.T) {
 	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), OptimizeOption(true), ExactOption(true))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
-	e = scrape.Find("abp-889")
+	e = scrape.Find("abp-923")
 	checkErr(e)
 	scrape.Range(func(key string, content Content) error {
 		fmt.Printf("key:%v,content:%+v", key, content)

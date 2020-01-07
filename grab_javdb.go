@@ -170,8 +170,8 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 			//nothing
 		case javdbIdols:
 			var idols []*Star
-			selection.Find("span.value.a").Each(func(i int, selection *goquery.Selection) {
-				s := new(Star)
+			selection.Find("span.value>a").Each(func(i int, selection *goquery.Selection) {
+				s := &Star{}
 				s.Name = strings.TrimSpace(selection.Text())
 				s.StarLink = grab.mainPage + selection.AttrOr("href", "")
 				idols = append(idols, s)
@@ -179,8 +179,8 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 			detail.idols = idols
 		case javdbGenre:
 			var genre []*Genre
-			selection.Find("span.value.a").Each(func(i int, selection *goquery.Selection) {
-				g := new(Genre)
+			selection.Find("span.value>a").Each(func(i int, selection *goquery.Selection) {
+				g := &Genre{}
 				g.Content = strings.TrimSpace(selection.Text())
 				g.URL = grab.mainPage + selection.AttrOr("href", "")
 				genre = append(genre, g)
