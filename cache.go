@@ -19,6 +19,8 @@ import (
 
 // DefaultCachePath ...
 var DefaultCachePath = "tmp"
+var _cache *Cache
+var _cacheOnce *sync.Once
 
 // Cache ...
 type Cache struct {
@@ -26,11 +28,23 @@ type Cache struct {
 	cache cacher.Cacher
 }
 
+func init() {
+	_cacheOnce = &sync.Once{}
+}
+
 func newCache() *Cache {
 	cache.DefaultCachePath = DefaultCachePath
 	return &Cache{
 		cache: cache.New(),
 	}
+}
+
+// NewCache ...
+func NewCache() *Cache {
+	_cacheOnce.Do(func() {
+		_cache = newCache()
+	})
+	return _cache
 }
 
 // Hash ...

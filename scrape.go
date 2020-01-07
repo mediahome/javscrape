@@ -232,6 +232,6 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 
 func (impl *scrapeImpl) init() {
 	if impl.cache == nil {
-		impl.cache = newCache()
+		impl.cache = NewCache()
 	}
 }
