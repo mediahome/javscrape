@@ -15,8 +15,8 @@ import (
 var DefaultOutputPath = "video"
 
 func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error) {
-	pid := filepath.Join(output, strings.ToUpper(msg.ID))
-	e = copyFile(cache, msg.Image, filepath.Join(pid, "image"))
+	pid := filepath.Join(output, strings.ToUpper(msg.ID), "."+msg.From)
+	e = copyFile(cache, msg.Poster, filepath.Join(pid, "poster"))
 	if e != nil {
 		return e
 	}
@@ -91,7 +91,7 @@ func imageCache(cache *Cache, m *Content, sample bool) (e error) {
 	path := make(chan string)
 	go func(path chan<- string) {
 		defer close(path)
-		path <- m.Image
+		path <- m.Poster
 		path <- m.Thumb
 		for _, act := range m.Actors {
 			path <- act.Image

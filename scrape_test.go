@@ -15,8 +15,9 @@ func init() {
 
 // TestNewScrape ...
 func TestNewScrape(t *testing.T) {
+	var e error
 	DebugOn()
-	e := RegisterProxy("http://localhost:7890")
+	e = RegisterProxy("sock5://localhost:7890")
 	if e != nil {
 		return
 	}
@@ -26,7 +27,7 @@ func TestNewScrape(t *testing.T) {
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(GrabOption(grab3), OptimizeOption(true), ExactOption(true))
+	scrape := NewScrape(GrabOption(grab3), OptimizeOption(true), ExactOption(false))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
 	e = scrape.Find("vec-457")

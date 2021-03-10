@@ -2,10 +2,6 @@ package scrape
 
 import "testing"
 
-func init() {
-	DebugOn()
-}
-
 // TestNewJavdb ...
 func TestNewJavdb(t *testing.T) {
 	javdb := NewGrabJavdb()

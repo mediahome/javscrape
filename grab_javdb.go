@@ -285,7 +285,7 @@ func (g *grabJavdb) Result() (c []*Content, e error) {
 			Title:         detail.title,
 			OriginalTitle: "",
 			Year:          strconv.Itoa(detail.date.Year()),
-			Image:         detail.bigImage,
+			Poster:        detail.bigImage,
 			Thumb:         detail.thumbImage,
 			ReleaseDate:   detail.date,
 			Studio:        detail.studio,

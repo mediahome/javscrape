@@ -19,5 +19,4 @@ func TestNewGrabJAVBUS(t *testing.T) {
 		t.Log(grab, e)
 		count++
 	}
-
 }

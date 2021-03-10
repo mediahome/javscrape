@@ -42,6 +42,11 @@ type grabBp4x struct {
 	mainPage string
 }
 
+// SetSample ...
+func (g *grabBp4x) SetSample(b bool) {
+	panic("implement me")
+}
+
 // SetExact ...
 func (g *grabBp4x) SetExact(bool) {
 	panic("implement me")
@@ -50,16 +55,6 @@ func (g *grabBp4x) SetExact(bool) {
 // Result ...
 func (g *grabBp4x) Result() ([]*Content, error) {
 	panic("implement me")
-}
-
-// SetSample ...
-func (g *grabBp4x) SetSample(bool) {
-	panic("implement me")
-}
-
-// SetScrape ...
-func (g *grabBp4x) SetScrape(scrape IScrape) {
-	g.scrape = scrape
 }
 
 // Clone ...

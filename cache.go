@@ -75,7 +75,6 @@ func (c *Cache) Get(url string) (bys []byte, e error) {
 	log.Infow("cache get", "url", url, "hash", name)
 	b, e := c.cache.Has(name)
 	if e == nil && b {
-
 		getted, e := c.cache.Get(name)
 		if e != nil {
 			return nil, e
@@ -87,7 +86,13 @@ func (c *Cache) Get(url string) (bys []byte, e error) {
 		cli = http.DefaultClient
 	}
 
-	res, e := cli.Get(url)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.11 Safari/537.36")
+
+	res, e := cli.Do(req)
 	if e != nil {
 		return nil, e
 	}

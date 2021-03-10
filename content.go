@@ -39,7 +39,7 @@ type Content struct {
 	Plot          string
 	Genres        []*Genre
 	Actors        []*Star
-	Image         string
+	Poster        string
 	Thumb         string
 	Sample        []*Sample
 }
