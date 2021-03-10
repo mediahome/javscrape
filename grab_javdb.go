@@ -15,19 +15,22 @@ import (
 const DefaultJavdbMainPage = "https://javdb4.com"
 const javdbSearch = "/search?q=%s&f=all"
 
-const javdbNo = "番號"
-const javdbTime = "時間"
-const javdbTimeLong = "時長"
-const javdbDirector = "導演"
-const javdbStudio = "片商"
-const javdbPublisher = "發行"
-const javdbIdols = "演員"
-const javdbGenre = "类别"
-const javdbSeries = "系列"
-const javdbTimeFormat = "2006-01-02"
+const javdbENRUL = "locale=en"
+const javdbZHRUL = "locale=zh"
+
+const javdbZHNo = "番號"
+const javdbZHTime = "日期"
+const javdbZHTimeLong = "時長"
+const javdbZHDirector = "導演"
+const javdbZHStudio = "片商"
+const javdbZHPublisher = "發行"
+const javdbZHIdols = "演員"
+const javdbZHGenre = "類別"
+const javdbZHSeries = "系列"
+const javdbZHTimeFormat = "2006-01-02"
+const javdbZHRating = "評分"
 
 type grabJavdb struct {
-	scrape   IScrape
 	mainPage string
 	next     string
 	sample   bool
@@ -45,11 +48,6 @@ func (g *grabJavdb) SetExact(b bool) {
 // SetSample ...
 func (g *grabJavdb) SetSample(b bool) {
 	g.sample = b
-}
-
-// SetScrape ...
-func (g *grabJavdb) SetScrape(scrape IScrape) {
-	g.scrape = scrape
 }
 
 func (g *grabJavdb) clone() *grabJavdb {
@@ -136,6 +134,7 @@ type javdbSearchDetail struct {
 	idols      []*Star
 	sample     []*Sample
 	uncensored bool
+	rating     string
 }
 
 func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
@@ -148,28 +147,34 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 	}
 	detail = new(javdbSearchDetail)
 	detail.uncensored = strings.Index(document.Find("h2.title > strong").Text(), "無碼") > 0
-	detail.bigImage, _ = document.Find("div.columns.item-content > div.column.column-video-cover > a > img").Attr("src")
-	document.Find("div.columns.item-content > div > nav.panel > div.panel-block").Each(func(i int, selection *goquery.Selection) {
+	log.Infow("DetailAnalyze", "uncensored", detail.uncensored)
+
+	detail.bigImage, _ = document.Find("div.columns > div.column > a > img").Attr("src")
+	log.Infow("DetailAnalyze", "bigImage", detail.bigImage)
+	document.Find("div.columns > div > nav.panel > div.panel-block").Each(func(i int, selection *goquery.Selection) {
+		title := strings.TrimSpace(selection.Find("strong").Text())
+		value := strings.TrimSpace(selection.Find("span.value").Text())
 		if debug {
-			log.Infow("javdb", "title", selection.Find("span.item-title > strong").Text(), "value", selection.Find("span.value").Text())
+			log.Infow("DetailAnalyze", "title", title, "value", value)
 		}
-		title := strings.TrimSpace(selection.Find("span.item-title > strong").Text())
-		switch title {
-		case javdbNo:
-			detail.id = selection.Find("span.value").Text()
-		case javdbTime:
-			detail.date, _ = time.Parse(javdbTimeFormat, selection.Find("span.value").Text())
-		case javdbTimeLong:
-			detail.length = selection.Find("span.value").Text()
-		case javdbDirector:
-			detail.director = selection.Find("span.value").Text()
-		case javdbStudio:
-			detail.studio = selection.Find("span.value").Text()
-		case javdbSeries:
-			detail.series = selection.Find("span.value").Text()
-		case javdbPublisher:
+		switch {
+		case strings.Index(title, javdbZHNo) != -1:
+			detail.id = value
+		case strings.Index(title, javdbZHTime) != -1:
+			detail.date, _ = time.Parse(javdbZHTimeFormat, value)
+		case strings.Index(title, javdbZHTimeLong) != -1:
+			detail.length = value
+		case strings.Index(title, javdbZHDirector) != -1:
+			detail.director = value
+		case strings.Index(title, javdbZHStudio) != -1:
+			detail.studio = value
+		case strings.Index(title, javdbZHSeries) != -1:
+			detail.series = value
+		case strings.Index(title, javdbZHRating) != -1:
+			detail.rating = value
+		case strings.Index(title, javdbZHPublisher) != -1:
 			//nothing
-		case javdbIdols:
+		case strings.Index(title, javdbZHIdols) != -1:
 			var idols []*Star
 			selection.Find("span.value>a").Each(func(i int, selection *goquery.Selection) {
 				s := &Star{}
@@ -178,34 +183,35 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 				idols = append(idols, s)
 			})
 			detail.idols = idols
-		case javdbGenre:
+		case strings.Index(title, javdbZHGenre) != -1:
 			var genre []*Genre
 			selection.Find("span.value>a").Each(func(i int, selection *goquery.Selection) {
 				g := &Genre{}
 				g.Content = strings.TrimSpace(selection.Text())
 				g.URL = grab.mainPage + selection.AttrOr("href", "")
 				genre = append(genre, g)
+				if debug {
+					log.Infow("DetailAnalyze|Genre", "context", g.Content, "url", g.URL)
+				}
 			})
 			detail.genre = genre
 		default:
-			log.Warnw("javdb", "title", title, "val", selection.Text())
+			log.Warnw("DetailAnalyze|Other", "title", title, "value", value)
 		}
 	})
 
 	if grab.sample {
 		document.Find("div.message-body > div.tile-images.preview-images > a.tile-item").Each(func(i int, selection *goquery.Selection) {
 			image := selection.AttrOr("href", "")
-			//thumb := selection.Find("div > img").AttrOr("src", "")
 			title := selection.AttrOr("data-caption", "")
-			if debug {
-				log.Infow("sample", "index", i, "image", image, "title", title, "thumb", "")
-			}
 			detail.sample = append(detail.sample, &Sample{
 				Index: i,
-				//Thumb: thumb,
 				Image: image,
 				Title: title,
 			})
+			if debug {
+				log.Infow("DetailAnalyze|Sample", "index", i, "image", image, "title", title, "thumb", "")
+			}
 		})
 	}
 
@@ -221,6 +227,7 @@ type javdbSearchResult struct {
 	Date       string
 }
 
+//tag:SearchResultAnalyze
 func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearchResult, e error) {
 	document, e := grab.cache.Query(url)
 	if e != nil {
@@ -229,9 +236,7 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 	var res []*javdbSearchResult
 	document.Find("#videos > div > div.grid-item.column").Each(func(i int, selection *goquery.Selection) {
 		resTmp := new(javdbSearchResult)
-		if debug {
-			log.Infow("javdb", "index", i, "text", selection.Text())
-		}
+
 		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
 		resTmp.DetailLink = selection.Find("a.box").AttrOr("href", "")
 
@@ -247,6 +252,9 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearc
 		resTmp.Date = strings.TrimSpace(selection.Find("a.box >div.meta").Text())
 		if resTmp.ID != "" {
 			res = append(res, resTmp)
+		}
+		if debug {
+			log.Infow("SearchResultAnalyze", "res", res)
 		}
 	})
 

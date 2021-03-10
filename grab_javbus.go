@@ -28,7 +28,6 @@ var grabJavbusLanguageList = []string{
 }
 
 type grabJavbus struct {
-	scrape     IScrape
 	mainPage   string
 	next       string
 	uncensored bool
@@ -48,11 +47,6 @@ func (g *grabJavbus) SetExact(b bool) {
 // SetSample ...
 func (g *grabJavbus) SetSample(b bool) {
 	g.sample = b
-}
-
-// SetScrape ...
-func (g *grabJavbus) SetScrape(scrape IScrape) {
-	g.scrape = scrape
 }
 
 // HasNext ...
@@ -207,6 +201,7 @@ func javbusSearchResultAnalyze(grab *grabJavbus, url string) ([]*javbusSearchRes
 }
 
 type javbusSearchDetail struct {
+	language   string
 	title      string
 	thumbImage string
 	bigImage   string

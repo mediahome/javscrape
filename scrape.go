@@ -107,7 +107,6 @@ func ExactOption(b bool) Options {
 // GrabOption ...
 func GrabOption(grab IGrab) Options {
 	return func(impl *scrapeImpl) {
-		grab.SetScrape(impl)
 		impl.grabs = append(impl.grabs, grab)
 	}
 }

@@ -27,6 +27,7 @@ type Star struct {
 // Content ...
 type Content struct {
 	From          string //where this
+	Language      string
 	Uncensored    bool
 	ID            string
 	Title         string
