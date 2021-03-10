@@ -32,6 +32,7 @@ const javdbZHRating = "評分"
 
 type grabJavdb struct {
 	mainPage string
+	language GrabLanguage
 	next     string
 	sample   bool
 	exact    bool
@@ -280,6 +281,7 @@ func (g *grabJavdb) Result() (c []Content, e error) {
 		log.Infow("decode", "index", idx)
 		c = append(c, Content{
 			From:          g.Name(),
+			Language:      g.language.String(),
 			Uncensored:    detail.uncensored,
 			ID:            strings.ToUpper(detail.id),
 			Title:         detail.title,

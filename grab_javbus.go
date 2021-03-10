@@ -21,10 +21,10 @@ const javbusUncensored = "uncensored/search/%s"
 const javbusCensored = "search/%s"
 
 var grabJavbusLanguageList = []string{
-	LanguageChinese:  javbusCNURL,
-	LanguageEnglish:  javbusENURL,
-	LanguageJapanese: javbusJAURL,
-	LanguageKorea:    javbusKOURL,
+	LanguageChineseTraditional: javbusCNURL,
+	LanguageEnglish:            javbusENURL,
+	LanguageJapanese:           javbusJAURL,
+	LanguageKorea:              javbusKOURL,
 }
 
 type grabJavbus struct {
@@ -80,8 +80,10 @@ func (g *grabJavbus) Result() (c []Content, e error) {
 		if debug {
 			log.Infow("decode", "index", idx, "id", detail.id)
 		}
+
 		c = append(c, Content{
 			From:          g.Name(),
+			Language:      g.language.String(),
 			Uncensored:    detail.uncensored,
 			ID:            strings.ToUpper(detail.id),
 			Title:         detail.title,
@@ -258,7 +260,7 @@ var analyzeLanguageList = map[GrabLanguage][]string{
 		"ジャンル",
 		"出演者",
 	},
-	LanguageChinese: {
+	LanguageChineseTraditional: {
 		"識別碼",
 		"發行日期",
 		"長度",
@@ -514,7 +516,7 @@ func NewGrabJavbus(ops ...GrabJavbusOptions) IGrab {
 	grab := &grabJavbus{
 		cache:    NewCache(),
 		mainPage: DefaultJavbusMainPage,
-		language: LanguageChinese,
+		language: LanguageChineseTraditional,
 		exact:    true,
 	}
 	for _, op := range ops {

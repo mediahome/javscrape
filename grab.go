@@ -19,6 +19,23 @@ type GrabLanguage int
 const (
 	LanguageEnglish GrabLanguage = iota
 	LanguageJapanese
-	LanguageChinese
+	LanguageChineseSimple
+	LanguageChineseTraditional
 	LanguageKorea
 )
+
+var languageGrabStringList = map[GrabLanguage]string{
+	LanguageEnglish:            "english",
+	LanguageJapanese:           "japanese",
+	LanguageChineseSimple:      "simple chinese",
+	LanguageChineseTraditional: "traditional chinese",
+	LanguageKorea:              "korea",
+}
+
+func (g GrabLanguage) String() string {
+	v, b := languageGrabStringList[g]
+	if !b {
+		return ""
+	}
+	return v
+}

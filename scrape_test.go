@@ -22,12 +22,12 @@ func TestNewScrape(t *testing.T) {
 		return
 	}
 	//grab1 := NewGrabBp4x(GrabBp4xTypeOption(BP4XTypeJAV))
-	//grab2 := NewGrabJavbus()
+	grab2 := NewGrabJavbus()
 	grab3 := NewGrabJavdb()
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(GrabOption(grab3), ExactOption(true))
+	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), ExactOption(true))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
 	e = scrape.Find("vec-457")

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+	"github.com/goextension/log"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,6 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gocacher/badger-cache/v2"
 	"github.com/gocacher/cacher"
-	"github.com/goextension/log"
 )
 
 // DefaultCachePath ...
@@ -72,8 +72,8 @@ func (c *Cache) Get(url string) (bys []byte, e error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	name := Hash(url)
-	log.Infow("cache get", "url", url, "hash", name)
 	b, e := c.cache.Has(name)
+	log.Infow("cache get", "url", url, "hash", name, "exist", b)
 	if e == nil && b {
 		getted, e := c.cache.Get(name)
 		if e != nil {
