@@ -12,7 +12,7 @@ import (
 )
 
 // DefaultJavdbMainPage ...
-const DefaultJavdbMainPage = "https://javdb2.com"
+const DefaultJavdbMainPage = "https://javdb4.com"
 const javdbSearch = "/search?q=%s&f=all"
 
 const javdbNo = "番號"
@@ -34,6 +34,7 @@ type grabJavdb struct {
 	exact    bool
 	finder   string
 	details  []*javdbSearchDetail
+	cache    *Cache
 }
 
 // SetExact ...
@@ -141,7 +142,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javdb search result is null")
 	}
-	document, e := grab.scrape.Cache().Query(grab.mainPage + result.DetailLink)
+	document, e := grab.cache.Query(grab.mainPage + result.DetailLink)
 	if e != nil {
 		return nil, e
 	}
@@ -221,7 +222,7 @@ type javdbSearchResult struct {
 }
 
 func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearchResult, e error) {
-	document, e := grab.scrape.Cache().Query(url)
+	document, e := grab.cache.Query(url)
 	if e != nil {
 		return nil, e
 	}
@@ -311,9 +312,11 @@ func NewGrabJavdb(ops ...GrabJavdbOptions) IGrab {
 		mainPage: DefaultJavdbMainPage,
 		sample:   false,
 		exact:    true,
+		cache:    NewCache(),
 	}
 	for _, op := range ops {
 		op(grab)
 	}
+
 	return grab
 }

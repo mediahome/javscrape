@@ -8,13 +8,13 @@ import (
 // TestGrabJAVBUS_Find ...
 func TestGrabJAVBUS_Find(t *testing.T) {
 	DebugOn()
-	e := RegisterProxy("socks5://localhost:10808")
+	e := RegisterProxy("http://localhost:7890")
 	if e != nil {
 		return
 	}
 	grab := NewGrabJavbus()
 	grab.SetSample(true)
-	doc, err := grab.Find("abp-874")
+	doc, err := grab.Find("vec-457")
 
 	if err != nil {
 		t.Fatal(err)

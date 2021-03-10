@@ -8,12 +8,12 @@ func init() {
 
 // TestNewJavdb ...
 func TestNewJavdb(t *testing.T) {
-
 	javdb := NewGrabJavdb()
 	javdb.SetSample(true)
-	grab, e := javdb.Find("FCH-041")
+	grab, e := javdb.Find("vec-457")
 	t.Log(grab, e)
 	t.Log(grab.HasNext())
+
 	count := 0
 	for grab.HasNext() {
 		if count > 2 {
