@@ -27,7 +27,7 @@ func TestNewScrape(t *testing.T) {
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(GrabOption(grab3), OptimizeOption(true), ExactOption(false))
+	scrape := NewScrape(GrabOption(grab3), ExactOption(true))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
 	e = scrape.Find("vec-457")

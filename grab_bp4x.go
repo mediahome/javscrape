@@ -53,7 +53,7 @@ func (g *grabBp4x) SetExact(bool) {
 }
 
 // Result ...
-func (g *grabBp4x) Result() ([]*Content, error) {
+func (g *grabBp4x) Result() ([]Content, error) {
 	panic("implement me")
 }
 

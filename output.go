@@ -47,7 +47,7 @@ func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error)
 
 func copyInfo(msg *Content, path string, name string) error {
 	pid := filepath.Join(path, strings.ToUpper(msg.ID))
-	inf := filepath.Join(pid, name)
+	inf := filepath.Join(pid, "."+msg.From+name)
 	_ = os.MkdirAll(filepath.Dir(inf), os.ModePerm)
 	info, e := os.Stat(inf)
 	if e != nil && !os.IsNotExist(e) {
@@ -87,8 +87,8 @@ func copyFile(cache *Cache, source, path string) error {
 	return ioutil.WriteFile(path+Ext(source), bys, 0755)
 }
 
-func imageCache(cache *Cache, m *Content, sample bool) (e error) {
-	path := make(chan string)
+func imageCache(cache *Cache, m Content, sample bool) (e error) {
+	path := make(chan string, 2)
 	go func(path chan<- string) {
 		defer close(path)
 		path <- m.Poster

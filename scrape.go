@@ -1,8 +1,8 @@
 package scrape
 
 import (
-	"fmt"
 	"strings"
+	"sync"
 
 	"github.com/goextension/log"
 	"github.com/goextension/log/zap"
@@ -22,13 +22,12 @@ type IScrape interface {
 }
 
 type scrapeImpl struct {
-	contents map[string][]*Content
+	contents map[string][]Content
 	grabs    []IGrab
 	sample   bool
 	cache    *Cache
 	output   string
 	infoName string
-	optimize bool
 	exact    bool
 }
 
@@ -49,13 +48,6 @@ func (impl *scrapeImpl) IsGrabSample() bool {
 func CacheOption(cache *Cache) Options {
 	return func(impl *scrapeImpl) {
 		impl.cache = cache
-	}
-}
-
-// OptimizeOption ...
-func OptimizeOption(b bool) Options {
-	return func(impl *scrapeImpl) {
-		impl.optimize = b
 	}
 }
 
@@ -119,10 +111,9 @@ func DebugOn() {
 // NewScrape ...
 func NewScrape(opts ...Options) IScrape {
 	scrape := &scrapeImpl{
-		contents: make(map[string][]*Content),
+		contents: make(map[string][]Content),
 		sample:   true,
 		exact:    false,
-		optimize: true,
 		output:   DefaultOutputPath,
 		infoName: DefaultInfoName,
 	}
@@ -138,7 +129,7 @@ func NewScrape(opts ...Options) IScrape {
 
 // Clear ...
 func (impl *scrapeImpl) Clear() {
-	impl.contents = make(map[string][]*Content)
+	impl.contents = make(map[string][]Content)
 }
 
 // Output ...
@@ -170,10 +161,10 @@ func (impl *scrapeImpl) Range(rangeFunc RangeFunc) error {
 	for key, value := range impl.contents {
 		log.Infow("range", "key", key)
 		for _, v := range value {
-			if v == nil {
+			if v.ID == "" {
 				continue
 			}
-			e := rangeFunc(key, *v)
+			e := rangeFunc(key, v)
 			if e != nil {
 				return e
 			}
@@ -184,48 +175,52 @@ func (impl *scrapeImpl) Range(rangeFunc RangeFunc) error {
 
 // Find ...
 func (impl *scrapeImpl) Find(name string) (e error) {
-	var contents []*Content
+	chanContent := make(chan Content, 1)
+	wg := &sync.WaitGroup{}
 	for _, grab := range impl.grabs {
-		grab.SetExact(impl.exact)
-		grab.SetSample(impl.sample)
-		iGrab, e := grab.Find(name)
+		wg.Add(1)
+		go func(grab IGrab, cctx chan<- Content) {
+			defer wg.Done()
+			grab.SetExact(impl.exact)
+			grab.SetSample(impl.sample)
+			iGrab, e := grab.Find(name)
+			if e != nil {
+				log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
+				return
+			}
+			cs, e := iGrab.Result()
+			if e != nil {
+				log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
+			}
+			if debug {
+				log.Infow("find", "result", cs)
+			}
+			for _, c := range cs {
+				cctx <- c
+			}
+		}(grab, chanContent)
+	}
+
+	go func(cctx chan<- Content) {
+		wg.Wait()
+		close(cctx)
+	}(chanContent)
+
+	for content := range chanContent {
+		e = imageCache(impl.cache, content, impl.sample)
 		if e != nil {
-			log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
-			continue
+			log.Errorw("error", "cache", content.ID, "error", e)
 		}
-		cs, e := iGrab.Result()
-		if e != nil {
-			log.Errorw("error", "error", e, "name", grab.Name(), "decode", name)
+		if v, b := impl.contents[content.ID]; b {
+			impl.contents[content.ID] = append(v, content)
+		} else {
+			impl.contents[content.ID] = []Content{content}
 		}
 		if debug {
-			log.Infow("find", "result", cs)
-		}
-		contents = append(contents, cs...)
-	}
-	if impl.exact && impl.optimize {
-		c := MergeOptimize(name, contents)
-		if c != nil {
-			e = imageCache(impl.cache, c, impl.sample)
-			if e != nil {
-				log.Errorw("error", "cache", c.ID, "error", e)
-			}
-			contents = []*Content{c}
-		}
-	} else {
-		for _, c := range contents {
-			e = imageCache(impl.cache, c, impl.sample)
-			if e != nil {
-				log.Errorw("error", "cache", c.ID, "error", e)
-			}
+			log.Infow("find", "content", content)
 		}
 	}
-	if len(contents) == 0 {
-		return fmt.Errorf("[%s] not found", name)
-	}
-	if debug {
-		log.Infow("find", "contents", contents)
-	}
-	impl.contents[name] = contents
+
 	return nil
 }
 

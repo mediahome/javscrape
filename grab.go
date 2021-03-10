@@ -9,7 +9,7 @@ type IGrab interface {
 	Find(string) (IGrab, error)
 	HasNext() bool
 	Next() (IGrab, error)
-	Result() ([]*Content, error)
+	Result() ([]Content, error)
 }
 
 // GrabLanguage ...

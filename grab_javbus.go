@@ -75,12 +75,12 @@ func (g *grabJavbus) Name() string {
 }
 
 // Decode ...
-func (g *grabJavbus) Result() (c []*Content, e error) {
+func (g *grabJavbus) Result() (c []Content, e error) {
 	for idx, detail := range g.details {
 		if debug {
 			log.Infow("decode", "index", idx, "id", detail.id)
 		}
-		c = append(c, &Content{
+		c = append(c, Content{
 			From:          g.Name(),
 			Uncensored:    detail.uncensored,
 			ID:            strings.ToUpper(detail.id),
