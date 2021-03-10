@@ -5,6 +5,7 @@ type IGrab interface {
 	MainPage(url string)
 	SetSample(bool)
 	SetExact(bool)
+	SetLanguage(language GrabLanguage)
 	Name() string
 	Find(string) (IGrab, error)
 	HasNext() bool

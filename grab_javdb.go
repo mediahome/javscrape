@@ -41,6 +41,10 @@ type grabJavdb struct {
 	cache    *Cache
 }
 
+func (g *grabJavdb) SetLanguage(language GrabLanguage) {
+	//do nothing
+}
+
 // SetExact ...
 func (g *grabJavdb) SetExact(b bool) {
 	g.exact = b
@@ -292,6 +296,7 @@ func (g *grabJavdb) Result() (c []Content, e error) {
 			ReleaseDate:   detail.date,
 			Studio:        detail.studio,
 			MovieSet:      detail.series,
+			Director:      detail.director,
 			Plot:          "",
 			Genres:        detail.genre,
 			Actors:        detail.idols,
@@ -320,6 +325,7 @@ func (g *grabJavdb) MainPage(url string) {
 func NewGrabJavdb(ops ...GrabJavdbOptions) IGrab {
 	grab := &grabJavdb{
 		mainPage: DefaultJavdbMainPage,
+		language: LanguageChineseTraditional,
 		sample:   false,
 		exact:    true,
 		cache:    NewCache(),

@@ -5,9 +5,10 @@ import "testing"
 // TestNewGrabJAVBUS ...
 func TestNewGrabJAVBUS(t *testing.T) {
 	//DebugOn()
-	javdb := NewGrabJavbus()
-	javdb.SetSample(true)
-	grab, e := javdb.Find("vec-457")
+	javbus := NewGrabJavbus()
+	javbus.SetSample(true)
+	//javbus.SetLanguage(LanguageEnglish)
+	grab, e := javbus.Find("vec-457")
 	t.Log(grab, e)
 	t.Log(grab.HasNext())
 	count := 0

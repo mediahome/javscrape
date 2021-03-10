@@ -39,6 +39,10 @@ type grabJavbus struct {
 	cache      *Cache
 }
 
+func (g *grabJavbus) SetLanguage(language GrabLanguage) {
+	g.language = language
+}
+
 // SetExact ...
 func (g *grabJavbus) SetExact(b bool) {
 	g.exact = b
@@ -94,6 +98,7 @@ func (g *grabJavbus) Result() (c []Content, e error) {
 			ReleaseDate:   detail.date,
 			Studio:        detail.studio,
 			MovieSet:      detail.series,
+			Director:      detail.director,
 			Plot:          "",
 			Genres:        detail.genre,
 			Actors:        detail.idols,
@@ -115,14 +120,12 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 	if e != nil {
 		return clone, e
 	}
-	if debug {
-		for _, r := range results {
-			log.Infof("%+v", r)
-		}
-	}
 	for _, r := range results {
+		if debug {
+			log.Infow("find", "id", r.ID, "detail", r)
+		}
+
 		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
-			log.Infow("continue", "id", r.ID, "find", clone.finder)
 			continue
 		}
 		detail, e := javbusSearchDetailAnalyze(clone, r)
@@ -135,7 +138,7 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 		detail.title = r.Title
 		clone.details = append(clone.details, detail)
 		if debug {
-			log.Infof("javbus detail:%+v", detail)
+			log.Infow("find|detail", "id", detail.id, "detail", detail)
 		}
 	}
 

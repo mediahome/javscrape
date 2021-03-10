@@ -17,20 +17,21 @@ func init() {
 func TestNewScrape(t *testing.T) {
 	var e error
 	DebugOn()
-	e = RegisterProxy("sock5://localhost:7890")
+	e = RegisterProxy("http://localhost:7890")
 	if e != nil {
 		return
 	}
 	//grab1 := NewGrabBp4x(GrabBp4xTypeOption(BP4XTypeJAV))
 	grab2 := NewGrabJavbus()
+	//grab2.SetLanguage(LanguageEnglish)
 	grab3 := NewGrabJavdb()
 	//doc, err := grab.Find("abp-874")
 	//if err != nil {
 	//	t.Fatal(err)
-	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), ExactOption(true))
+	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), ExactOption(false))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
-	e = scrape.Find("vec-457")
+	e = scrape.Find("abp-888")
 	checkErr(e)
 	scrape.Range(func(key string, content Content) error {
 		fmt.Printf("key:%v,content:%+v", key, content)

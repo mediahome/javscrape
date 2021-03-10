@@ -35,6 +35,7 @@ type Content struct {
 	Year          string
 	ReleaseDate   time.Time
 	Studio        string
+	Director      string
 	MovieSet      string
 	Plot          string
 	Genres        []*Genre
