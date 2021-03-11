@@ -43,4 +43,5 @@ type Content struct {
 	Poster        string
 	Thumb         string
 	Sample        []*Sample
+	Publisher     string
 }

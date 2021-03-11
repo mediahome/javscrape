@@ -133,13 +133,13 @@ type javdbSearchDetail struct {
 	length     string
 	director   string
 	studio     string
-	label      string
 	series     string
 	genre      []*Genre
 	idols      []*Star
 	sample     []*Sample
 	uncensored bool
 	rating     string
+	publisher  string
 }
 
 func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
@@ -178,7 +178,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 		case strings.Index(title, javdbZHRating) != -1:
 			detail.rating = value
 		case strings.Index(title, javdbZHPublisher) != -1:
-			//nothing
+			detail.publisher = value
 		case strings.Index(title, javdbZHIdols) != -1:
 			var idols []*Star
 			selection.Find("span.value>a").Each(func(i int, selection *goquery.Selection) {
@@ -297,6 +297,7 @@ func (g *grabJavdb) Result() (c []Content, e error) {
 			Studio:        detail.studio,
 			MovieSet:      detail.series,
 			Director:      detail.director,
+			Publisher:     detail.publisher,
 			Plot:          "",
 			Genres:        detail.genre,
 			Actors:        detail.idols,

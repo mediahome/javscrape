@@ -99,6 +99,7 @@ func (g *grabJavbus) Result() (c []Content, e error) {
 			Studio:        detail.studio,
 			MovieSet:      detail.series,
 			Director:      detail.director,
+			Publisher:     detail.label,
 			Plot:          "",
 			Genres:        detail.genre,
 			Actors:        detail.idols,
