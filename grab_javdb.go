@@ -184,7 +184,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detai
 			selection.Find("span.value>a").Each(func(i int, selection *goquery.Selection) {
 				s := &Star{}
 				s.Name = strings.TrimSpace(selection.Text())
-				s.StarLink = grab.mainPage + selection.AttrOr("href", "")
+				s.Link = grab.mainPage + selection.AttrOr("href", "")
 				idols = append(idols, s)
 			})
 			detail.idols = idols

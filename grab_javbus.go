@@ -312,9 +312,9 @@ func javbusSearchDetailAnalyzeIdols(selection *goquery.Selection, detail *javbus
 			log.Infow("idols", "name", name, "image", image, "star", starLink)
 		}
 		idols = append(idols, &Star{
-			StarLink: starLink,
-			Image:    image,
-			Name:     name,
+			Link:  starLink,
+			Image: image,
+			Name:  name,
 		})
 	})
 	if debug {
