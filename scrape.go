@@ -20,6 +20,7 @@ type IScrape interface {
 	Find(name string) (e error)
 	Clear()
 	Range(rangeFunc RangeFunc) error
+	OutputCallback(f func(key string, content Content) *OutputOption)
 	Output() error
 }
 
