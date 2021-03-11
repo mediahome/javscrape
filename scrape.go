@@ -1,6 +1,8 @@
 package scrape
 
 import (
+	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -142,6 +144,52 @@ func (impl *scrapeImpl) Output() error {
 		e = copyCache(impl.cache, &content, impl.sample, DefaultOutputPath)
 		if e != nil {
 			log.Errorw("copy cache", "error", e, "output", key)
+		}
+		return nil
+	})
+}
+
+func (impl scrapeImpl) OutputCallback(f func(key string, content Content) *OutputOption) {
+	impl.Range(func(key string, content Content) error {
+		var e error
+		option := f(key, content)
+		if option == nil {
+			option = DefaultOutputOption()
+		}
+		if option.Skip {
+			return nil
+		}
+		if option.CopyInfo {
+			e = copyInfo(&content, filepath.Join(option.OutputPath, option.InfoPath), option.InfoName)
+			if e != nil {
+				log.Errorw("OutputCallback", "error", e, "output", key)
+			}
+		}
+
+		if option.CopyPoster {
+			path := filepath.Join(option.OutputPath, option.PosterPath, option.PosterName)
+			e = copyFile(impl.Cache(), content.Poster, path)
+			if e != nil {
+				log.Errorw("OutputCallback", "error", e, "output", key)
+			}
+		}
+
+		if option.CopyThumb {
+			path := filepath.Join(option.OutputPath, option.ThumbPath, option.ThumbName)
+			e = copyFile(impl.Cache(), content.Thumb, path)
+			if e != nil {
+				log.Errorw("OutputCallback", "error", e, "output", key)
+			}
+		}
+
+		if option.CopySample {
+			for i, sample := range content.Sample {
+				path := filepath.Join(option.OutputPath, option.SamplePath, option.SampleName+"@"+strconv.Itoa(i))
+				e = copyFile(impl.Cache(), sample.Image, path)
+				if e != nil {
+					log.Errorw("OutputCallback", "error", e, "output", key)
+				}
+			}
 		}
 		return nil
 	})

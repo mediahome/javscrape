@@ -12,7 +12,43 @@ import (
 )
 
 // DefaultOutputPath ...
-var DefaultOutputPath = "video"
+var DefaultOutputPath = "image"
+
+type OutputOption struct {
+	Skip       bool
+	OutputPath string
+	CopyInfo   bool
+	InfoPath   string
+	InfoName   string
+	CopyPoster bool
+	PosterPath string
+	PosterName string
+	CopyThumb  bool
+	ThumbPath  string
+	ThumbName  string
+	CopySample bool
+	SamplePath string
+	SampleName string
+}
+
+func DefaultOutputOption() *OutputOption {
+	return &OutputOption{
+		Skip:       false,
+		OutputPath: "image",
+		CopyInfo:   false,
+		InfoPath:   "",
+		InfoName:   ".nfo",
+		CopyPoster: true,
+		PosterPath: "",
+		PosterName: "poster",
+		CopyThumb:  true,
+		ThumbPath:  "",
+		ThumbName:  "thumb",
+		CopySample: false,
+		SamplePath: "",
+		SampleName: "sample",
+	}
+}
 
 func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error) {
 	pid := filepath.Join(output, strings.ToUpper(msg.ID), "."+msg.From)
@@ -46,8 +82,7 @@ func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error)
 }
 
 func copyInfo(msg *Content, path string, name string) error {
-	pid := filepath.Join(path, strings.ToUpper(msg.ID))
-	inf := filepath.Join(pid, "."+msg.From+name)
+	inf := filepath.Join(path, name)
 	_ = os.MkdirAll(filepath.Dir(inf), os.ModePerm)
 	info, e := os.Stat(inf)
 	if e != nil && !os.IsNotExist(e) {
@@ -68,12 +103,12 @@ func copyFile(cache *Cache, source, path string) error {
 		return nil
 	}
 
-	path = TrimEnd(path)
+	ext := TrimEnd(source)
 	if debug {
-		log.Infow("copy", "dir", filepath.Dir(path), "path", path)
+		log.Infow("CopyFile", "source", source, "path", path)
 	}
 	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
-	info, e := os.Stat(path + Ext(source))
+	info, e := os.Stat(path + Ext(ext))
 	if e != nil && !os.IsNotExist(e) {
 		return e
 	}
