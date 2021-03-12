@@ -16,6 +16,7 @@ var DefaultOutputPath = "image"
 
 type OutputOption struct {
 	Skip       bool
+	Force      bool
 	OutputPath string
 	CopyInfo   bool
 	InfoPath   string
@@ -50,29 +51,29 @@ func DefaultOutputOption() *OutputOption {
 	}
 }
 
-func copyCache(cache *Cache, msg *Content, sample bool, output string) (e error) {
+func copyCache(cache *Cache, msg *Content, sample bool, output string, force bool) (e error) {
 	pid := filepath.Join(output, strings.ToUpper(msg.ID), "."+msg.From)
-	e = copyFile(cache, msg.Poster, filepath.Join(pid, "poster"))
+	e = copyFile(cache, msg.Poster, filepath.Join(pid, "poster"), force)
 	if e != nil {
 		return e
 	}
-	e = copyFile(cache, msg.Thumb, filepath.Join(pid, "thumb"))
+	e = copyFile(cache, msg.Thumb, filepath.Join(pid, "thumb"), force)
 	if e != nil {
 		return e
 	}
 	for _, act := range msg.Actors {
-		e = copyFile(cache, act.Image, filepath.Join(pid, ".actor", act.Name))
+		e = copyFile(cache, act.Image, filepath.Join(pid, ".actor", act.Name), force)
 		if e != nil {
 			return e
 		}
 	}
 	if sample {
 		for _, s := range msg.Sample {
-			e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "sample"+"@"+strconv.Itoa(s.Index)))
+			e = copyFile(cache, s.Image, filepath.Join(pid, ".sample", "sample"+"@"+strconv.Itoa(s.Index)), force)
 			if e != nil {
 				return e
 			}
-			e = copyFile(cache, s.Thumb, filepath.Join(pid, ".thumb", "thumb"+"@"+strconv.Itoa(s.Index)))
+			e = copyFile(cache, s.Thumb, filepath.Join(pid, ".thumb", "thumb"+"@"+strconv.Itoa(s.Index)), force)
 			if e != nil {
 				return e
 			}
@@ -98,7 +99,47 @@ func copyInfo(msg *Content, path string, name string) error {
 	return ioutil.WriteFile(inf, bytes, 0755)
 }
 
-func copyFile(cache *Cache, source, path string) error {
+func copyFileWithOption(cache *Cache, content Content, option *OutputOption) error {
+	var e error
+	if option.Skip {
+		return nil
+	}
+	if option.CopyInfo {
+		e = copyInfo(&content, filepath.Join(option.OutputPath, option.InfoPath), option.InfoName)
+		if e != nil {
+			log.Errorw("OutputCallback", "error", e, "output", content.ID)
+		}
+	}
+
+	if option.CopyPoster {
+		path := filepath.Join(option.OutputPath, option.PosterPath, option.PosterName)
+		e = copyFile(cache, content.Poster, path, option.Force)
+		if e != nil {
+			log.Errorw("OutputCallback", "error", e, "output", content.ID)
+		}
+	}
+
+	if option.CopyThumb {
+		path := filepath.Join(option.OutputPath, option.ThumbPath, option.ThumbName)
+		e = copyFile(cache, content.Thumb, path, option.Force)
+		if e != nil {
+			log.Errorw("OutputCallback", "error", e, "output", content.ID)
+		}
+	}
+
+	if option.CopySample {
+		for i, sample := range content.Sample {
+			path := filepath.Join(option.OutputPath, option.SamplePath, option.SampleName+"@"+strconv.Itoa(i))
+			e = copyFile(cache, sample.Image, path, option.Force)
+			if e != nil {
+				log.Errorw("OutputCallback", "error", e, "output", content.ID)
+			}
+		}
+	}
+	return e
+}
+
+func copyFile(cache *Cache, source, path string, force bool) error {
 	if source == "" {
 		return nil
 	}
@@ -112,10 +153,16 @@ func copyFile(cache *Cache, source, path string) error {
 	if e != nil && !os.IsNotExist(e) {
 		return e
 	}
+
+	var bys []byte
 	if e == nil && info.Size() != 0 {
 		return nil
 	}
-	bys, e := cache.GetBytes(source)
+	if force {
+		bys, e = cache.ForceGet(source)
+	} else {
+		bys, e = cache.GetBytes(source)
+	}
 	if e != nil {
 		return e
 	}

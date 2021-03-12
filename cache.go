@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+	cache "github.com/gocacher/badger-cache/v3"
 	"github.com/goextension/log"
 	"io"
 	"io/ioutil"
@@ -13,7 +14,6 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gocacher/badger-cache/v2"
 	"github.com/gocacher/cacher"
 )
 
@@ -67,21 +67,30 @@ func (c *Cache) GetBytes(url string) ([]byte, error) {
 	return c.Get(url)
 }
 
+func (c *Cache) ForceGet(url string) (bys []byte, e error) {
+	return c.get(url, false)
+}
+
 // Get ...
 func (c *Cache) Get(url string) (bys []byte, e error) {
+	return c.get(url, true)
+}
+
+func (c *Cache) get(url string, useCache bool) (bys []byte, e error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	name := Hash(url)
-	b, e := c.cache.Has(name)
-	log.Infow("cache get", "url", url, "hash", name, "exist", b)
-	if e == nil && b {
-		getted, e := c.cache.Get(name)
-		if e != nil {
-			return nil, e
+	if useCache {
+		b, e := c.cache.Has(name)
+		log.Infow("cache get", "url", url, "hash", name, "exist", b)
+		if e == nil && b {
+			getted, e := c.cache.Get(name)
+			if e != nil {
+				return nil, e
+			}
+			return getted, nil
 		}
-		return getted, nil
 	}
-
 	if cli == nil {
 		cli = http.DefaultClient
 	}
