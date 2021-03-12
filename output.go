@@ -30,12 +30,14 @@ type OutputOption struct {
 	CopySample bool
 	SamplePath string
 	SampleName string
+	ImagePath  string
 }
 
 func DefaultOutputOption() *OutputOption {
 	return &OutputOption{
 		Skip:       false,
-		OutputPath: "image",
+		OutputPath: "",
+		ImagePath:  "image",
 		CopyInfo:   false,
 		InfoPath:   "",
 		InfoName:   ".nfo",
@@ -112,7 +114,7 @@ func copyFileWithOption(cache *Cache, content Content, option *OutputOption) err
 	}
 
 	if option.CopyPoster {
-		path := filepath.Join(option.OutputPath, option.PosterPath, option.PosterName)
+		path := filepath.Join(option.OutputPath, option.ImagePath, option.PosterPath, option.PosterName)
 		e = copyFile(cache, content.Poster, path, option.Force)
 		if e != nil {
 			log.Errorw("OutputCallback", "error", e, "output", content.ID)
@@ -120,7 +122,7 @@ func copyFileWithOption(cache *Cache, content Content, option *OutputOption) err
 	}
 
 	if option.CopyThumb {
-		path := filepath.Join(option.OutputPath, option.ThumbPath, option.ThumbName)
+		path := filepath.Join(option.OutputPath, option.ImagePath, option.ThumbPath, option.ThumbName)
 		e = copyFile(cache, content.Thumb, path, option.Force)
 		if e != nil {
 			log.Errorw("OutputCallback", "error", e, "output", content.ID)
@@ -129,7 +131,7 @@ func copyFileWithOption(cache *Cache, content Content, option *OutputOption) err
 
 	if option.CopySample {
 		for i, sample := range content.Sample {
-			path := filepath.Join(option.OutputPath, option.SamplePath, option.SampleName+"@"+strconv.Itoa(i))
+			path := filepath.Join(option.OutputPath, option.ImagePath, option.SamplePath, option.SampleName+"@"+strconv.Itoa(i))
 			e = copyFile(cache, sample.Image, path, option.Force)
 			if e != nil {
 				log.Errorw("OutputCallback", "error", e, "output", content.ID)

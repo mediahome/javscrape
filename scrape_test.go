@@ -79,7 +79,9 @@ func TestNewScrapeOutput(t *testing.T) {
 	})
 	scrape.OutputCallback(func(key string, content Content) *OutputOption {
 		option := DefaultOutputOption()
-		option.OutputPath = filepath.Join(DefaultOutputPath, key, option.OutputPath)
+		option.OutputPath = filepath.Join(DefaultOutputPath, key)
+		option.CopyInfo = true
+		option.InfoName = key + ".nfo"
 		return option
 	})
 	checkErr(e)
