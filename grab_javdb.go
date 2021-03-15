@@ -105,7 +105,7 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 		if debug {
 			log.Infow("find", "id", r.ID, "detail", r)
 		}
-		if clone.exact && strings.ToLower(r.ID) == strings.ToLower(clone.finder) {
+		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
 			continue
 		}
 		detail, e := javdbSearchDetailAnalyze(clone, r, g.force)
