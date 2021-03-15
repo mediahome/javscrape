@@ -40,6 +40,7 @@ type grabBp4x struct {
 	grabType GrabBp4xType
 	sample   bool
 	mainPage string
+	force    bool
 }
 
 func (g *grabBp4x) SetForce(force bool) {
@@ -105,7 +106,7 @@ func (g *grabBp4x) Find(name string) (IGrab, error) {
 	name = strings.ToUpper(name)
 	url := g.mainPage + bp4xGrabList[g.grabType]
 	url = fmt.Sprintf(url, name)
-	document, e := g.scrape.Cache().Query(url)
+	document, e := g.scrape.Cache().Query(url, g.force)
 	if e != nil {
 		return g, e
 	}
