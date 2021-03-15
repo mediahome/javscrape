@@ -102,8 +102,10 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 	}
 
 	for _, r := range results {
-		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
-			log.Infow("continue", "id", r.ID, "find", clone.finder)
+		if debug {
+			log.Infow("find", "id", r.ID, "detail", r)
+		}
+		if clone.exact && strings.ToLower(r.ID) == strings.ToLower(clone.finder) {
 			continue
 		}
 		detail, e := javdbSearchDetailAnalyze(clone, r, g.force)
@@ -115,7 +117,10 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 		detail.title = r.Title
 		clone.details = append(clone.details, detail)
 		if debug {
-			log.Infof("javdb detail:%+v", detail)
+			log.Infow("find|detail", "id", detail.id, "detail", detail)
+		}
+		if clone.exact {
+			break
 		}
 	}
 

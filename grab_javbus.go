@@ -146,6 +146,9 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 		if debug {
 			log.Infow("find|detail", "id", detail.id, "detail", detail)
 		}
+		if clone.exact {
+			break
+		}
 	}
 
 	return clone, nil
