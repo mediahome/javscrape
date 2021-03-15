@@ -11,6 +11,7 @@ type IGrab interface {
 	HasNext() bool
 	Next() (IGrab, error)
 	Result() ([]Content, error)
+	SetForce(force bool)
 }
 
 // GrabLanguage ...

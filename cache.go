@@ -54,8 +54,8 @@ func Hash(url string) string {
 }
 
 // GetReader ...
-func (c *Cache) GetReader(url string) (io.Reader, error) {
-	bys, e := c.Get(url)
+func (c *Cache) GetReader(url string, force bool) (io.Reader, error) {
+	bys, e := c.get(url, force)
 	if e != nil {
 		return nil, e
 	}
@@ -143,8 +143,24 @@ func (c *Cache) Save(url, to string) (e error) {
 }
 
 // Query ...
-func (c *Cache) Query(url string) (*goquery.Document, error) {
-	closer, e := c.GetReader(url)
+func (c *Cache) Query(url string, force bool) (*goquery.Document, error) {
+	closer, e := c.GetReader(url, force)
+	if e != nil {
+		return nil, e
+	}
+	return goquery.NewDocumentFromReader(closer)
+}
+
+func (c *Cache) BaseQuery(url string) (*goquery.Document, error) {
+	closer, e := c.GetReader(url, true)
+	if e != nil {
+		return nil, e
+	}
+	return goquery.NewDocumentFromReader(closer)
+}
+
+func (c *Cache) ForceQuery(url string) (*goquery.Document, error) {
+	closer, e := c.GetReader(url, true)
 	if e != nil {
 		return nil, e
 	}

@@ -74,7 +74,7 @@ func TestNewScrapeOutput(t *testing.T) {
 	e = scrape.Find("ABW-066")
 	checkErr(e)
 	scrape.Range(func(key string, content Content) error {
-		fmt.Printf("key:%v,content:%+v", key, content)
+		log.Printf("key:%v,content:%+v", key, content)
 		return nil
 	})
 	scrape.OutputCallback(func(key string, content Content) *OutputOption {

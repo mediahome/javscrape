@@ -37,6 +37,11 @@ type grabJavbus struct {
 	language   GrabLanguage
 	details    []*javbusSearchDetail
 	cache      *Cache
+	force      bool
+}
+
+func (g *grabJavbus) SetForce(force bool) {
+	g.force = force
 }
 
 func (g *grabJavbus) SetLanguage(language GrabLanguage) {
@@ -117,7 +122,7 @@ func (g *grabJavbus) clone() *grabJavbus {
 
 func (g *grabJavbus) find(url string) (IGrab, error) {
 	clone := g.clone()
-	results, e := javbusSearchResultAnalyze(clone, url)
+	results, e := javbusSearchResultAnalyze(clone, url, g.force)
 	if e != nil {
 		return clone, e
 	}
@@ -129,7 +134,7 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {
 			continue
 		}
-		detail, e := javbusSearchDetailAnalyze(clone, r)
+		detail, e := javbusSearchDetailAnalyze(clone, r, g.force)
 		if e != nil {
 			log.Error(e)
 			continue
@@ -168,8 +173,8 @@ type javbusSearchResult struct {
 	ReleaseDate string
 }
 
-func javbusSearchResultAnalyze(grab *grabJavbus, url string) ([]*javbusSearchResult, error) {
-	document, e := grab.cache.Query(url)
+func javbusSearchResultAnalyze(grab *grabJavbus, url string, force bool) ([]*javbusSearchResult, error) {
+	document, e := grab.cache.Query(url, force)
 	if e != nil {
 		return nil, e
 	}
@@ -443,11 +448,11 @@ func javbusSearchDetailAnalyzeID(selection *goquery.Selection, detail *javbusSea
 	detail.id = strings.TrimSpace(id)
 	return
 }
-func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult) (*javbusSearchDetail, error) {
+func javbusSearchDetailAnalyze(grab *grabJavbus, result *javbusSearchResult, force bool) (*javbusSearchDetail, error) {
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javbus search result is null")
 	}
-	document, e := grab.cache.Query(result.DetailLink)
+	document, e := grab.cache.Query(result.DetailLink, force)
 	if e != nil {
 		return nil, e
 	}

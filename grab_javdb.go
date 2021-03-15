@@ -39,6 +39,11 @@ type grabJavdb struct {
 	finder   string
 	details  []*javdbSearchDetail
 	cache    *Cache
+	force    bool
+}
+
+func (g *grabJavdb) SetForce(force bool) {
+	g.force = force
 }
 
 func (g *grabJavdb) SetLanguage(language GrabLanguage) {
@@ -86,7 +91,7 @@ func (g *grabJavdb) Name() string {
 
 func (g *grabJavdb) find(url string) (IGrab, error) {
 	clone := g.clone()
-	results, e := javdbSearchResultAnalyze(clone, url)
+	results, e := javdbSearchResultAnalyze(clone, url, g.force)
 	if e != nil {
 		return clone, e
 	}
@@ -101,7 +106,7 @@ func (g *grabJavdb) find(url string) (IGrab, error) {
 			log.Infow("continue", "id", r.ID, "find", clone.finder)
 			continue
 		}
-		detail, e := javdbSearchDetailAnalyze(clone, r)
+		detail, e := javdbSearchDetailAnalyze(clone, r, g.force)
 		if e != nil {
 			log.Error(e)
 			continue
@@ -142,11 +147,11 @@ type javdbSearchDetail struct {
 	publisher  string
 }
 
-func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult) (detail *javdbSearchDetail, e error) {
+func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult, force bool) (detail *javdbSearchDetail, e error) {
 	if result == nil || result.DetailLink == "" {
 		return nil, errors.New("javdb search result is null")
 	}
-	document, e := grab.cache.Query(grab.mainPage + result.DetailLink)
+	document, e := grab.cache.Query(grab.mainPage+result.DetailLink, force)
 	if e != nil {
 		return nil, e
 	}
@@ -233,8 +238,8 @@ type javdbSearchResult struct {
 }
 
 //tag:SearchResultAnalyze
-func javdbSearchResultAnalyze(grab *grabJavdb, url string) (result []*javdbSearchResult, e error) {
-	document, e := grab.cache.Query(url)
+func javdbSearchResultAnalyze(grab *grabJavdb, url string, force bool) (result []*javdbSearchResult, e error) {
+	document, e := grab.cache.Query(url, force)
 	if e != nil {
 		return nil, e
 	}

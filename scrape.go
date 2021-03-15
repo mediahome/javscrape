@@ -14,6 +14,7 @@ type RangeFunc func(key string, content Content) error
 // IScrape ...
 type IScrape interface {
 	Cache() *Cache
+	Force(b bool)
 	IsGrabSample() (b bool)
 	Find(name string) (e error)
 	Clear()
@@ -30,6 +31,7 @@ type scrapeImpl struct {
 	output   string
 	infoName string
 	exact    bool
+	force    bool
 }
 
 var debug = false
@@ -104,6 +106,12 @@ func GrabOption(grab IGrab) Options {
 	}
 }
 
+func ForceOption(b bool) Options {
+	return func(impl *scrapeImpl) {
+		impl.force = b
+	}
+}
+
 // DebugOn ...
 func DebugOn() {
 	debug = true
@@ -126,6 +134,10 @@ func NewScrape(opts ...Options) IScrape {
 	scrape.init()
 
 	return scrape
+}
+
+func (impl *scrapeImpl) Force(b bool) {
+	impl.force = b
 }
 
 // Clear ...
@@ -194,6 +206,7 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 			defer wg.Done()
 			grab.SetExact(impl.exact)
 			grab.SetSample(impl.sample)
+			grab.SetForce(impl.force)
 			iGrab, e := grab.Find(name)
 			if e != nil {
 				log.Errorw("error", "error", e, "name", grab.Name(), "find", name)

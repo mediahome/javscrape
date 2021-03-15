@@ -42,6 +42,10 @@ type grabBp4x struct {
 	mainPage string
 }
 
+func (g *grabBp4x) SetForce(force bool) {
+	panic("implement me")
+}
+
 func (g *grabBp4x) SetLanguage(language GrabLanguage) {
 	panic("implement me")
 }
