@@ -128,7 +128,7 @@ func (g *grabJavbus) find(url string) (IGrab, error) {
 	}
 	for _, r := range results {
 		if debug {
-			log.Infow("find", "id", r.ID, "detail", r)
+			log.Infow("find", "exact", clone.exact, "id", r.ID, "request id", clone.finder, "detail", r)
 		}
 
 		if clone.exact && strings.ToLower(r.ID) != strings.ToLower(clone.finder) {

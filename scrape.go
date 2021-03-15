@@ -202,11 +202,11 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 	wg := &sync.WaitGroup{}
 	for _, grab := range impl.grabs {
 		wg.Add(1)
-		go func(grab IGrab, cctx chan<- Content) {
+		go func(grab IGrab, exact bool, force bool, sample bool, cctx chan<- Content) {
 			defer wg.Done()
-			grab.SetExact(impl.exact)
-			grab.SetSample(impl.sample)
-			grab.SetForce(impl.force)
+			grab.SetExact(exact)
+			grab.SetSample(sample)
+			grab.SetForce(force)
 			iGrab, e := grab.Find(name)
 			if e != nil {
 				log.Errorw("error", "error", e, "name", grab.Name(), "find", name)
@@ -222,7 +222,7 @@ func (impl *scrapeImpl) Find(name string) (e error) {
 			for _, c := range cs {
 				cctx <- c
 			}
-		}(grab, chanContent)
+		}(grab, impl.exact, impl.force, impl.sample, chanContent)
 	}
 
 	go func(cctx chan<- Content) {
