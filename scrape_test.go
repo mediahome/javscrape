@@ -71,17 +71,22 @@ func TestNewScrapeOutput(t *testing.T) {
 	scrape := NewScrape(GrabOption(grab2), GrabOption(grab3), ExactOption(false))
 	//scrape.Output("video")
 	//scrape.GrabSample(true)
-	e = scrape.Find("ABW-066")
+	e = scrape.Find("HMDN-344")
 	checkErr(e)
 	scrape.Range(func(key string, content Content) error {
 		log.Printf("key:%v,content:%+v", key, content)
 		return nil
 	})
+	outputFlag := "javdb"
+
 	scrape.OutputCallback(func(key string, content Content) *OutputOption {
 		option := DefaultOutputOption()
 		option.OutputPath = filepath.Join(DefaultOutputPath, key)
 		option.CopyInfo = true
 		option.InfoName = key + ".nfo"
+		if outputFlag != content.From {
+			option.Skip = true
+		}
 		return option
 	})
 	checkErr(e)

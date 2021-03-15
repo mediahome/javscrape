@@ -12,7 +12,7 @@ import (
 )
 
 // DefaultJavdbMainPage ...
-const DefaultJavdbMainPage = "https://javdb4.com"
+const DefaultJavdbMainPage = "https://javdb7.com"
 const javdbSearch = "/search?q=%s&f=all"
 
 const javdbENRUL = "locale=en"
@@ -252,10 +252,9 @@ func javdbSearchResultAnalyze(grab *grabJavdb, url string, force bool) (result [
 	document.Find("#videos > div > div.grid-item.column").Each(func(i int, selection *goquery.Selection) {
 		resTmp := new(javdbSearchResult)
 
-		//resTmp.Title, _ = selection.Find("a.box").Attr("Title")
 		resTmp.DetailLink = selection.Find("a.box").AttrOr("href", "")
 
-		resTmp.Thumb = selection.Find("a.box > div.item-image > img").AttrOr("src", "")
+		resTmp.Thumb = selection.Find("a.box > div > img").AttrOr("data-src", "")
 		if strings.Index(resTmp.Thumb, "//") == 0 {
 			resTmp.Thumb = "https:" + resTmp.Thumb
 		}
