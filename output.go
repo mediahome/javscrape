@@ -15,23 +15,24 @@ import (
 var DefaultOutputPath = "image"
 
 type OutputInfo struct {
-	Skip       bool
-	Force      bool
-	OutputPath string
-	CopyInfo   bool
-	InfoPath   string
-	InfoName   string
-	CopyPoster bool
-	PosterPath string
-	PosterName string
-	CopyThumb  bool
-	ThumbPath  string
-	ThumbName  string
-	CopySample bool
-	SamplePath string
-	SampleName string
-	ImagePath  string
-	InfoExt    string
+	Skip        bool
+	Force       bool
+	OutputPath  string
+	CopyInfo    bool
+	InfoPath    string
+	InfoName    string
+	CopyPoster  bool
+	PosterPath  string
+	PosterName  string
+	CopyThumb   bool
+	ThumbPath   string
+	ThumbName   string
+	CopySample  bool
+	SamplePath  string
+	SampleName  string
+	SampleFiles []string
+	ImagePath   string
+	InfoExt     string
 }
 
 func DefaultOutputOption() *OutputInfo {
@@ -146,12 +147,12 @@ func copyFileWithInfo(cache *Cache, content Content, option *OutputInfo) error {
 	}
 
 	if option.CopySample {
+		if option.SamplePath == "" {
+			option.SamplePath = filepath.Join(option.OutputPath, option.ImagePath, option.SamplePath)
+		}
 		for i, sample := range content.Sample {
-			option.SampleName = option.SampleName + "@" + strconv.Itoa(i) + Ext(content.Thumb)
-			if option.SampleName == "" {
-				option.SamplePath = filepath.Join(option.OutputPath, option.ImagePath, option.SamplePath)
-			}
-			path := filepath.Join(option.SamplePath, option.SampleName)
+			path := filepath.Join(option.SamplePath, option.SampleName+"@"+strconv.Itoa(i)+Ext(content.Sample[i].Image))
+			option.SampleFiles = append(option.SampleFiles, path)
 			e = copyFile(cache, sample.Image, path, option.Force)
 			if e != nil {
 				log.Errorw("OutputCallback", "error", e, "output", content.ID)

@@ -83,6 +83,7 @@ func TestNewScrapeOutput(t *testing.T) {
 		option := DefaultOutputOption()
 		option.OutputPath = filepath.Join(DefaultOutputPath, key)
 		option.CopyInfo = true
+		option.CopySample = true
 		option.InfoName = key
 		if outputFlag != content.From {
 			option.Skip = true
