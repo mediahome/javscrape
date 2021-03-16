@@ -15,6 +15,7 @@ import (
 var DefaultOutputPath = "image"
 
 type OutputInfo struct {
+	Name        string
 	Skip        bool
 	Force       bool
 	OutputPath  string
