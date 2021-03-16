@@ -172,11 +172,17 @@ func (impl scrapeImpl) OutputCallback(f func(key string, content Content) *Outpu
 			option.Name = key
 		}
 		err := copyFileWithInfo(impl.Cache(), content, option)
+		if debug {
+			log.Infow("append info", "skip", option.Skip, "err", err)
+		}
 		if err == nil && !option.Skip {
 			result = append(result, *option)
 		}
 		return err
 	})
+	if debug {
+		log.Infow("result", "result", result)
+	}
 	return result
 }
 

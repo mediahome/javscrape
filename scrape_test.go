@@ -84,15 +84,16 @@ func TestNewScrapeOutput(t *testing.T) {
 		option.OutputPath = filepath.Join(DefaultOutputPath, key)
 		option.CopyInfo = true
 		option.CopySample = true
-		option.InfoName = key
+		option.InfoName = ""
 		if outputFlag != content.From {
 			option.Skip = true
 		}
+		fmt.Printf("info:%+v\n", option)
 		return option
 	})
 
 	for i := range infos {
-		t.Logf("info:%+v", infos[i])
+		fmt.Printf("infos:%+v\n", infos[i])
 	}
 	checkErr(e)
 	scrape.Clear()
