@@ -79,7 +79,7 @@ func TestNewScrapeOutput(t *testing.T) {
 	})
 	outputFlag := "javdb"
 
-	scrape.OutputCallback(func(key string, content Content) *OutputOption {
+	scrape.OutputCallback(func(key string, content Content) *OutputInfo {
 		option := DefaultOutputOption()
 		option.OutputPath = filepath.Join(DefaultOutputPath, key)
 		option.CopyInfo = true

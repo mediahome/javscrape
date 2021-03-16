@@ -19,7 +19,7 @@ type IScrape interface {
 	Find(name string) (e error)
 	Clear()
 	Range(rangeFunc RangeFunc) error
-	OutputCallback(f func(key string, content Content) *OutputOption)
+	OutputCallback(f func(key string, content Content) *OutputInfo) []*OutputInfo
 	Output() error
 }
 
@@ -32,6 +32,7 @@ type scrapeImpl struct {
 	infoName string
 	exact    bool
 	force    bool
+	result   []*OutputInfo
 }
 
 var debug = false
@@ -160,14 +161,20 @@ func (impl *scrapeImpl) Output() error {
 	})
 }
 
-func (impl scrapeImpl) OutputCallback(f func(key string, content Content) *OutputOption) {
+func (impl scrapeImpl) OutputCallback(f func(key string, content Content) *OutputInfo) []*OutputInfo {
+	var result []*OutputInfo
 	impl.Range(func(key string, content Content) error {
 		option := f(key, content)
 		if option == nil {
 			option = DefaultOutputOption()
 		}
-		return copyFileWithOption(impl.Cache(), content, option)
+		err := copyFileWithInfo(impl.Cache(), content, option)
+		if err == nil {
+			result = append(result, option)
+		}
+		return err
 	})
+	return result
 }
 
 func init() {
