@@ -173,17 +173,17 @@ func copyFile(cache *Cache, source, path string, force bool) error {
 	}
 	_ = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	info, e := os.Stat(path)
-	if e != nil && !os.IsNotExist(e) {
-		return e
-	}
 
 	var bys []byte
-	if e == nil && info.Size() != 0 {
-		return nil
-	}
 	if force {
 		bys, e = cache.ForceGet(source)
 	} else {
+		if e != nil && !os.IsNotExist(e) {
+			return e
+		}
+		if e == nil && info.Size() != 0 {
+			return nil
+		}
 		bys, e = cache.GetBytes(source)
 	}
 	if e != nil {
