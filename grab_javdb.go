@@ -22,8 +22,9 @@ const javdbZHNo = "番號"
 const javdbZHTime = "日期"
 const javdbZHTimeLong = "時長"
 const javdbZHDirector = "導演"
-const javdbZHStudio = "片商"
-const javdbZHPublisher = "發行"
+const javdbZHStudio = "工作室"
+const javdbZHPublisher2 = "發行"
+const javdbZHPublisher = "片商"
 const javdbZHIdols = "演員"
 const javdbZHGenre = "類別"
 const javdbZHSeries = "系列"
@@ -187,7 +188,7 @@ func javdbSearchDetailAnalyze(grab *grabJavdb, result *javdbSearchResult, force 
 			detail.series = value
 		case strings.Index(title, javdbZHRating) != -1:
 			detail.rating = value
-		case strings.Index(title, javdbZHPublisher) != -1:
+		case strings.Index(title, javdbZHPublisher) != -1 || strings.Index(title, javdbZHPublisher2) != -1:
 			detail.publisher = value
 		case strings.Index(title, javdbZHIdols) != -1:
 			var idols []*Star
