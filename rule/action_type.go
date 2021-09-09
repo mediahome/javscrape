@@ -1,10 +1,10 @@
 package rule
 
 //ActionType action type
-type ActionType int
+type ActionType string
 
 const (
-	ActionTypeNone = iota
-	ActionTypeAction
-	ActionTypeActionGroup
+	ActionTypeNone        ActionType = "none"
+	ActionTypeAction                 = "action"
+	ActionTypeActionGroup            = "action_group"
 )
