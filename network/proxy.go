@@ -1,4 +1,4 @@
-package scrape
+package network
 
 import (
 	"context"
@@ -6,13 +6,22 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	"golang.org/x/net/proxy"
 )
 
 //var log = trait.NewZapSugar()
-var cli *http.Client
+var (
+	cli  *http.Client
+	lock sync.RWMutex
+)
+
+func init() {
+	cli = http.DefaultClient
+	lock = sync.RWMutex{}
+}
 
 // ProxyArgs ...
 type ProxyArgs func(cli *http.Client)
@@ -41,6 +50,7 @@ func RegisterProxy(addr string, args ...ProxyArgs) (e error) {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
+	lock.Lock()
 	cli = &http.Client{
 		Transport:     transport,
 		CheckRedirect: nil,
@@ -51,6 +61,7 @@ func RegisterProxy(addr string, args ...ProxyArgs) (e error) {
 	for _, fn := range args {
 		fn(cli)
 	}
+	lock.Unlock()
 	return nil
 }
 
@@ -82,4 +93,10 @@ func getSOCKS5Transport(addr string) *http.Transport {
 			return queryProxy.Dial(network, addr)
 		},
 	}
+}
+
+func Client() *http.Client {
+	lock.RLock()
+	defer lock.RUnlock()
+	return cli
 }
