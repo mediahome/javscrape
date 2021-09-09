@@ -1,7 +1,9 @@
 package rule
 
+//Action ...
 type Action struct {
 	Name      string     `toml:"name"`
+	Index     int        `toml:"index"`
 	Type      ActionType `toml:"type"`
 	URI       string     `toml:"uri"`
 	Through   bool       `toml:"through"`
