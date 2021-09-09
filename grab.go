@@ -2,16 +2,7 @@ package scrape
 
 // IGrab ...
 type IGrab interface {
-	MainPage(url string)
-	SetSample(bool)
-	SetExact(bool)
-	SetLanguage(language GrabLanguage)
-	Name() string
-	Find(string) (IGrab, error)
-	HasNext() bool
-	Next() (IGrab, error)
-	Result() ([]Content, error)
-	SetForce(force bool)
+	MainPage() string
 }
 
 // GrabLanguage ...

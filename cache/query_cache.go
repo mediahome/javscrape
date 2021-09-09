@@ -1,13 +1,15 @@
 package cache
 
 import (
+	"net/http"
+
 	"github.com/PuerkitoBio/goquery"
 )
 
-type QueryCache NetCache
+type queryCache netCache
 
 // Query ...
-func (c *QueryCache) Query(url string, force bool) (*goquery.Document, error) {
+func (c *queryCache) Query(url string, force bool) (*goquery.Document, error) {
 	closer, e := c.net().GetReader(url, force)
 	if e != nil {
 		return nil, e
@@ -15,7 +17,7 @@ func (c *QueryCache) Query(url string, force bool) (*goquery.Document, error) {
 	return goquery.NewDocumentFromReader(closer)
 }
 
-func (c *QueryCache) GetQuery(url string, force bool) (*goquery.Document, error) {
+func (c *queryCache) GetQuery(url string, force bool) (*goquery.Document, error) {
 	closer, e := c.net().GetReader(url, force)
 	if e != nil {
 		return nil, e
@@ -23,7 +25,7 @@ func (c *QueryCache) GetQuery(url string, force bool) (*goquery.Document, error)
 	return goquery.NewDocumentFromReader(closer)
 }
 
-func (c *QueryCache) ForceQuery(url string) (*goquery.Document, error) {
+func (c *queryCache) ForceQuery(url string) (*goquery.Document, error) {
 	closer, e := c.net().GetReader(url, true)
 	if e != nil {
 		return nil, e
@@ -31,12 +33,13 @@ func (c *QueryCache) ForceQuery(url string) (*goquery.Document, error) {
 	return goquery.NewDocumentFromReader(closer)
 }
 
-func (c *QueryCache) net() *NetCache {
-	return (*NetCache)(c)
+func (c *queryCache) net() *netCache {
+	return (*netCache)(c)
 }
 
-func NewQueryCache() *QueryCache {
-	return (*QueryCache)(newCache())
+func NewQueryCache(client *http.Client) Querier {
+	return (*queryCache)(newCache(client))
 }
 
-var _ = (*QueryCache)(&NetCache{})
+var _ = Querier((*queryCache)(&netCache{}))
+var _ = (*queryCache)(&netCache{})
