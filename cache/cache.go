@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/PuerkitoBio/goquery"
 	cache "github.com/gocacher/badger-cache/v3"
 	"github.com/gocacher/cacher"
 
@@ -21,28 +20,29 @@ import (
 
 // DefaultCachePath ...
 var DefaultCachePath = "tmp"
-var _cache *Cache
+var _cache *NetCache
 var _cacheOnce *sync.Once
 
-// Cache ...
-type Cache struct {
+// NetCache ...
+type NetCache struct {
 	lock sync.Mutex
 	cacher.Cacher
+	client *http.Client
 }
 
 func init() {
 	_cacheOnce = &sync.Once{}
 }
 
-func newCache() *Cache {
+func newCache() *NetCache {
 	cache.DefaultCachePath = DefaultCachePath
-	return &Cache{
+	return &NetCache{
 		Cacher: cache.New(),
 	}
 }
 
-// NewCache ...
-func NewCache() *Cache {
+// New ...
+func New() *NetCache {
 	_cacheOnce.Do(func() {
 		_cache = newCache()
 	})
@@ -56,7 +56,7 @@ func Hash(url string) string {
 }
 
 // GetReader ...
-func (c *Cache) GetReader(url string, force bool) (io.Reader, error) {
+func (c *NetCache) GetReader(url string, force bool) (io.Reader, error) {
 	bys, e := c.get(url, force)
 	if e != nil {
 		return nil, e
@@ -65,20 +65,20 @@ func (c *Cache) GetReader(url string, force bool) (io.Reader, error) {
 }
 
 // GetBytes ...
-func (c *Cache) GetBytes(url string, force bool) ([]byte, error) {
+func (c *NetCache) GetBytes(url string, force bool) ([]byte, error) {
 	return c.get(url, force)
 }
 
-func (c *Cache) HasURL(url string) bool {
+func (c *NetCache) HasURL(url string) bool {
 	return c.has(Hash(url))
 }
 
-func (c *Cache) has(name string) bool {
+func (c *NetCache) has(name string) bool {
 	exist, err := c.Has(name)
 	return err == nil && exist
 }
 
-func (c *Cache) get(url string, useCache bool) (bys []byte, e error) {
+func (c *NetCache) get(url string, useCache bool) (bys []byte, e error) {
 	name := Hash(url)
 	if useCache {
 		b := c.has(name)
@@ -119,7 +119,7 @@ func (c *Cache) get(url string, useCache bool) (bys []byte, e error) {
 }
 
 // Save ...
-func (c *Cache) Save(url, to string) (e error) {
+func (c *NetCache) Save(url, to string) (e error) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	s, e := filepath.Abs(to)
@@ -138,29 +138,4 @@ func (c *Cache) Save(url, to string) (e error) {
 		return e
 	}
 	return nil
-}
-
-// Query ...
-func (c *Cache) Query(url string, force bool) (*goquery.Document, error) {
-	closer, e := c.GetReader(url, force)
-	if e != nil {
-		return nil, e
-	}
-	return goquery.NewDocumentFromReader(closer)
-}
-
-func (c *Cache) GetQuery(url string, force bool) (*goquery.Document, error) {
-	closer, e := c.GetReader(url, force)
-	if e != nil {
-		return nil, e
-	}
-	return goquery.NewDocumentFromReader(closer)
-}
-
-func (c *Cache) ForceQuery(url string) (*goquery.Document, error) {
-	closer, e := c.GetReader(url, true)
-	if e != nil {
-		return nil, e
-	}
-	return goquery.NewDocumentFromReader(closer)
 }

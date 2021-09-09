@@ -6,6 +6,8 @@ import (
 
 	"github.com/goextension/log"
 	"github.com/goextension/log/zap"
+
+	"github.com/javscrape/go-scrape/cache"
 )
 
 // RangeFunc ...
@@ -13,7 +15,7 @@ type RangeFunc func(key string, content Content) error
 
 // IScrape ...
 type IScrape interface {
-	Cache() *Cache
+	Cache() *cache.NetCache
 	Force(b bool)
 	IsGrabSample() (b bool)
 	Find(name string) (e error)
@@ -27,7 +29,7 @@ type scrapeImpl struct {
 	contents map[string][]Content
 	grabs    []IGrab
 	sample   bool
-	cache    *Cache
+	cache    *cache.NetCache
 	output   string
 	infoName string
 	exact    bool

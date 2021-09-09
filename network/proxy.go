@@ -6,7 +6,6 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"sync"
 	"time"
 
 	"golang.org/x/net/proxy"
@@ -14,13 +13,11 @@ import (
 
 //var log = trait.NewZapSugar()
 var (
-	cli  *http.Client
-	lock sync.RWMutex
+	cli *http.Client
 )
 
 func init() {
 	cli = http.DefaultClient
-	lock = sync.RWMutex{}
 }
 
 // ProxyArgs ...
@@ -50,7 +47,6 @@ func RegisterProxy(addr string, args ...ProxyArgs) (e error) {
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
 	}
-	lock.Lock()
 	cli = &http.Client{
 		Transport:     transport,
 		CheckRedirect: nil,
@@ -61,7 +57,6 @@ func RegisterProxy(addr string, args ...ProxyArgs) (e error) {
 	for _, fn := range args {
 		fn(cli)
 	}
-	lock.Unlock()
 	return nil
 }
 
@@ -96,7 +91,5 @@ func getSOCKS5Transport(addr string) *http.Transport {
 }
 
 func Client() *http.Client {
-	lock.RLock()
-	defer lock.RUnlock()
 	return cli
 }
