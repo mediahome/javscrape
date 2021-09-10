@@ -3,6 +3,8 @@ package scrape
 import (
 	"testing"
 
+	"github.com/goextension/log"
+
 	"github.com/javscrape/go-scrape/config"
 	"github.com/javscrape/go-scrape/core"
 	"github.com/javscrape/go-scrape/rule"
@@ -13,23 +15,28 @@ var scrape core.IScrape
 
 func init() {
 	cfg.Debug = true
-	scrape = New(ProxyOption("http://localhost:7890"))
+	//core.InitGlobalLogger(cfg.Debug)
 }
 
 // TestNewScrape ...
 func TestNew(t *testing.T) {
-	r, err := rule.LoadRuleFromFile("tmp.toml")
+	scrape = New(ProxyOption("http://127.0.0.1:7890"), ConfigOption(cfg))
+
+	r, err := rule.LoadRuleFromFile("./templates/javbus.toml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Debug("TEST", "load rules")
+	grabs, err := scrape.LoadRules(r)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	grab, err := scrape.LoadRules(r)
-	if err != nil {
-		t.Fatal(err)
-		return
+	if len(grabs) == 0 {
+		t.Fatal("empty grabs list")
 	}
 
-	err = grab[0].Do()
+	err = grabs[0].Do()
 	if err != nil {
 		return
 	}

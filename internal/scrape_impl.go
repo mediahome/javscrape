@@ -1,10 +1,13 @@
 package internal
 
 import (
+	"fmt"
+
+	"github.com/goextension/log"
+
 	"github.com/javscrape/go-scrape/cache"
 	"github.com/javscrape/go-scrape/config"
 	"github.com/javscrape/go-scrape/core"
-	"github.com/javscrape/go-scrape/log"
 	"github.com/javscrape/go-scrape/network"
 	"github.com/javscrape/go-scrape/rule"
 )
@@ -34,8 +37,8 @@ func (s *scrapeImpl) init() {
 	if s.config == nil {
 		s.config = config.DefaultConfig()
 	}
-
-	log.InitGlobalLogger(s.config.Debug)
+	fmt.Println("DEBUG ON:", s.config.Debug)
+	core.InitGlobalLogger(s.config.Debug)
 }
 
 func (s *scrapeImpl) Cache() cache.Querier {
@@ -43,12 +46,17 @@ func (s *scrapeImpl) Cache() cache.Querier {
 }
 
 func (s *scrapeImpl) LoadRules(rs ...*rule.Rule) ([]core.IGrab, error) {
-	if len(rs) == 1 {
+	if len(rs) == 0 {
 		return nil, core.ErrEmptyRule
 	}
 	var gs []core.IGrab
-	for i, _ := range rs {
-		gs = append(gs, NewGrab(s, rs[i]))
+	for i := range rs {
+		log.Debug("SCRAPE", "new grab", "index", i)
+		g := NewGrab(s, rs[i])
+		if err := g.LoadActions(rs[i].Actions...); err != nil {
+			return nil, err
+		}
+		gs = append(gs, g)
 	}
 	return gs, nil
 }

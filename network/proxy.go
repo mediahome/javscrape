@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/goextension/log"
 	"golang.org/x/net/proxy"
 )
 
@@ -32,6 +33,7 @@ func TimeOut(sec int) ProxyArgs {
 
 // RegisterProxy ...
 func RegisterProxy(addr string, args ...ProxyArgs) (e error) {
+	log.Debug("NETWORK", "register proxy", "addr", addr)
 	u, e := url.Parse(addr)
 	if e != nil {
 		return e

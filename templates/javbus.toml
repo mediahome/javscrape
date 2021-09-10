@@ -2,25 +2,23 @@ entrance = "search"
 main_page = "https://www.javbus.com/"
 
 [[actions]]
-  type = ""
+  type = "group"
   name = "search"
   index = 0
   through = false
-  on_success = ""
+  on_success = "detail"
   on_failure = ""
   [actions.web]
     method = "GET"
-    url = "test url"
-    uri = "test uri"
+    url = ""
+    uri = "search"
     selector = ""
-    [actions.web.header]
-      cookie = ["1"]
   [actions.step]
     type = "none"
 
 [[actions]]
   type = ""
-  name = ""
+  name = "detail"
   index = 2
   through = false
   on_success = ""

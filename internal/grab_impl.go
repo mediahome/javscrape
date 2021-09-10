@@ -3,6 +3,8 @@ package internal
 import (
 	"errors"
 
+	"github.com/goextension/log"
+
 	"github.com/javscrape/go-scrape/core"
 	"github.com/javscrape/go-scrape/internal/action"
 	"github.com/javscrape/go-scrape/rule"
@@ -36,11 +38,13 @@ func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 	for _, v := range acts {
 		switch v.Type {
 		case rule.ActionTypeGroup:
+			log.Debug("GRAB", "load group", v.Name)
 			g.group[v.Name] = append(g.group[v.Name], action.FromAction(g, v))
 		default:
 			v.Type = rule.ActionTypeAction
 			fallthrough
 		case rule.ActionTypeAction:
+			log.Debug("GRAB", "load action", v.Name)
 			if _, exist := g.actions[v.Name]; exist {
 				return ErrActionIsAlreadyExist
 			}
