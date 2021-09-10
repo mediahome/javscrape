@@ -1,6 +1,8 @@
 package core
 
 import (
+	"github.com/goextension/gomap"
+
 	"github.com/javscrape/go-scrape/cache"
 	"github.com/javscrape/go-scrape/rule"
 )
@@ -10,7 +12,8 @@ type IGrab interface {
 	MainPage() string
 	LoadActions(...rule.Action) error
 	Cache() cache.Querier
-	Put(key, value string)
-	Get(key string) string
+	Put(key string, value *Value)
+	Get(key string) *Value
 	Do(key string) error
+	Value() gomap.Map
 }

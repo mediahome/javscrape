@@ -40,11 +40,13 @@ func TestSaveRuleToFile(t *testing.T) {
 							Through:   false,
 							OnSuccess: "",
 							OnFailure: "",
-							Success: Process{
-								Name:     "nexturl",
-								Trim:     true,
-								Type:     "put",
-								Property: "attr",
+							Success: []Process{
+								{
+									Name:     "nexturl",
+									Trim:     true,
+									Type:     "put",
+									Property: "attr",
+								},
 							},
 						},
 						{

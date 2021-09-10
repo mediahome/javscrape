@@ -12,11 +12,12 @@ main_page = "https://www.javbus.com/"
     method = "GET"
     uri = "search"
     selector = "div > a.movie-box"
-  [actions.success]
+  [[actions.web.success]]
     name = "nexturl"
     trim = true
     type = "put"
     property = "attr"
+    property_name = "href"
 
 [[actions]]
   type = ""

@@ -1,10 +1,13 @@
 package action
 
 import (
+	"strings"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/goextension/log"
 
 	"github.com/javscrape/go-scrape/core"
+	"github.com/javscrape/go-scrape/rule"
 )
 
 func (a Action) Do(key string) error {
@@ -37,10 +40,41 @@ func (a Action) doWeb(url string, key string) (sl string, err error) {
 	if query == nil {
 		return "", nil
 	}
-	log.Debug("ACTION", "query selector", a.action.Web.Selector)
 	if a.action.Web.Selector != "" {
+		log.Debug("ACTION", "do query selector", a.action.Web.Selector)
 		find := query.Find(a.action.Web.Selector)
+		a.doWebSuccess(find)
 		return find.Html()
 	}
 	return query.Html()
+}
+
+func (a *Action) doWebSuccess(selection *goquery.Selection) {
+	for i, s := range a.action.Web.Success {
+		switch s.Type {
+		case rule.ProcessTypePut:
+			v := a.doWebSuccessValue(selection, s)
+			log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
+			a.Put(s.Name, v)
+		}
+	}
+}
+
+func (a *Action) doWebSuccessValue(selection *goquery.Selection, p rule.Process) *core.Value {
+	var ret core.Value
+	switch p.Property {
+	case "attr":
+		ret.Type = rule.ProcessValueString
+		v := selection.AttrOr(p.PropertyName, "")
+		if p.Trim {
+			v = strings.TrimSpace(v)
+		}
+		ret.Set(v)
+	}
+
+	return &ret
+}
+
+func (a Action) doWebSuccessPut() {
+
 }

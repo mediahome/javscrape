@@ -30,6 +30,8 @@ github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2 h1:tdlZCpZ/P9DhczC
 github.com/dgryski/go-farm v0.0.0-20190423205320-6a90982ecee2/go.mod h1:SqUrOPUnsFjfmXRMNPybcSiG0BgUW2AuFH8PAnS2iTw=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
+github.com/fatih/structs v1.1.0 h1:Q7juDM0QtcnhCpeyLGQKyg4TOIghuNXrkL32pHAUMxo=
+github.com/fatih/structs v1.1.0/go.mod h1:9NiDSp5zOcgEDl+j00MP/WkGVPOlPRLejGD8Ga6PJ7M=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/go-delve/delve v1.5.0/go.mod h1:c6b3a1Gry6x8a4LGCe/CWzrocrfaHvkUxCj3k4bvSUQ=
 github.com/gocacher/badger-cache/v3 v3.0.2 h1:G+8h1m5UDYKoJ4+lpg+Zwbag8aDR8fOcfLY4nE5iclw=
@@ -37,6 +39,12 @@ github.com/gocacher/badger-cache/v3 v3.0.2/go.mod h1:684gRVmt1L3cFFJmwcui1fZHSO6
 github.com/gocacher/cacher v1.0.4/go.mod h1:59qIKgE1PQiWqo+pl9cXtvNpG0JJl+CpMz+pOeqRQ64=
 github.com/gocacher/cacher v1.0.5 h1:Nk7TfMg/rhKvYvuP4xe/qGq3KGndQ769BvsbTUpRqQU=
 github.com/gocacher/cacher v1.0.5/go.mod h1:59qIKgE1PQiWqo+pl9cXtvNpG0JJl+CpMz+pOeqRQ64=
+github.com/goextension/gomap v0.0.4 h1:+P7QDYLGUqBCTlYL1ZvhWor38kNm4wdC7/pTBPH+k7c=
+github.com/goextension/gomap v0.0.4/go.mod h1:E2gvFKXPxXL4TBCCb801Mg06Z20A0RIr/dxH4OUJDwM=
+github.com/goextension/gomap v0.0.5 h1:dic3Us+agON7sZGbvBbvT3CYYdbAA0yJ8EMINqULkwQ=
+github.com/goextension/gomap v0.0.5/go.mod h1:E2gvFKXPxXL4TBCCb801Mg06Z20A0RIr/dxH4OUJDwM=
+github.com/goextension/gomap v0.0.6 h1:xjNX4TwGAO0rLC2mdVnTDmXa6I+1AiANw92qp0x3XRc=
+github.com/goextension/gomap v0.0.6/go.mod h1:E2gvFKXPxXL4TBCCb801Mg06Z20A0RIr/dxH4OUJDwM=
 github.com/goextension/log v0.0.2 h1:/KMuT22zzIMHe4qD7rR8dnfXWSFAyp+10pTC4fWLztI=
 github.com/goextension/log v0.0.2/go.mod h1:fz72q/d4Iw05nbRSbxgGkGNTne3jxrq2Td5ogfunZak=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
@@ -67,6 +75,7 @@ github.com/magiconair/properties v1.8.0/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czP
 github.com/mattn/go-colorable v0.0.0-20170327083344-ded68f7a9561/go.mod h1:9vuHe8Xs5qXnSaW/c/ABM9alt+Vo+STaOChaDxuIBZU=
 github.com/mattn/go-isatty v0.0.3/go.mod h1:M+lRXTBqGeGNdLjl/ufCoiOlB5xdOkqRJdNxMWT7Zi4=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
+github.com/mitchellh/mapstructure v1.1.2 h1:fmNYVwqnSfB9mZU6OS2O6GsXM+wcskZDuKQzvN1EDeE=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mmcloughlin/avo v0.0.0-20201105074841-5d2f697d268f/go.mod h1:6aKT4zZIrpGqB3RpFU14ByCSSyKY6LfJz4J/JJChHfI=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=

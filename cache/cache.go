@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gocacher/cacher"
 )
 
 // DefaultCachePath ...
@@ -17,12 +18,14 @@ var _cacheOnce *sync.Once
 // Querier ...
 // @Description:
 type Querier interface {
+	Cache() cacher.Cacher
 	Query(url string, force bool) (*goquery.Document, error)
 	GetQuery(url string, force bool) (*goquery.Document, error)
 	ForceQuery(url string) (*goquery.Document, error)
 }
 
 type NetCacher interface {
+	Cache() cacher.Cacher
 	GetReader(url string, force bool) (io.Reader, error)
 	GetBytes(url string, force bool) ([]byte, error)
 	HasURL(url string) bool

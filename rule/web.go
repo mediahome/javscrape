@@ -1,9 +1,10 @@
 package rule
 
 type Web struct {
-	Method   string              `toml:"method"`
-	Header   map[string][]string `toml:"header"`
-	URL      string              `toml:"url"`
-	URI      string              `toml:"uri"`
-	Selector string              `toml:"selector"`
+	Method   string              `toml:"method,omitempty"`
+	Header   map[string][]string `toml:"header,omitempty"`
+	URL      string              `toml:"url,omitempty"`
+	URI      string              `toml:"uri,omitempty"`
+	Selector string              `toml:"selector,omitempty"`
+	Success  []Process           `toml:"success,omitempty"`
 }

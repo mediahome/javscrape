@@ -106,6 +106,10 @@ func (c *netCache) get(url string, force bool) (bys []byte, e error) {
 	return bys, nil
 }
 
+func (c *netCache) Cache() cacher.Cacher {
+	return c.Cacher
+}
+
 // Save ...
 func (c *netCache) Save(url, to string) (e error) {
 	c.lock.Lock()

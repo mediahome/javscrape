@@ -4,9 +4,14 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gocacher/cacher"
 )
 
 type queryCache netCache
+
+func (c *queryCache) Cache() cacher.Cacher {
+	return c.net().Cache()
+}
 
 // Query ...
 func (c *queryCache) Query(url string, force bool) (*goquery.Document, error) {

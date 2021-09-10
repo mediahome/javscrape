@@ -8,12 +8,17 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/gocacher/cacher"
 
 	"github.com/javscrape/go-scrape/network"
 )
 
 type nocache struct {
 	client *http.Client
+}
+
+func (n nocache) Cache() cacher.Cacher {
+	return _cache.Cache()
 }
 
 func (n nocache) getReader(url string) (io.Reader, error) {

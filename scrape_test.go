@@ -42,4 +42,6 @@ func TestNew(t *testing.T) {
 		t.Fatal(err)
 		return
 	}
+
+	log.Debug("Test", "total values", grabs[0].Value())
 }

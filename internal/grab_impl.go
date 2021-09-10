@@ -3,6 +3,7 @@ package internal
 import (
 	"errors"
 
+	"github.com/goextension/gomap"
 	"github.com/goextension/log"
 
 	"github.com/javscrape/go-scrape/core"
@@ -18,15 +19,16 @@ type grabImpl struct {
 	entrance string
 	actions  map[string]*action.Action
 	group    map[string][]*action.Action
-	value    map[string]string
+	value    gomap.Map
 }
 
-func (g *grabImpl) Put(key, value string) {
-	g.value[key] = value
+func (g *grabImpl) Put(key string, value *core.Value) {
+	g.value.Set(key, value)
 }
 
-func (g *grabImpl) Get(key string) string {
-	return g.value[key]
+func (g *grabImpl) Get(key string) *core.Value {
+	v := g.value.Get(key)
+	return (v).(*core.Value)
 }
 
 func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
@@ -36,7 +38,7 @@ func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
 		entrance: r.Entrance,
 		actions:  make(map[string]*action.Action),
 		group:    make(map[string][]*action.Action),
-		value:    make(map[string]string, 3),
+		value:    gomap.New(),
 	}
 }
 
@@ -91,6 +93,10 @@ func (g *grabImpl) getActions(name string) []*action.Action {
 		actions = g.group[name]
 	}
 	return actions.Sort()
+}
+
+func (g *grabImpl) Value() gomap.Map {
+	return g.value
 }
 
 var _ core.IGrab = (*grabImpl)(nil)
