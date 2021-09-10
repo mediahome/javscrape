@@ -16,3 +16,11 @@ func FromAction(grab core.IGrab, action rule.Action) *Action {
 		action: &action,
 	}
 }
+
+func (a *Action) Failure() string {
+	return a.action.OnFailure
+}
+
+func (a *Action) Success() string {
+	return a.action.OnSuccess
+}

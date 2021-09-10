@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	log.Register(core.NiLogger)
+	log.Register(core.PrintLogger)
 }
 
 var New = internal.NewScrape

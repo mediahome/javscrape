@@ -18,6 +18,15 @@ type grabImpl struct {
 	entrance string
 	actions  map[string]*action.Action
 	group    map[string][]*action.Action
+	value    map[string]string
+}
+
+func (g *grabImpl) Put(key, value string) {
+	g.value[key] = value
+}
+
+func (g *grabImpl) Get(key string) string {
+	return g.value[key]
 }
 
 func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
@@ -27,6 +36,7 @@ func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
 		entrance: r.Entrance,
 		actions:  make(map[string]*action.Action),
 		group:    make(map[string][]*action.Action),
+		value:    make(map[string]string, 3),
 	}
 }
 
@@ -54,23 +64,31 @@ func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 	return nil
 }
 
-func (g *grabImpl) Do() error {
-	actions := g.getEntranceActions()
+func (g *grabImpl) Do(key string) error {
+	return g.actionDo(g.entrance, key)
+}
+
+func (g *grabImpl) actionDo(name string, key string) error {
+	actions := g.getActions(name)
+	if len(actions) == 0 {
+		return nil
+	}
 	for _, a := range actions {
-		if err := a.Do(); err != nil {
-			return err
+		if err := a.Do(key); err != nil {
+			return g.actionDo(a.Failure(), key)
 		}
+		return g.actionDo(a.Success(), key)
 	}
 	return nil
 }
 
-func (g *grabImpl) getEntranceActions() []*action.Action {
+func (g *grabImpl) getActions(name string) []*action.Action {
 	var exist bool
 	var actions action.Actions
-	if _, exist = g.actions[g.entrance]; exist {
-		actions = []*action.Action{g.actions[g.entrance]}
-	} else if _, exist = g.group[g.entrance]; exist {
-		actions = g.group[g.entrance]
+	if _, exist = g.actions[name]; exist {
+		actions = []*action.Action{g.actions[name]}
+	} else if _, exist = g.group[name]; exist {
+		actions = g.group[name]
 	}
 	return actions.Sort()
 }

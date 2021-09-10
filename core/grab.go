@@ -10,5 +10,7 @@ type IGrab interface {
 	MainPage() string
 	LoadActions(...rule.Action) error
 	Cache() cache.Querier
-	Do() error
+	Put(key, value string)
+	Get(key string) string
+	Do(key string) error
 }

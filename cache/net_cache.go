@@ -12,6 +12,7 @@ import (
 
 	cache "github.com/gocacher/badger-cache/v3"
 	"github.com/gocacher/cacher"
+	"github.com/goextension/log"
 
 	"github.com/javscrape/go-scrape/network"
 )
@@ -61,16 +62,16 @@ func (c *netCache) has(name string) bool {
 	return err == nil && exist
 }
 
-func (c *netCache) get(url string, useCache bool) (bys []byte, e error) {
+func (c *netCache) get(url string, force bool) (bys []byte, e error) {
 	name := Hash(url)
-	if useCache {
+	if !force {
 		b := c.has(name)
-		//log.Infow("cache get", "url", url, "hash", name, "exist", b)
 		if b {
 			bys, e = c.Get(name)
 			if e != nil {
 				return nil, e
 			}
+			log.Debug("CACHE", "query on cache", "url", url, "name", name)
 			return bys, nil
 		}
 	}
@@ -94,9 +95,13 @@ func (c *netCache) get(url string, useCache bool) (bys []byte, e error) {
 	if e != nil {
 		return nil, e
 	}
-	e = c.Set(name, bys)
-	if e != nil {
-		return nil, e
+	log.Debug("CACHE", "query on remote server", "url", url, "name", name)
+
+	if !force {
+		e = c.Set(name, bys)
+		if e != nil {
+			return nil, e
+		}
 	}
 	return bys, nil
 }

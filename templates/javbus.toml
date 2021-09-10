@@ -10,11 +10,13 @@ main_page = "https://www.javbus.com/"
   on_failure = ""
   [actions.web]
     method = "GET"
-    url = ""
     uri = "search"
-    selector = ""
-  [actions.step]
-    type = "none"
+    selector = "div > a.movie-box"
+  [actions.success]
+    name = "nexturl"
+    trim = true
+    type = "put"
+    property = "attr"
 
 [[actions]]
   type = ""

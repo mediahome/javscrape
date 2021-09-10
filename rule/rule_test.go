@@ -37,12 +37,15 @@ func TestSaveRuleToFile(t *testing.T) {
 								URL: "test url",
 								URI: "test uri",
 							},
-							Step: Step{
-								Type: "none",
-							},
 							Through:   false,
 							OnSuccess: "",
 							OnFailure: "",
+							Success: Process{
+								Name:     "nexturl",
+								Trim:     true,
+								Type:     "put",
+								Property: "attr",
+							},
 						},
 						{
 							Type:  "",
@@ -55,9 +58,6 @@ func TestSaveRuleToFile(t *testing.T) {
 								},
 								URL: "test url",
 								URI: "test uri",
-							},
-							Step: Step{
-								Type: "none2",
 							},
 							Through:   false,
 							OnSuccess: "",
@@ -110,9 +110,6 @@ func TestLoadRuleFromFile(t *testing.T) {
 							URL: "test url",
 							URI: "test uri",
 						},
-						Step: Step{
-							Type: "none",
-						},
 						Through:   false,
 						OnSuccess: "",
 						OnFailure: "",
@@ -128,9 +125,6 @@ func TestLoadRuleFromFile(t *testing.T) {
 							},
 							URL: "test url",
 							URI: "test uri",
-						},
-						Step: Step{
-							Type: "none2",
 						},
 						Through:   false,
 						OnSuccess: "",
