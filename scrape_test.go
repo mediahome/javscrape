@@ -29,5 +29,8 @@ func TestNew(t *testing.T) {
 		return
 	}
 
-	grab[0].Do()
+	err = grab[0].Do()
+	if err != nil {
+		return
+	}
 }

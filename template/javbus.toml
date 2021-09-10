@@ -1,0 +1,36 @@
+entrance = "search"
+main_page = "https://www.javbus.com/"
+
+[[actions]]
+  type = ""
+  name = "search"
+  index = 0
+  through = false
+  on_success = ""
+  on_failure = ""
+  [actions.web]
+    method = "GET"
+    url = "test url"
+    uri = "test uri"
+    selector = ""
+    [actions.web.header]
+      cookie = ["1"]
+  [actions.step]
+    type = "none"
+
+[[actions]]
+  type = ""
+  name = ""
+  index = 2
+  through = false
+  on_success = ""
+  on_failure = ""
+  [actions.web]
+    method = "GET"
+    url = "test url"
+    uri = "test uri"
+    selector = ""
+    [actions.web.header]
+      cookie = ["2"]
+  [actions.step]
+    type = "none2"

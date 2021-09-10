@@ -35,13 +35,16 @@ func (g *grabImpl) MainPage() string {
 func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 	for _, v := range acts {
 		switch v.Type {
+		case rule.ActionTypeGroup:
+			g.group[v.Name] = append(g.group[v.Name], action.FromAction(g, v))
+		default:
+			v.Type = rule.ActionTypeAction
+			fallthrough
 		case rule.ActionTypeAction:
 			if _, exist := g.actions[v.Name]; exist {
 				return ErrActionIsAlreadyExist
 			}
 			g.actions[v.Name] = action.FromAction(g, v)
-		case rule.ActionTypeGroup:
-			g.group[v.Name] = append(g.group[v.Name], action.FromAction(g, v))
 		}
 	}
 	return nil
