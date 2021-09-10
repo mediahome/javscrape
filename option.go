@@ -1,25 +1,15 @@
 package scrape
 
 import (
-	"github.com/javscrape/go-scrape/cache"
-	"github.com/javscrape/go-scrape/network"
+	"github.com/javscrape/go-scrape/internal"
 )
 
 // Options ...
-type Options func(impl *scrapeImpl)
+type Options = internal.Options
 
 // CacheOption ...
-func CacheOption(cache cache.Querier) Options {
-	return func(impl *scrapeImpl) {
-		impl.cache = cache
-	}
-}
+var CacheOption = internal.CacheOption
 
-func ProxyOption(addr string) Options {
-	return func(impl *scrapeImpl) {
-		err := network.RegisterProxy(addr)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
+var ConfigOption = internal.ConfigOption
+
+var ProxyOption = internal.ProxyOption

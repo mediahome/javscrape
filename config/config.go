@@ -22,5 +22,6 @@ func DefaultConfig() *Config {
 		Cache:   "tmp",
 		ToUpper: true,
 		Output:  "output",
+		Debug:   false,
 	}
 }

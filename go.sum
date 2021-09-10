@@ -32,8 +32,6 @@ github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/go-delve/delve v1.5.0/go.mod h1:c6b3a1Gry6x8a4LGCe/CWzrocrfaHvkUxCj3k4bvSUQ=
-github.com/go-interface/cache v0.0.0-20210908103742-ed103d3bc80f h1:OUamOrEz9IgzcIGOu5Lu7l9eB5SxgxGfzDY+3PlXWzo=
-github.com/go-interface/cache v0.0.0-20210908103742-ed103d3bc80f/go.mod h1:KtYMtKRMV9v0V+1RFRUdm1efBeLMHuNwZf4i9glsASk=
 github.com/gocacher/badger-cache/v3 v3.0.2 h1:G+8h1m5UDYKoJ4+lpg+Zwbag8aDR8fOcfLY4nE5iclw=
 github.com/gocacher/badger-cache/v3 v3.0.2/go.mod h1:684gRVmt1L3cFFJmwcui1fZHSO6d5ho9qqtsBvkUhQ4=
 github.com/gocacher/cacher v1.0.4/go.mod h1:59qIKgE1PQiWqo+pl9cXtvNpG0JJl+CpMz+pOeqRQ64=

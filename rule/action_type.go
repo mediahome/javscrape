@@ -4,7 +4,7 @@ package rule
 type ActionType string
 
 const (
-	ActionTypeNone        ActionType = "none"
-	ActionTypeAction                 = "action"
-	ActionTypeActionGroup            = "action_group"
+	ActionTypeNone   ActionType = "none"
+	ActionTypeAction            = "action"
+	ActionTypeGroup             = "group"
 )
