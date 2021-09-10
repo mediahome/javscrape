@@ -52,6 +52,9 @@ func (s *scrapeImpl) LoadRules(rs ...*rule.Rule) ([]core.IGrab, error) {
 	var gs []core.IGrab
 	for i := range rs {
 		log.Debug("SCRAPE", "new grab", "index", i)
+		if rs[i].InputType == "" {
+			rs[i].InputType = rule.InputTypeURL
+		}
 		g := NewGrab(s, rs[i])
 		if err := g.LoadActions(rs[i].Actions...); err != nil {
 			return nil, err

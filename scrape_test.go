@@ -37,11 +37,17 @@ func TestNew(t *testing.T) {
 		t.Fatal("empty grabs list")
 	}
 
-	err = grabs[0].Do("ABW-140")
+	err = grabs[0].Run("ABW-140")
 	if err != nil {
 		t.Fatal(err)
 		return
 	}
 
-	log.Debug("Test", "total values", grabs[0].Value())
+	m := grabs[0].Value()
+	m.Range(func(key string, value interface{}) bool {
+		v := value.(*core.Value)
+		log.Debug("Test", "print value", "key", key, "value", v)
+		return true
+	})
+
 }

@@ -14,3 +14,10 @@ func URL(prefix string, uris ...string) string {
 	u.Path = path.Join(uris...)
 	return u.String()
 }
+
+func URLAddValues(urlpath string, v url.Values) string {
+	if v == nil {
+		return urlpath
+	}
+	return urlpath + "?" + v.Encode()
+}

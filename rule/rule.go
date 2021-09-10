@@ -9,9 +9,11 @@ import (
 // Rule ...
 // @Description:
 type Rule struct {
-	Entrance string   `toml:"entrance,omitempty"`
-	MainPage string   `toml:"main_page,omitempty"`
-	Actions  []Action `toml:"actions,omitempty"`
+	Entrance  string    `toml:"entrance,omitempty"`
+	MainPage  string    `toml:"main_page,omitempty"`
+	InputKey  string    `toml:"input_key,omitempty"`
+	InputType InputType `toml:"input_type,omitempty"`
+	Actions   []Action  `toml:"actions,omitempty"`
 }
 
 func LoadRuleFromFile(file string) (*Rule, error) {

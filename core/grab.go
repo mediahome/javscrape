@@ -12,8 +12,10 @@ type IGrab interface {
 	MainPage() string
 	LoadActions(...rule.Action) error
 	Cache() cache.Querier
+	InputType() rule.InputType
+	InputKey() string
 	Put(key string, value *Value)
 	Get(key string) *Value
-	Do(key string) error
+	Run(input string) error
 	Value() gomap.Map
 }

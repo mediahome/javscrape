@@ -10,7 +10,8 @@ main_page = "https://www.javbus.com/"
   on_failure = ""
   [actions.web]
     method = "GET"
-    uri = "search"
+    relative = true
+    before_url = "search"
     selector = "div > a.movie-box"
   [[actions.web.success]]
     name = "nexturl"
@@ -22,6 +23,27 @@ main_page = "https://www.javbus.com/"
 [[actions]]
   type = ""
   name = "detail"
+  index = 1
+  through = false
+  on_success = ""
+  on_failure = ""
+  [actions.web]
+    method = "GET"
+      relative = false
+      skip = ["input", "main"]
+      from_value = ["nexturl"]
+#     url = "test url"
+#     uri = "test uri"
+    selector = "body > div.container > div.row.movie"
+    [actions.web.header]
+      cookie = ["2"]
+  [actions.step]
+    type = "none2"
+
+
+[[actions]]
+  type = ""
+  name = "finish"
   index = 2
   through = false
   on_success = ""
@@ -31,7 +53,3 @@ main_page = "https://www.javbus.com/"
     url = "test url"
     uri = "test uri"
     selector = ""
-    [actions.web.header]
-      cookie = ["2"]
-  [actions.step]
-    type = "none2"

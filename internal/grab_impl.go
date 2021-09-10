@@ -15,11 +15,21 @@ var ErrActionIsAlreadyExist = errors.New("action is already exist")
 
 type grabImpl struct {
 	core.IScrape
-	mainPage string
-	entrance string
-	actions  map[string]*action.Action
-	group    map[string][]*action.Action
-	value    gomap.Map
+	mainPage  string
+	entrance  string
+	inputType rule.InputType
+	inputKey  string
+	actions   map[string]*action.Action
+	group     map[string][]*action.Action
+	value     gomap.Map
+}
+
+func (g *grabImpl) InputType() rule.InputType {
+	return g.inputType
+}
+
+func (g *grabImpl) InputKey() string {
+	return g.inputKey
 }
 
 func (g *grabImpl) Put(key string, value *core.Value) {
@@ -29,17 +39,6 @@ func (g *grabImpl) Put(key string, value *core.Value) {
 func (g *grabImpl) Get(key string) *core.Value {
 	v := g.value.Get(key)
 	return (v).(*core.Value)
-}
-
-func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
-	return &grabImpl{
-		IScrape:  scrape,
-		mainPage: r.MainPage,
-		entrance: r.Entrance,
-		actions:  make(map[string]*action.Action),
-		group:    make(map[string][]*action.Action),
-		value:    gomap.New(),
-	}
 }
 
 func (g *grabImpl) MainPage() string {
@@ -66,20 +65,21 @@ func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 	return nil
 }
 
-func (g *grabImpl) Do(key string) error {
-	return g.actionDo(g.entrance, key)
+func (g *grabImpl) Run(input string) error {
+	return g.actionDo(g.entrance, input)
 }
 
-func (g *grabImpl) actionDo(name string, key string) error {
+func (g *grabImpl) actionDo(name string, input string) error {
 	actions := g.getActions(name)
 	if len(actions) == 0 {
 		return nil
 	}
+	log.Debug("GRAB", "start action", name, "query", input)
 	for _, a := range actions {
-		if err := a.Do(key); err != nil {
-			return g.actionDo(a.Failure(), key)
+		if err := a.Run(input); err != nil {
+			return g.actionDo(a.Failure(), input)
 		}
-		return g.actionDo(a.Success(), key)
+		return g.actionDo(a.Success(), input)
 	}
 	return nil
 }
@@ -97,6 +97,19 @@ func (g *grabImpl) getActions(name string) []*action.Action {
 
 func (g *grabImpl) Value() gomap.Map {
 	return g.value
+}
+
+func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
+	return &grabImpl{
+		IScrape:   scrape,
+		mainPage:  r.MainPage,
+		entrance:  r.Entrance,
+		inputType: r.InputType,
+		inputKey:  r.InputKey,
+		actions:   make(map[string]*action.Action),
+		group:     make(map[string][]*action.Action),
+		value:     gomap.New(),
+	}
 }
 
 var _ core.IGrab = (*grabImpl)(nil)
