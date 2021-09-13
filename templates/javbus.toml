@@ -30,16 +30,88 @@ main_page = "https://www.javbus.com/"
   [actions.web]
     method = "GET"
       relative = false
-      skip = ["input", "main"]
-      from_value = ["nexturl"]
+      skip = ["input"]
+      value = ["$nexturl"]
 #     url = "test url"
 #     uri = "test uri"
-    selector = "body > div.container > div.row.movie"
-    [actions.web.header]
-      cookie = ["2"]
-  [actions.step]
-    type = "none2"
+    selector = "body > div.container"
+  [[actions.web.success]]
+    selector = "h3"
+    name = "title"
+    trim = true
+    type = "put"
+    property = "value"
 
+  [[actions.web.success]]
+    selector = "div.row.movie > div.col-md-3.info > p"
+#     filter = ["span.header"]
+    index = 0
+    name = "code_no"
+    trim = true
+    type = "put"
+    property = "value"
+    [[actions.web.success]]
+      selector = "div.row.movie > div.col-md-3.info > p"
+#       filter = ["span.header"]
+      index = 1
+      name = "release"
+      trim = true
+      type = "put"
+      property = "value"
+
+    [[actions.web.success]]
+      selector = "div.row.movie > div.col-md-3.info > p"
+#       filter = ["span.header"]
+      index = 2
+      name = "length"
+      trim = true
+      type = "put"
+      property = "value"
+
+    [[actions.web.success]]
+      selector = "div.row.movie > div.col-md-3.info > p"
+#       filter = ["span.header"]
+      index = 3
+      name = "studio"
+      trim = true
+      type = "put"
+      property = "value"
+
+      [[actions.web.success]]
+        selector = "div.row.movie > div.col-md-3.info > p"
+  #       filter = ["span.header"]
+        index = 4
+        name = "label"
+        trim = true
+        type = "put"
+        property = "value"
+
+      [[actions.web.success]]
+        selector = "div.row.movie > div.col-md-3.info > p"
+  #       filter = ["span.header"]
+        index = 5
+        name = "series"
+        trim = true
+        type = "put"
+        property = "value"
+
+     [[actions.web.success]]
+       selector = "div.row.movie > div.col-md-3.info > p"
+ #       filter = ["span.header"]
+       index = 7
+       name = "genre"
+       trim = true
+       type = "put"
+       property = "array"
+
+          [[actions.web.success]]
+            selector = "div.row.movie > div.col-md-3.info > p"
+      #       filter = ["span.header"]
+            index = 9
+            name = "star"
+            trim = true
+            type = "put"
+            property = "array"
 
 [[actions]]
   type = ""

@@ -18,7 +18,7 @@ func NewStringValue(value interface{}) *Value {
 }
 
 func NewArrayValue(value []interface{}) *Value {
-	return &Value{Type: rule.ProcessValueString, v: value}
+	return &Value{Type: rule.ProcessValueArray, v: value}
 }
 
 func NewMapValue(value interface{}) *Value {
@@ -48,5 +48,5 @@ func (v Value) GetFileHash() string {
 }
 
 func (v Value) String() string {
-	return fmt.Sprintf("Value(Type:%v,Value:%+v)", v.Type, v.v)
+	return fmt.Sprintf("Value(Type:%v,Value:%v)", v.Type, v.v)
 }

@@ -13,11 +13,11 @@ import (
 )
 
 func (a Action) Run() error {
-	web, err := a.doWeb()
+	_, err := a.doWeb()
 	if err != nil {
 		return err
 	}
-	log.Debug("ACTION", "web html", web)
+	log.Debug("ACTION", "web html")
 	return nil
 }
 
@@ -76,10 +76,13 @@ func (a Action) getWebValue() string {
 				vals = append(vals, val)
 			}
 		}
-		if len(exps) == 0 {
-			exps = append(exps, "%v")
+		format := "%v"
+		if len(exps) == 1 {
+			format = exps[0]
+		} else if len(exps) > 1 {
+			format = strings.Join(exps, "/")
 		}
-		format := strings.Join(exps, "/")
+
 		fix := strings.Count(format, "%") - len(vals)
 		for ; fix > 0; fix-- {
 			vals = append(vals, "")
@@ -127,9 +130,28 @@ func (a Action) doWeb() (sl string, err error) {
 
 func (a *Action) doWebSuccess(selection *goquery.Selection) {
 	for i, s := range a.action.Web.Success {
+		ssel := selection.Clone()
+		if s.Selector != "" {
+			ssel = ssel.Find(s.Selector)
+		}
+		html, _ := ssel.Html()
+		log.Debug("ACTION", "print find html", html)
+		for _, f := range s.Filter {
+			ssel = ssel.Filter(f)
+		}
+
+		log.Debug("ACTION", "print filter html", html)
+		ssel.Each(func(i int, selection *goquery.Selection) {
+			if s.Index == i {
+				html, _ = ssel.Html()
+				log.Debug("ACTION", "print each html", "index", i, html)
+				ssel = selection
+			}
+		})
+
 		switch s.Type {
 		case rule.ProcessTypePut:
-			v := a.doWebSuccessValue(selection, s)
+			v := a.doWebSuccessValue(ssel, s)
 			if v != nil {
 				log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
 				a.Put(s.Name, v)
@@ -139,17 +161,31 @@ func (a *Action) doWebSuccess(selection *goquery.Selection) {
 }
 
 func (a *Action) doWebSuccessValue(selection *goquery.Selection, p rule.Process) *core.Value {
-	var ret *core.Value
+	var v string
 	switch p.Property {
-	case "attr":
-		v := selection.AttrOr(p.PropertyName, "")
-		if p.Trim {
-			v = strings.TrimSpace(v)
+	case "array":
+		var arr []interface{}
+		selection.Each(func(i int, selection *goquery.Selection) {
+			v = strings.TrimSpace(selection.Text())
+			arr = append(arr, v)
+		})
+		if len(arr) != 0 {
+			return core.NewArrayValue(arr)
 		}
-		ret = core.NewStringValue(v)
+	case "value":
+		v = selection.Text()
+	case "attr":
+		v = selection.AttrOr(p.PropertyName, "")
 	}
 
-	return ret
+	if p.Trim {
+		v = strings.TrimSpace(v)
+	}
+
+	if v == "" {
+		return nil
+	}
+	return core.NewStringValue(v)
 }
 
 func (a Action) doWebSuccessPut() {
