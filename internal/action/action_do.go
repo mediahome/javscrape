@@ -131,23 +131,31 @@ func (a Action) doWeb() (sl string, err error) {
 func (a *Action) doWebSuccess(selection *goquery.Selection) {
 	for i, s := range a.action.Web.Success {
 		ssel := selection.Clone()
+
 		if s.Selector != "" {
 			ssel = ssel.Find(s.Selector)
 		}
-		html, _ := ssel.Html()
-		log.Debug("ACTION", "print find html", html)
+		//html, _ := ssel.Html()
+		//log.Debug("ACTION", "print find html", html)
 		for _, f := range s.Filter {
 			ssel = ssel.Filter(f)
 		}
 
-		log.Debug("ACTION", "print filter html", html)
-		ssel.Each(func(i int, selection *goquery.Selection) {
-			if s.Index == i {
-				html, _ = ssel.Html()
-				log.Debug("ACTION", "print each html", "index", i, html)
-				ssel = selection
-			}
-		})
+		if len(ssel.Nodes) == 0 || len(ssel.Nodes) < s.Index {
+			log.Error("failed do loop by index", "loop", i, "index", s.Index, "length", len(ssel.Nodes), "name", s.Name)
+			continue
+		}
+		//log.Debug("ACTION", "print filter html", html)
+		ssel = goquery.NewDocumentFromNode(ssel.Nodes[s.Index]).First()
+		html, _ := ssel.Html()
+		log.Debug("ACTION", "print current html", "index", s.Index, html)
+		//ssel.Each(func(i int, selection *goquery.Selection) {
+		//	if s.Index == i {
+		//		html, _ = ssel.Html()
+		//		log.Debug("ACTION", "print each html", "index", i, html)
+		//		ssel = selection
+		//	}
+		//})
 
 		switch s.Type {
 		case rule.ProcessTypePut:
@@ -176,6 +184,12 @@ func (a *Action) doWebSuccessValue(selection *goquery.Selection, p rule.Process)
 		v = selection.Text()
 	case "attr":
 		v = selection.AttrOr(p.PropertyName, "")
+	case "text":
+		selection.Contents().Each(func(i int, selection *goquery.Selection) {
+			if goquery.NodeName(selection) == "#text" {
+				v = selection.Text()
+			}
+		})
 	}
 
 	if p.Trim {

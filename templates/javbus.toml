@@ -50,6 +50,7 @@ main_page = "https://www.javbus.com/"
     trim = true
     type = "put"
     property = "value"
+
     [[actions.web.success]]
       selector = "div.row.movie > div.col-md-3.info > p"
 #       filter = ["span.header"]
@@ -57,7 +58,7 @@ main_page = "https://www.javbus.com/"
       name = "release"
       trim = true
       type = "put"
-      property = "value"
+      property = "text"
 
     [[actions.web.success]]
       selector = "div.row.movie > div.col-md-3.info > p"
@@ -66,30 +67,30 @@ main_page = "https://www.javbus.com/"
       name = "length"
       trim = true
       type = "put"
-      property = "value"
+      property = "text"
 
     [[actions.web.success]]
-      selector = "div.row.movie > div.col-md-3.info > p"
+      selector = "div.row.movie > div.col-md-3.info > p > a"
 #       filter = ["span.header"]
-      index = 3
+      index = 0
       name = "studio"
       trim = true
       type = "put"
       property = "value"
 
       [[actions.web.success]]
-        selector = "div.row.movie > div.col-md-3.info > p"
+        selector = "div.row.movie > div.col-md-3.info > p > a"
   #       filter = ["span.header"]
-        index = 4
+        index = 1
         name = "label"
         trim = true
         type = "put"
         property = "value"
 
       [[actions.web.success]]
-        selector = "div.row.movie > div.col-md-3.info > p"
+        selector = "div.row.movie > div.col-md-3.info > p > a"
   #       filter = ["span.header"]
-        index = 5
+        index = 2
         name = "series"
         trim = true
         type = "put"
@@ -104,14 +105,14 @@ main_page = "https://www.javbus.com/"
        type = "put"
        property = "array"
 
-          [[actions.web.success]]
-            selector = "div.row.movie > div.col-md-3.info > p"
-      #       filter = ["span.header"]
-            index = 9
-            name = "star"
-            trim = true
-            type = "put"
-            property = "array"
+      [[actions.web.success]]
+        selector = "div.row.movie > div.col-md-3.info > p"
+  #       filter = ["span.header"]
+        index = 9
+        name = "star"
+        trim = true
+        type = "put"
+        property = "array"
 
 [[actions]]
   type = ""
