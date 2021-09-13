@@ -13,14 +13,22 @@ type Value struct {
 	v    interface{}
 }
 
-func (v *Value) Set(value interface{}) {
-	v.v = value
+func NewStringValue(value interface{}) *Value {
+	return &Value{Type: rule.ProcessValueString, v: value}
 }
 
-func (v *Value) SetFile(value []byte, fn func(key string, value []byte)) {
+func NewArrayValue(value []interface{}) *Value {
+	return &Value{Type: rule.ProcessValueString, v: value}
+}
+
+func NewMapValue(value interface{}) *Value {
+	return &Value{Type: rule.ProcessValueMap, v: value}
+}
+
+func NewFileValue(value []byte, fn func(key string, value []byte)) *Value {
 	key := MD5(value)
-	v.v = key
 	fn(key, value)
+	return &Value{Type: rule.ProcessValueFie, v: value}
 }
 
 func (v Value) GetMap() gomap.Map {

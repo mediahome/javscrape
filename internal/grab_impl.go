@@ -2,6 +2,7 @@ package internal
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/goextension/gomap"
 	"github.com/goextension/log"
@@ -15,13 +16,14 @@ var ErrActionIsAlreadyExist = errors.New("action is already exist")
 
 type grabImpl struct {
 	core.IScrape
-	mainPage  string
-	entrance  string
 	inputType rule.InputType
 	inputKey  string
 	actions   map[string]*action.Action
 	group     map[string][]*action.Action
-	value     gomap.Map
+	value     struct {
+		lock sync.RWMutex
+		gomap.Map
+	}
 }
 
 func (g *grabImpl) InputType() rule.InputType {
@@ -33,16 +35,21 @@ func (g *grabImpl) InputKey() string {
 }
 
 func (g *grabImpl) Put(key string, value *core.Value) {
+	g.value.lock.Lock()
 	g.value.Set(key, value)
+	g.value.lock.Unlock()
 }
 
 func (g *grabImpl) Get(key string) *core.Value {
-	v := g.value.Get(key)
+	var v interface{}
+	g.value.lock.RLock()
+	v = g.value.Get(key)
+	g.value.lock.RUnlock()
 	return (v).(*core.Value)
 }
 
 func (g *grabImpl) MainPage() string {
-	return g.mainPage
+	return g.value.GetString("main_page")
 }
 
 func (g *grabImpl) LoadActions(acts ...rule.Action) error {
@@ -66,20 +73,22 @@ func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 }
 
 func (g *grabImpl) Run(input string) error {
-	return g.actionDo(g.entrance, input)
+	g.value.Set(g.InputKey(), core.NewStringValue(input))
+	return g.actionDo(g.value.GetString("entrance"))
 }
 
-func (g *grabImpl) actionDo(name string, input string) error {
+func (g *grabImpl) actionDo(name string) error {
 	actions := g.getActions(name)
+	log.Debug("GRAB", "get actions", name, "total", len(actions))
 	if len(actions) == 0 {
 		return nil
 	}
-	log.Debug("GRAB", "start action", name, "query", input)
+	log.Debug("GRAB", "start action", name, "query", g.Get(g.InputKey()))
 	for _, a := range actions {
-		if err := a.Run(input); err != nil {
-			return g.actionDo(a.Failure(), input)
+		if err := a.Run(); err != nil {
+			return g.actionDo(a.Failure())
 		}
-		return g.actionDo(a.Success(), input)
+		return g.actionDo(a.Success())
 	}
 	return nil
 }
@@ -96,19 +105,37 @@ func (g *grabImpl) getActions(name string) []*action.Action {
 }
 
 func (g *grabImpl) Value() gomap.Map {
-	return g.value
+	g.value.lock.Lock()
+	defer g.value.lock.Unlock()
+	return g.value.Clone()
 }
 
 func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
+	value := gomap.New()
+	for s, i := range r.Preset {
+		value.Set(s, i)
+	}
+	if r.MainPage != "" {
+		value.Set("main_page", core.NewStringValue(r.MainPage))
+	}
+	if r.Entrance != "" {
+		value.Set("entrance", core.NewStringValue(r.Entrance))
+	}
+
+	if r.InputKey == "" {
+		r.InputKey = "intput"
+	}
+
 	return &grabImpl{
 		IScrape:   scrape,
-		mainPage:  r.MainPage,
-		entrance:  r.Entrance,
 		inputType: r.InputType,
 		inputKey:  r.InputKey,
 		actions:   make(map[string]*action.Action),
 		group:     make(map[string][]*action.Action),
-		value:     gomap.New(),
+		value: struct {
+			lock sync.RWMutex
+			gomap.Map
+		}{Map: value},
 	}
 }
 

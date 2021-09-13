@@ -1,7 +1,7 @@
 package action
 
 import (
-	"errors"
+	"fmt"
 	"net/url"
 	"strings"
 
@@ -12,8 +12,8 @@ import (
 	"github.com/javscrape/go-scrape/rule"
 )
 
-func (a Action) Run(input string) error {
-	web, err := a.doWeb(a.MainPage(), input)
+func (a Action) Run() error {
+	web, err := a.doWeb()
 	if err != nil {
 		return err
 	}
@@ -45,61 +45,64 @@ func isSkipped(skipType rule.SkipType, skips []rule.SkipType) bool {
 	return false
 }
 
-func (a Action) doWeb(url string, input string) (sl string, err error) {
+func (a Action) getWebURL(relative bool) string {
+	value := a.getWebValue()
+	mainPage := a.Get("main_page").GetString()
+	if relative {
+		if mainPage == "" {
+			mainPage = value
+		} else {
+			mainPage = core.URL(mainPage, value)
+		}
+	} else {
+		mainPage = core.URL(value)
+	}
+	return mainPage
+}
+
+func (a Action) getWebValue() string {
+	var ret string
+	if len(a.action.Web.Value) != 0 {
+		var exps []string
+		var vals []interface{}
+		for _, s := range a.action.Web.Value {
+			val := s[1:]
+			switch s[0] {
+			case '$':
+				vals = append(vals, a.Get(val).GetString())
+			case '%':
+				exps = append(exps, val)
+			default:
+				vals = append(vals, val)
+			}
+		}
+		if len(exps) == 0 {
+			exps = append(exps, "%v")
+		}
+		format := strings.Join(exps, "/")
+		fix := strings.Count(format, "%") - len(vals)
+		for ; fix > 0; fix-- {
+			vals = append(vals, "")
+		}
+		ret = fmt.Sprintf(format, vals...)
+		log.Debug("ACTION", "get from value", ret)
+	}
+	return ret
+}
+
+func (a Action) doWeb() (sl string, err error) {
+	log.Debug("ACTION", "do web query")
 	var query *goquery.Document
 
 	//url = core.URL(url, a.action.Web.BeforeURL)
-	mainSkipped := isSkipped(rule.SkipTypeMainPage, a.action.Web.Skip)
-	if mainSkipped {
-		url = ""
-	}
+	//mainSkipped := isSkipped(rule.SkipTypeMainPage, a.action.Web.Skip)
+	//if mainSkipped {
+	//	url = ""
+	//}
 
-	if a.action.Web.BeforeURL != "" {
-		if a.action.Web.Relative {
-			if url == "" {
-				url = a.action.Web.BeforeURL
-			} else {
-				url = core.URL(url, a.action.Web.BeforeURL)
-			}
-		} else {
-			if url != "" {
-				return "", core.ErrAbsoluteMultiAddress
-			} else {
-				url = a.action.Web.BeforeURL
-			}
-		}
-	}
-
-	log.Debug("ACTION", "get main url", url)
-	if len(a.action.Web.FromValue) != 0 {
-		var froms []string
-		for _, s := range a.action.Web.FromValue {
-			froms = append(froms, a.Get(s).GetString())
-		}
-		if len(froms) == 1 {
-			if a.action.Web.Relative {
-				url = core.URL(url, froms...)
-			} else {
-				url = core.URL(froms[0])
-			}
-		} else if len(froms) > 1 {
-			url = core.URL(url, froms...)
-			if !a.action.Web.Relative {
-				return "", errors.New("absolute mode cannot use multi from")
-			}
-		} else {
-			//0
-		}
-		log.Debug("ACTION", "get from value", url)
-	}
-
-	if a.action.Web.AfterURL != "" {
-		url = core.URL(url, a.action.Web.AfterURL)
-		log.Debug("ACTION", "get page after url", url)
-	}
-
+	url := a.getWebURL(a.action.Web.Relative)
 	if !isSkipped(rule.SkipTypeInput, a.action.Web.Skip) {
-		url = a.getInputURL(url, input)
+		url = a.getInputURL(url, a.Get(a.InputKey()).GetString())
 		log.Debug("ACTION", "query page url", url)
 	}
 
@@ -127,25 +130,26 @@ func (a *Action) doWebSuccess(selection *goquery.Selection) {
 		switch s.Type {
 		case rule.ProcessTypePut:
 			v := a.doWebSuccessValue(selection, s)
-			log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
-			a.Put(s.Name, v)
+			if v != nil {
+				log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
+				a.Put(s.Name, v)
+			}
 		}
 	}
 }
 
 func (a *Action) doWebSuccessValue(selection *goquery.Selection, p rule.Process) *core.Value {
-	var ret core.Value
+	var ret *core.Value
 	switch p.Property {
 	case "attr":
-		ret.Type = rule.ProcessValueString
 		v := selection.AttrOr(p.PropertyName, "")
 		if p.Trim {
 			v = strings.TrimSpace(v)
 		}
-		ret.Set(v)
+		ret = core.NewStringValue(v)
 	}
 
-	return &ret
+	return ret
 }
 
 func (a Action) doWebSuccessPut() {

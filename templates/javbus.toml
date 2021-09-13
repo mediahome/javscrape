@@ -11,7 +11,7 @@ main_page = "https://www.javbus.com/"
   [actions.web]
     method = "GET"
     relative = true
-    before_url = "search"
+    value = ["/search"]
     selector = "div > a.movie-box"
   [[actions.web.success]]
     name = "nexturl"
