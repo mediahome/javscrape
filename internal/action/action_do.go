@@ -103,9 +103,9 @@ func (a Action) doWeb() (sl string, err error) {
 	url := a.getWebURL(a.action.Web.Relative)
 	if !isSkipped(rule.SkipTypeInput, a.action.Web.Skip) {
 		url = a.getInputURL(url, a.Get(a.InputKey()).GetString())
-		log.Debug("ACTION", "query page url", url)
-	}
 
+	}
+	log.Debug("ACTION", "query page url", url)
 	query, err = a.Cache().Query(url, false)
 
 	if err != nil {

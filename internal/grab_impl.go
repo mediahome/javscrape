@@ -74,7 +74,7 @@ func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 
 func (g *grabImpl) Run(input string) error {
 	g.value.Set(g.InputKey(), core.NewStringValue(input))
-	return g.actionDo(g.value.GetString("entrance"))
+	return g.actionDo(g.Get("entrance").GetString())
 }
 
 func (g *grabImpl) actionDo(name string) error {
@@ -125,6 +125,12 @@ func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
 	if r.InputKey == "" {
 		r.InputKey = "intput"
 	}
+
+	value.Range(func(key string, value interface{}) bool {
+		v := value.(*core.Value)
+		log.Debug("GRAB", "init map value", key, v)
+		return true
+	})
 
 	return &grabImpl{
 		IScrape:   scrape,
