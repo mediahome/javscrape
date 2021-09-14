@@ -9,6 +9,7 @@ import (
 // Rule ...
 // @Description:
 type Rule struct {
+	Name      string                 `toml:"name,omitempty"`
 	Entrance  string                 `toml:"entrance,omitempty"`
 	MainPage  string                 `toml:"main_page,omitempty"`
 	InputKey  string                 `toml:"input_key,omitempty"`

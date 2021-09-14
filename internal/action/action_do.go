@@ -14,6 +14,7 @@ import (
 )
 
 func (a Action) Run() error {
+
 	_, err := a.doWeb()
 	if err != nil {
 		return err
@@ -48,7 +49,7 @@ func isSkipped(skipType rule.SkipType, skips []rule.SkipType) bool {
 
 func (a Action) getWebURL(relative bool) string {
 	value := a.getWebValue()
-	mainPage := a.Get("main_page").GetString()
+	mainPage := a.MainPage()
 	if relative {
 		if mainPage == "" {
 			mainPage = value
@@ -67,14 +68,12 @@ func (a Action) getWebValue() string {
 		var exps []string
 		var vals []interface{}
 		for _, s := range a.action.Web.Value {
-			val := s[1:]
-			switch s[0] {
-			case '$':
-				vals = append(vals, a.Get(val).GetString())
-			case '%':
-				exps = append(exps, val)
+			t, v := a.GetValue(s)
+			switch t {
+			case core.KeyTypeExpression:
+				exps = append(exps, v)
 			default:
-				vals = append(vals, val)
+				vals = append(vals, v)
 			}
 		}
 		format := "%v"

@@ -35,9 +35,13 @@ func (g *grabImpl) InputKey() string {
 	return g.inputKey
 }
 
+func (g *grabImpl) Name() string {
+	return g.Get("#name").GetString()
+}
+
 func (g *grabImpl) PutInner(key string, value *core.Value) {
 	g.value.lock.Lock()
-	g.value.Set(key, value)
+	g.value.Set("#"+key, value)
 	g.value.lock.Unlock()
 }
 
@@ -67,7 +71,11 @@ func (g *grabImpl) Value() gomap.Map {
 }
 
 func (g *grabImpl) MainPage() string {
-	return g.value.GetString("main_page")
+	return g.Get("#main_page").GetString()
+}
+
+func (g *grabImpl) Entrance() string {
+	return g.Get("#entrance").GetString()
 }
 
 func (g *grabImpl) LoadActions(acts ...rule.Action) error {
@@ -91,8 +99,8 @@ func (g *grabImpl) LoadActions(acts ...rule.Action) error {
 }
 
 func (g *grabImpl) Run(input string) error {
-	g.value.Set(g.InputKey(), core.NewStringValue(input))
-	return g.actionDo(g.Get("entrance").GetString())
+	g.PutInner(g.InputKey(), core.NewStringValue(input))
+	return g.actionDo(g.Entrance())
 }
 
 func (g *grabImpl) actionDo(name string) error {
@@ -127,11 +135,12 @@ func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
 	for s, i := range r.Preset {
 		value.Set(s, i)
 	}
+	value.Set("#name", core.NewStringValue(r.Name))
 	if r.MainPage != "" {
-		value.Set("main_page", core.NewStringValue(r.MainPage))
+		value.Set("#main_page", core.NewStringValue(r.MainPage))
 	}
 	if r.Entrance != "" {
-		value.Set("entrance", core.NewStringValue(r.Entrance))
+		value.Set("#entrance", core.NewStringValue(r.Entrance))
 	}
 
 	if r.InputKey == "" {

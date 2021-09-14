@@ -24,3 +24,16 @@ func (a *Action) Failure() string {
 func (a *Action) Success() string {
 	return a.action.OnSuccess
 }
+
+func (a Action) GetValue(key string) (core.KeyType, string) {
+	val := key[1:]
+	switch key[0] {
+	case '$':
+		return core.KeyTypeCache, a.Get(val).GetString()
+	case '%':
+		return core.KeyTypeExpression, key
+	case '#':
+		return core.KeyTypeSystem, a.Get(key).GetString()
+	}
+	return core.KeyTypeProto, key
+}

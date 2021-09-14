@@ -9,5 +9,6 @@ require (
 	github.com/gocacher/cacher v1.0.5
 	github.com/goextension/gomap v0.0.6
 	github.com/goextension/log v0.0.2
+	github.com/google/uuid v1.3.0 // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 )

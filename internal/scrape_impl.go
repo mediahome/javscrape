@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/goextension/log"
+	"github.com/google/uuid"
 
 	"github.com/javscrape/go-scrape/cache"
 	"github.com/javscrape/go-scrape/config"
@@ -54,6 +55,9 @@ func (s *scrapeImpl) LoadRules(rs ...*rule.Rule) ([]core.IGrab, error) {
 		log.Debug("SCRAPE", "new grab", "index", i)
 		if rs[i].InputType == "" {
 			rs[i].InputType = rule.InputTypeURL
+		}
+		if rs[i].Name == "" {
+			rs[i].Name = uuid.New().String()
 		}
 		g := NewGrab(s, rs[i])
 		if err := g.LoadActions(rs[i].Actions...); err != nil {
