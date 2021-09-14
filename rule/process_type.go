@@ -3,5 +3,6 @@ package rule
 type ProcessType string
 
 const (
-	ProcessTypePut = "put"
+	ProcessTypePut      = "put"
+	ProcessTypePutArray = "put_array"
 )

@@ -22,6 +22,7 @@ type grabImpl struct {
 	group     map[string][]*action.Action
 	value     struct {
 		lock sync.RWMutex
+		keys map[string]struct{}
 		gomap.Map
 	}
 }
@@ -34,8 +35,15 @@ func (g *grabImpl) InputKey() string {
 	return g.inputKey
 }
 
+func (g *grabImpl) PutInner(key string, value *core.Value) {
+	g.value.lock.Lock()
+	g.value.Set(key, value)
+	g.value.lock.Unlock()
+}
+
 func (g *grabImpl) Put(key string, value *core.Value) {
 	g.value.lock.Lock()
+	g.value.keys[key] = core.Empty
 	g.value.Set(key, value)
 	g.value.lock.Unlock()
 }
@@ -46,6 +54,16 @@ func (g *grabImpl) Get(key string) *core.Value {
 	v = g.value.Get(key)
 	g.value.lock.RUnlock()
 	return (v).(*core.Value)
+}
+
+func (g *grabImpl) Value() gomap.Map {
+	g.value.lock.Lock()
+	defer g.value.lock.Unlock()
+	var keys []string
+	for k := range g.value.keys {
+		keys = append(keys, k)
+	}
+	return g.value.Only(keys)
 }
 
 func (g *grabImpl) MainPage() string {
@@ -104,12 +122,6 @@ func (g *grabImpl) getActions(name string) []*action.Action {
 	return actions.Sort()
 }
 
-func (g *grabImpl) Value() gomap.Map {
-	g.value.lock.Lock()
-	defer g.value.lock.Unlock()
-	return g.value.Clone()
-}
-
 func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
 	value := gomap.New()
 	for s, i := range r.Preset {
@@ -140,8 +152,9 @@ func NewGrab(scrape core.IScrape, r *rule.Rule) core.IGrab {
 		group:     make(map[string][]*action.Action),
 		value: struct {
 			lock sync.RWMutex
+			keys map[string]struct{}
 			gomap.Map
-		}{Map: value},
+		}{Map: value, keys: make(map[string]struct{})},
 	}
 }
 

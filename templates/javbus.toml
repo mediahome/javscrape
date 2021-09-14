@@ -29,11 +29,9 @@ main_page = "https://www.javbus.com/"
   on_failure = ""
   [actions.web]
     method = "GET"
-      relative = false
-      skip = ["input"]
-      value = ["$nexturl"]
-#     url = "test url"
-#     uri = "test uri"
+    relative = false
+    skip = ["input"]
+    value = ["$nexturl"]
     selector = "body > div.container"
   [[actions.web.success]]
     selector = "h3"
@@ -52,6 +50,7 @@ main_page = "https://www.javbus.com/"
     property = "value"
 
     [[actions.web.success]]
+      use = ["selector"]
       selector = "div.row.movie > div.col-md-3.info > p"
 #       filter = ["span.header"]
       index = 1
@@ -97,12 +96,12 @@ main_page = "https://www.javbus.com/"
         property = "value"
 
      [[actions.web.success]]
-       selector = "div.row.movie > div.col-md-3.info > p"
+       selector = "div.row.movie > div.col-md-3.info > p > span.genre > label"
  #       filter = ["span.header"]
-       index = 7
+       index = 0
        name = "genre"
        trim = true
-       type = "put"
+       type = "put_array"
        property = "array"
 
       [[actions.web.success]]

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/goextension/gomap"
 	"github.com/goextension/log"
 
 	"github.com/javscrape/go-scrape/core"
@@ -96,12 +97,7 @@ func (a Action) getWebValue() string {
 func (a Action) doWeb() (sl string, err error) {
 	log.Debug("ACTION", "do web query")
 	var query *goquery.Document
-
-	//url = core.URL(url, a.action.Web.BeforeURL)
-	//mainSkipped := isSkipped(rule.SkipTypeMainPage, a.action.Web.Skip)
-	//if mainSkipped {
-	//	url = ""
-	//}
+	webCache := gomap.New()
 
 	url := a.getWebURL(a.action.Web.Relative)
 	if !isSkipped(rule.SkipTypeInput, a.action.Web.Skip) {
@@ -122,43 +118,36 @@ func (a Action) doWeb() (sl string, err error) {
 	if a.action.Web.Selector != "" {
 		log.Debug("ACTION", "do query selector", a.action.Web.Selector)
 		find := query.Find(a.action.Web.Selector)
-		a.doWebSuccess(find)
+		a.doWebSuccess(webCache, find)
 		return find.Html()
 	}
 	return query.Html()
 }
 
-func (a *Action) doWebSuccess(selection *goquery.Selection) {
+func (a *Action) doWebSuccess(cache gomap.Map, selection *goquery.Selection) {
 	for i, s := range a.action.Web.Success {
 		ssel := selection.Clone()
 
 		if s.Selector != "" {
 			ssel = ssel.Find(s.Selector)
 		}
-		//html, _ := ssel.Html()
-		//log.Debug("ACTION", "print find html", html)
-		for _, f := range s.Filter {
-			ssel = ssel.Filter(f)
-		}
 
 		if len(ssel.Nodes) == 0 || len(ssel.Nodes) < s.Index {
 			log.Error("failed do loop by index", "loop", i, "index", s.Index, "length", len(ssel.Nodes), "name", s.Name)
 			continue
 		}
-		//log.Debug("ACTION", "print filter html", html)
-		ssel = goquery.NewDocumentFromNode(ssel.Nodes[s.Index]).First()
-		html, _ := ssel.Html()
-		log.Debug("ACTION", "print current html", "index", s.Index, html)
-		//ssel.Each(func(i int, selection *goquery.Selection) {
-		//	if s.Index == i {
-		//		html, _ = ssel.Html()
-		//		log.Debug("ACTION", "print each html", "index", i, html)
-		//		ssel = selection
-		//	}
-		//})
 
 		switch s.Type {
+		case rule.ProcessTypePutArray:
+			v := a.doWebSuccessValue(ssel, s)
+			if v != nil {
+				log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
+				a.Put(s.Name, v)
+			}
 		case rule.ProcessTypePut:
+			ssel = goquery.NewDocumentFromNode(ssel.Nodes[s.Index]).First()
+			html, _ := ssel.Html()
+			log.Debug("ACTION", "print current html", "index", s.Index, html)
 			v := a.doWebSuccessValue(ssel, s)
 			if v != nil {
 				log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
@@ -175,6 +164,7 @@ func (a *Action) doWebSuccessValue(selection *goquery.Selection, p rule.Process)
 		var arr []interface{}
 		selection.Each(func(i int, selection *goquery.Selection) {
 			v = strings.TrimSpace(selection.Text())
+			log.Debug("ACTION", "array", v)
 			arr = append(arr, v)
 		})
 		if len(arr) != 0 {

@@ -19,3 +19,5 @@ type IGrab interface {
 	Run(input string) error
 	Value() gomap.Map
 }
+
+var Empty = struct{}{}
