@@ -40,36 +40,38 @@ main_page = "https://www.javbus.com/"
     type = "put"
     property = "value"
 
-  [[actions.web.success]]
-    selector = "div.row.movie > div.col-md-3.info > p"
-    index = 0
-    name = "code_no"
-    trim = true
-    type = "put"
-    property = "value"
     [[actions.web.success]]
-      selector = "div.row.movie > div.col-md-3.info > p"
-      index = 1
-      name = "release"
-      trim = true
-      type = "put"
-      property = "text"
+        selector = "div.row.movie > div.col-md-3.info > p"
+        name = "code_no"
+        trim = true
+        type = "put"
+        property = "value"
+          [[actions.web.success.compare]]
+            selector = "span"
+            name = "識別碼"
+            type = "compare"
+            property = "text"
 
     [[actions.web.success]]
-      selector = "div.row.movie > div.col-md-3.info > p"
-      index = 2
-      name = "length"
-      trim = true
-      type = "put"
-      property = "text"
+        selector = "div.row.movie > div.col-md-3.info > p:nth-child(2)"
+        name = "release"
+        trim = true
+        type = "put"
+        property = "text"
 
     [[actions.web.success]]
-      selector = "div.row.movie > div.col-md-3.info > p > a"
-      index = 0
-      name = "studio"
-      trim = true
-      type = "put"
-      property = "value"
+        selector = "div.row.movie > div.col-md-3.info > p:nth-child(3)"
+        name = "length"
+        trim = true
+        type = "put"
+        property = "text"
+
+    [[actions.web.success]]
+        selector = "div.row.movie > div.col-md-3.info > p:nth-child(4) > a"
+        name = "studio"
+        trim = true
+        type = "put"
+        property = "value"
 
       [[actions.web.success]]
         selector = "div.row.movie > div.col-md-3.info > p > a"
@@ -88,12 +90,12 @@ main_page = "https://www.javbus.com/"
         property = "value"
 
      [[actions.web.success]]
-       selector = "div.row.movie > div.col-md-3.info > p > span.genre > label"
-       index = 0
-       name = "genre"
-       trim = true
-       type = "put_array"
-       property = "array"
+        selector = "div.row.movie > div.col-md-3.info > p > span.genre > label"
+        index = 0
+        name = "genre"
+        trim = true
+        type = "put_array"
+        property = "array"
 
       [[actions.web.success]]
         selector = "div.row.movie > div.col-md-3.info > p"

@@ -57,6 +57,9 @@ func (g *grabImpl) Get(key string) *core.Value {
 	g.value.lock.RLock()
 	v = g.value.Get(key)
 	g.value.lock.RUnlock()
+	if v == nil {
+		return nil
+	}
 	return (v).(*core.Value)
 }
 

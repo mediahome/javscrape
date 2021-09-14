@@ -46,11 +46,21 @@ func TestSaveRuleToFile(t *testing.T) {
 								{
 									Name:     "nexturl",
 									Selector: "",
-									Cache: map[string]string{
-										"selector": "abc",
+									Compare: []Process{
+										{
+											Name:          "xxx",
+											Selector:      "span",
+											Compare:       nil,
+											Index:         0,
+											Type:          "",
+											Property:      "",
+											PropertyIndex: 0,
+											PropertyName:  "",
+											Value:         "",
+											Do:            nil,
+										},
 									},
 									Index:         0,
-									Trim:          true,
 									Type:          "put",
 									Property:      "attr",
 									PropertyIndex: 0,
@@ -74,11 +84,21 @@ func TestSaveRuleToFile(t *testing.T) {
 									{
 										Name:     "",
 										Selector: "",
-										Cache: map[string]string{
-											"selector": "cache",
+										Compare: []Process{
+											{
+												Name:          "zzzzz",
+												Selector:      "",
+												Compare:       nil,
+												Index:         0,
+												Type:          "",
+												Property:      "",
+												PropertyIndex: 0,
+												PropertyName:  "",
+												Value:         "",
+												Do:            nil,
+											},
 										},
 										Index:         0,
-										Trim:          false,
 										Type:          "",
 										Property:      "",
 										PropertyIndex: 0,

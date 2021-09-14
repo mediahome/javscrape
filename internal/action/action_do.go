@@ -100,8 +100,7 @@ func (a Action) doWeb() (sl string, err error) {
 
 	url := a.getWebURL(a.action.Web.Relative)
 	if !isSkipped(rule.SkipTypeInput, a.action.Web.Skip) {
-		url = a.getInputURL(url, a.Get(a.InputKey()).GetString())
-
+		url = a.getInputURL(url, a.Get("#"+a.InputKey()).GetString())
 	}
 	log.Debug("ACTION", "query page url", url)
 	query, err = a.Cache().Query(url, false)
@@ -117,28 +116,46 @@ func (a Action) doWeb() (sl string, err error) {
 	if a.action.Web.Selector != "" {
 		log.Debug("ACTION", "do query selector", a.action.Web.Selector)
 		find := query.Find(a.action.Web.Selector)
-		a.doWebSuccess(webCache, find)
+		a.processDo(webCache, find, a.action.Web.Success)
 		return find.Html()
 	}
 	return query.Html()
 }
 
-func (a *Action) doWebSuccess(cache gomap.Map, selection *goquery.Selection) {
-	for i, s := range a.action.Web.Success {
+func (a *Action) processDo(cache gomap.Map, selection *goquery.Selection, process []rule.Process) *goquery.Selection {
+	if len(process) == 0 {
+		return selection
+	}
+	for i, s := range process {
 		ssel := selection.Clone()
-
 		if s.Selector != "" {
 			ssel = ssel.Find(s.Selector)
 		}
+		ssel = a.processDo(cache, ssel, s.Compare)
 
-		if len(ssel.Nodes) == 0 || len(ssel.Nodes) < s.Index {
-			log.Error("failed do loop by index", "loop", i, "index", s.Index, "length", len(ssel.Nodes), "name", s.Name)
+		if ssel == nil {
 			continue
 		}
+		html, _ := ssel.Html()
+		log.Debug("ACTION", "print compare html", "index", s.Index, html)
 
 		switch s.Type {
+		case rule.ProcessTypeCompare:
+			var ret *goquery.Selection
+			selection.EachWithBreak(func(i int, selection *goquery.Selection) bool {
+				v := core.ProcessValue(ssel, s)
+				if v == nil {
+					return true
+				}
+				if strings.Contains(v.GetString(), s.Name) {
+					ret = selection
+					return false
+				}
+				return true
+			})
+			return ret
 		case rule.ProcessTypePutArray:
-			v := a.doWebSuccessValue(ssel, s)
+			v := core.ProcessValue(ssel, s)
 			if v != nil {
 				log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
 				a.Put(s.Name, v)
@@ -147,48 +164,14 @@ func (a *Action) doWebSuccess(cache gomap.Map, selection *goquery.Selection) {
 			ssel = goquery.NewDocumentFromNode(ssel.Nodes[s.Index]).First()
 			html, _ := ssel.Html()
 			log.Debug("ACTION", "print current html", "index", s.Index, html)
-			v := a.doWebSuccessValue(ssel, s)
+			v := core.ProcessValue(ssel, s)
 			if v != nil {
 				log.Debug("ACTION", "put web value", "name", s.Name, "value", v, "index", i)
 				a.Put(s.Name, v)
 			}
 		}
 	}
-}
-
-func (a *Action) doWebSuccessValue(selection *goquery.Selection, p rule.Process) *core.Value {
-	var v string
-	switch p.Property {
-	case "array":
-		var arr []interface{}
-		selection.Each(func(i int, selection *goquery.Selection) {
-			v = strings.TrimSpace(selection.Text())
-			log.Debug("ACTION", "array", v)
-			arr = append(arr, v)
-		})
-		if len(arr) != 0 {
-			return core.NewArrayValue(arr)
-		}
-	case "value":
-		v = selection.Text()
-	case "attr":
-		v = selection.AttrOr(p.PropertyName, "")
-	case "text":
-		selection.Contents().Each(func(i int, selection *goquery.Selection) {
-			if goquery.NodeName(selection) == "#text" {
-				v = selection.Text()
-			}
-		})
-	}
-
-	if p.Trim {
-		v = strings.TrimSpace(v)
-	}
-
-	if v == "" {
-		return nil
-	}
-	return core.NewStringValue(v)
+	return nil
 }
 
 func (a Action) doWebSuccessPut() {
